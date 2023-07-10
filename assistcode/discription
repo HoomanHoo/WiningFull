@@ -17,6 +17,9 @@ assistcode
 		
 log
 
+temp 
+						DB 수정을 목적으로 만든 App. 실제 구현에서는 사용되지 않는다. 
+
 templates
 
 Wining

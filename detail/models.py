@@ -24,6 +24,7 @@ class WinDetailView(models.Model):
 class WinWine(models.Model):
     wine_id = models.AutoField(primary_key=True)
     wine_name = models.CharField(max_length=150)
+    wine_name_eng = models.CharField(max_length=150)
     wine_sort = models.IntegerField()
     wine_capacity = models.IntegerField(blank=True, null=True)
     wine_alc = models.DecimalField(max_digits=3, decimal_places=1)

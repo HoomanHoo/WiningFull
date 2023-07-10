@@ -8,7 +8,7 @@ class WinDetailViewAdmin( admin.ModelAdmin ):
 admin.site.register( WinDetailView, WinDetailViewAdmin )
 
 class WinWineAdmin( admin.ModelAdmin ):
-    list_display = ( "wine_id", "wine_name", "wine_sort", "wine_capacity", "wine_alc", 
+    list_display = ( "wine_id", "wine_name", "wine_name_eng", "wine_sort", "wine_capacity", "wine_alc", 
                      "wine_dangdo", "wind_sando", "wine_tannin", "wine_food", "wine_image", "wine_region")
 
 admin.site.register(  WinWine,  WinWineAdmin )
