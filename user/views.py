@@ -10,10 +10,11 @@ from django.utils.dateformat import DateFormat
 from datetime import datetime
 from board.models import WinBoard, WinComment, WinBoardImg
 from store.models import WinSell
-from purchasing.models import WinPurchase, WinPurchaseDetail, WinCart
+from purchasing.models import WinPurchase, WinPurchaseDetail, WinCart, WinReceiveCode
 from detail.models import WinDetailView
 from django.contrib.messages.context_processors import messages
 from django.urls.base import reverse
+from django.db.models import F
 
 
 class LoginView(View):
@@ -446,4 +447,45 @@ class AddPointHisView(View):
             "dtos": dtos,
         }
 
+        return HttpResponse(template.render(context, request))
+
+
+class MyReceiveCodeView(View):
+    def get(self, request):
+        template = loader.get_template("user/myReceiveCode.html")
+        page_num = request.GET.get("pageNum", 1)
+        show_length = 30
+        end = int(show_length) * int(page_num)
+        start = end - int(show_length)
+        user_id = request.session.get("memid")
+        dtos = (
+            WinReceiveCode.objects.annotate(
+                purchase_det_number=F("purchase_detail__purchase_det_number"),
+                purchase_det_price=F("purchase_detail__purchase_det_price"),
+                store_name=F("purchase_detail__sell__store__store_name"),
+                user_name=F("purchase_detail__purchase__user__user_name"),
+                user_id=F("purchase_detail__purchase__user__user_id"),
+                wine_name=F("purchase_detail__sell__wine__wine_name"),
+                purchase_state=F("purchase_detail__purchase_det_state"),
+            )
+            .filter(user_id=user_id)
+            .values(
+                "purchase_detail_id",
+                "purchase_det_number",
+                "purchase_det_price",
+                "store_name",
+                "wine_name",
+                "receive_code",
+            )
+        )
+
+        list_length = dtos.count()
+        if int(list_length) % int(show_length):
+            pages = int(list_length) // int(show_length)
+        else:
+            pages = int(list_length) // int(show_length) + 1
+        pdtos = dtos[start:end]
+        pages_list = [i + 1 for i in range(pages)]
+
+        context = {"pdtos": pdtos, "pages_list": pages_list}
         return HttpResponse(template.render(context, request))
