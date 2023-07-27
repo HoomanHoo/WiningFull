@@ -13,7 +13,14 @@ urlpatterns = [
         name="checkRegistNumber",
     ),
     path(
-        "product-addition", views.ProductAdditionView.as_view(), name="productAddition"
+        "product-addition/pages/<int:page_num>/<str:mdfy>",
+        views.ProductAdditionView.as_view(),
+        name="productAddition",
+    ),
+    path(
+        "product-addition/pages/<int:page_num>",
+        views.ProductAdditionView.as_view(),
+        name="productAddition",
     ),
     path("store-mypage", views.StoreMyPageView.as_view(), name="storeMyPage"),
     path("search-product", views.SearchProduct.as_view(), name="searchProduct"),

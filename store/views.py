@@ -1,5 +1,3 @@
-from typing import Any
-from django import http
 from django.shortcuts import render, redirect
 from django.views.generic.base import View
 from django.views.decorators.csrf import csrf_exempt
@@ -8,12 +6,13 @@ from django.template import loader
 from django.http.response import HttpResponse, JsonResponse
 from purchasing.models import WinPurchaseDetail
 from purchasing.usecase.receive_code_create_enc_module import EncModule
-from store.models import WinStore, WinSell
+from store.models import WinStore
 from detail.models import WinWine
 from django.utils.dateformat import DateFormat
 from datetime import datetime
 from store.db_access.query_set import (
     PurchaseDetailSerializer,
+    get_product_list,
     insert_store_info,
     insert_sell_info,
     delete_store_info,
@@ -88,7 +87,7 @@ class StoreRegistrationView(View):
         except DatabaseError:
             redirect("errorhandling:storeError")
 
-        return redirect("productAddition")
+        return redirect("productAddition", page_num=1)
 
     # insert_store_info 라는 함수를 정의하여 사용했다.
 
@@ -122,15 +121,31 @@ class ProductAdditionView(View):
     def dispatch(self, request, *args, **kwargs):
         return View.dispatch(self, request, *args, **kwargs)
 
-    def get(self, request):
+    def get(self, request, **kwargs):
+        modify = kwargs.get("mdfy", None)
         user_id = request.session.get("temp_id")
         if user_id == None:
             user_id = request.session.get("memid")
-        modify = request.GET.get("mdfy", None)
 
-        wines = WinWine.objects.values(
-            "wine_id", "wine_name", "wine_capacity", "wine_alc"
-        )
+        if modify == "mdfy":
+            modify = 1
+        else:
+            modify = 0
+        page_num = kwargs.get("page_num", 1)
+        show_length = 28
+        end = int(show_length) * int(page_num)
+        start = end - 28
+        # if page_num == 1:
+        #     start = 0
+        result = get_product_list(start=start, end=end)
+        list_length = result[0]
+        wines = result[1]
+        print(list_length)
+        if (list_length % show_length) == 0:
+            page_count = list_length // show_length
+        else:
+            page_count = (list_length // show_length) + 1
+        pages = [i + 1 for i in range(page_count)]
         product_list = get_product_list_by_seller(user_id=user_id)
         store_id = WinStore.objects.filter(user_id=user_id).values_list(
             "store_id", flat=True
@@ -143,6 +158,7 @@ class ProductAdditionView(View):
             "store_id": store_id,
             "product_list": product_list,
             "modify": modify,
+            "pages": pages,
         }
         return HttpResponse(template.render(context, request))
 
@@ -381,7 +397,7 @@ class SellDetailListView(View):
         template = loader.get_template("store/sellDetailList.html")
         list_count = 30
         end = int(list_count) * int(page_num)
-        start = end - 29
+        start = end - 30
         list_info = get_detail_sell_list(user_id=user_id, start=start, end=end)
         list_length = list_info[0]
         detail_sell_list = list_info[1]

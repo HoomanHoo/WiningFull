@@ -27,7 +27,7 @@
             판매할 주류를 선택해주세요
         </div>
     </div>
-    <div class="row" style="height:70vh">
+    <div class="row" ><!--style="height:70vh"-->
         <div class="col-4">
             <div class="row">
             	<div class="col" style="text-align:center">
@@ -44,7 +44,15 @@
                         {{ wine.wine_name }}
                     </div>
                 </div>
-             {% endfor %}
+            {% endfor %}
+            {% for i in pages %}
+                {% if modify == 1 %}
+                <a href="/store/product-addition/pages/{{i}}/mdfy">{{i}}</a>
+                {% endif %}
+                {% if modify != 1 %}
+                <a href="/store/product-addition/pages/{{i}}">{{i}}</a>
+                {% endif %}
+            {% endfor %}
              </div>
         </div>
         <div class="col">
