@@ -37,22 +37,22 @@
 	{% for info in list %}
 	<div class="row" style="text-align:center">
 		<div class="col-1">
-			{{info.winpurchasedetail__purchase_detail_id}}
+			{{info.sellPurchaseDetail__purchase_detail_id}}
 		</div>
 		<div class="col">
 			{{info.wine__wine_name}}
 		</div>
 		<div class="col">
-			{{info.winpurchasedetail__purchase_det_number}}
+			{{info.sellPurchaseDetail__purchase_det_number}}
 		</div>
 		<div class="col">
-			{{info.winpurchasedetail__purchase_det_price}}
+			{{info.sellPurchaseDetail__purchase_det_price}}
 		</div>
 		<div class="col">
-			{% if info.winpurchasedetail__purchase_det_state == 1 %}
+			{% if info.sellPurchaseDetail__purchase_det_state == 1 %}
 			미수령
 			{% endif %}
-			{% if info.winpurchasedetail__purchase_det_state == "2" %}
+			{% if info.sellPurchaseDetail__purchase_det_state == 2 %}
 			수령
 			{% endif %}
 		</div>

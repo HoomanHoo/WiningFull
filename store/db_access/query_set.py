@@ -46,15 +46,20 @@ def insert_store_info(
 
     store.save()
 
-    if store_map_url == "":
-        print("No URL!")
-
-    else:
-        store_map_url = store_map_url
-        win_store_url = WinStoreUrl(
-            store_id=store.store_id, store_map_url=store_map_url
-        )
-        win_store_url.save()
+    try:
+        store_url = WinStoreUrl.objects.get(store_id=store.store_id)
+        print("try")
+        if store_map_url == "":
+            print("No URL!")
+            store_url.delete()
+        else:
+            print("try-else")
+            store_url.store_map_url = store_map_url
+            store_url.save()
+    except:
+        print("except")
+        store_url = WinStoreUrl(store_id=store.store_id, store_map_url=store_map_url)
+        store_url.save()
 
 
 @transaction.atomic
@@ -176,11 +181,11 @@ def get_sell_list(user_id: str, start: int, end: int):
 
 
 def get_detail_sell_list(user_id: str, start: int, end: int):
-    store_id = WinStore.objects.get(user_id=user_id)
+    # store_id = WinStore.objects.get(user_id=user_id)
     list_info = []
     detail_sell_list = (
         WinSell.objects.select_related("sellPurchaseDetail", "wine")
-        .filter(store_id=store_id)
+        .filter(store__user_id=user_id)
         .values(
             "sellPurchaseDetail__purchase_detail_id",
             "wine__wine_name",
@@ -191,8 +196,13 @@ def get_detail_sell_list(user_id: str, start: int, end: int):
         .order_by("-sellPurchaseDetail__purchase_detail_id")
         .exclude(sellPurchaseDetail__purchase_detail_id=None)
     )
-    list_info.append(detail_sell_list.count())
-    list_info.append(detail_sell_list[start:end])
+
+    list_length = detail_sell_list.count()
+    list_info.append(list_length)
+    if list_length != 1:
+        list_info.append(detail_sell_list[start:end])
+    else:
+        list_info.append(detail_sell_list)
 
     return list_info
 

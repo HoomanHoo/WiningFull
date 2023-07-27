@@ -116,13 +116,18 @@ class ProductAdditionView(View):
 
     def get(self, request):
         user_id = request.session.get("temp_id")
+        if user_id == None:
+            user_id = request.session.get("memid")
         modify = request.GET.get("mdfy", None)
-        print(modify)
+
         wines = WinWine.objects.values(
             "wine_id", "wine_name", "wine_capacity", "wine_alc"
         )
         product_list = get_product_list_by_seller(user_id=user_id)
-        store_id = WinStore.objects.get(user_id=user_id).store_id
+        store_id = WinStore.objects.filter(user_id=user_id).values_list(
+            "store_id", flat=True
+        )[0]
+        print("store_id: ", store_id)
 
         template = loader.get_template("store/productAddition.html")
         context = {
@@ -135,6 +140,8 @@ class ProductAdditionView(View):
 
     def post(self, request):
         user_id = request.session.get("temp_id")
+        if user_id == None:
+            user_id = request.session.get("memid")
         store_id = request.POST.get("storeId", None)
         sell_ids = request.POST.getlist("sellId", None)
         wine_ids = request.POST.getlist("wineId", None)
@@ -215,7 +222,7 @@ class SearchProduct(View):
 
 class DiscontinueProductView(View):
     def get(self, request):
-        user_id = "test4444"
+        user_id = request.session.get("memid")
         wine_id = request.GET.get("wineid", None)
         print(wine_id)
         delete_product(wine_id=wine_id, user_id=user_id)
@@ -240,7 +247,7 @@ class SearchReceiveCodeView(View):
         context = {}
         return HttpResponse(template.render(context, request))
 
-    # 수령코드 get 방식으로 검색할지 post 방식으로 검색할지 결정하기
+    # 수령코드 get 방식으로 검색
 
 
 class StoreInfoView(View):
@@ -331,7 +338,6 @@ class SellDetailListView(View):
         end = int(list_count) * int(page_num)
         start = end - 29
         list_info = get_detail_sell_list(user_id=user_id, start=start, end=end)
-        # detail_sell_list()
         list_length = list_info[0]
         detail_sell_list = list_info[1]
         pages = (list_length // list_count) + 1

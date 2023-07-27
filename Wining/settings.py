@@ -66,7 +66,11 @@ LOGGING = {
             "propagate": True,
             "level": "INFO",
         },
-        "errorhandling": {"handlers": ["file", "console"], "propagate": True, "level": "INFO"},
+        "errorhandling": {
+            "handlers": ["file", "console"],
+            "propagate": True,
+            "level": "INFO",
+        },
     },
 }
 
@@ -99,7 +103,8 @@ INSTALLED_APPS = [
     "detail",
     "store",
     "purchasing",
-    "errorhandling"
+    "errorhandling",
+    "django_extensions",
 ]
 
 MIDDLEWARE = [
