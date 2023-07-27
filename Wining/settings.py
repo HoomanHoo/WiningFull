@@ -105,6 +105,7 @@ INSTALLED_APPS = [
     "purchasing",
     "errorhandling",
     "django_extensions",
+    "rest_framework",
 ]
 
 MIDDLEWARE = [

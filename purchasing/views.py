@@ -5,9 +5,9 @@ from django.http.response import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from purchasing.usecase.purchase_usecase import calc
-from purchasing.usecase.receive_code_create_enc_dec_module import (
+from purchasing.usecase.receive_code_create_enc_module import (
+    EncModule,
     create_receive_code,
-    EncDecModule,
 )
 
 
@@ -292,14 +292,13 @@ class OrderPageView(View):
                 purchase_infos = insert_purchase(result)
                 purchase_id = purchase_infos[0]
                 purchase_detail_ids = purchase_infos[1]
-                enc_dec_module = EncDecModule()
                 print("purchase_detail_ids: ", purchase_detail_ids)
                 for i in range(len(purchase_detail_ids)):
                     receive_code = create_receive_code(
-                        purchase_info=purchase_detail_ids[i][0]
+                        purchase_num=purchase_detail_ids[i][0]
                     )
                     receive_codes.append(receive_code)
-                    enc_receive_code = enc_dec_module.encrypt_receive_code(
+                    enc_receive_code = EncModule().encrypt_receive_code(
                         receive_code=receive_code
                     )
                     queryset = WinReceiveCode(

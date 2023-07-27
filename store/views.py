@@ -1,14 +1,19 @@
+from typing import Any
+from django import http
 from django.shortcuts import render, redirect
 from django.views.generic.base import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.template import loader
 from django.http.response import HttpResponse, JsonResponse
+from purchasing.models import WinPurchaseDetail
+from purchasing.usecase.receive_code_create_enc_module import EncModule
 from store.models import WinStore, WinSell
 from detail.models import WinWine
 from django.utils.dateformat import DateFormat
 from datetime import datetime
 from store.db_access.query_set import (
+    PurchaseDetailSerializer,
     insert_store_info,
     insert_sell_info,
     delete_store_info,
@@ -21,8 +26,12 @@ from store.db_access.query_set import (
     check_passwd,
     drop_store_info,
     get_store_revenue,
+    search_receive_code,
 )
 from django.db.utils import DatabaseError
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
 import json
 
 # Create your views here.
@@ -40,8 +49,7 @@ class StoreRegistrationView(View):
 
     def get(self, request):
         user_id = request.session.get("temp_id")
-        print(user_id)
-        print(check_store_product_info(user_id=user_id))
+        info = check_store_product_info(user_id=user_id)
 
         if check_store_product_info(user_id=user_id):
             return redirect("storeMyPage")
@@ -240,14 +248,51 @@ class StoreMyPageView(View):
 
 
 class SearchReceiveCodeView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request):
         template = loader.get_template("store/searchReceiveCode.html")
         user_id = request.session.get("memid")
 
-        context = {}
+        context = {"result": ""}
+
+        return HttpResponse(template.render(context, request))
+
+    def post(self, request):
+        purchase_detail_id = request.POST.get("purchaseDetailId", None)
+        template = loader.get_template("store/searchReceiveCode.html")
+        user_id = request.session.get("memid")
+        WinPurchaseDetail.objects.filter(
+            purchase_detail_id=purchase_detail_id,
+        ).update(purchase_det_state=2)
+
+        context = {"result": "수령 처리가 완료되었습니다", "result2": "다음 "}
+
         return HttpResponse(template.render(context, request))
 
     # 수령코드 get 방식으로 검색
+
+
+class SearchReceiveCodeApi(APIView):
+    def get(self, request, **kwargs):
+        receive_code = kwargs.get("code", None).replace(" ", "")
+        # receive_code = "0x8UlPWZPyHX1"
+
+        print("RECEIVE_CODE: ", receive_code)
+        result = search_receive_code(
+            receive_code=EncModule().encrypt_receive_code(receive_code)
+        )
+        # print("result: ", result, type(result))
+        # serializer = json.dumps(result[0])
+        serializer = PurchaseDetailSerializer(result)  # , many=True)
+        # print("SERIALIZE: ", serializer.data)
+        json_result = JSONRenderer().render(serializer.data)
+        # print("JSON RESULT: ", json_result)
+        # return Response(serializer)
+        return Response(json_result)
+        # return Response((serializer.data))
 
 
 class StoreInfoView(View):

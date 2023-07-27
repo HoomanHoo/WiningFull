@@ -38,4 +38,5 @@ urlpatterns = [
     path("drop-store", views.DropStoreView.as_view(), name="dropStore"),
     path("store-revenue", views.StoreRevenueMainView.as_view(), name="storeRevenue"),
     path("store-revenue-term", views.StoreRevenueTermView.as_view()),
+    path("receive-code/codes/<str:code>", views.SearchReceiveCodeApi.as_view()),
 ]

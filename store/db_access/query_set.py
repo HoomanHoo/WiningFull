@@ -1,4 +1,5 @@
-from purchasing.models import WinPurchase, WinPurchaseDetail
+import time
+from purchasing.models import WinPurchase, WinPurchaseDetail, WinReceiveCode
 from store.models import WinStore, WinStoreUrl, WinSell, WinRevenue
 from django.db import transaction
 from user.models import WinUser, WinUserGrade
@@ -122,11 +123,11 @@ def delete_store_info(store_id: str) -> None:
     store_info.delete()
 
 
-@transaction.atomic
+@transaction.atomic  # 조인해서 업데이트 하는 법 있는지 확인할 것
 def drop_store_info(user_id: str) -> None:
-    WinUser.objects.filter(user_id="test4444").update(user_grade=1)
-    WinStore.objects.filter(user_id="test4444").update(store_state=-1)
-    WinSell.objects.filter(store__user_id="test4444").update(sell_state=-1)
+    WinUser.objects.filter(user_id=user_id).update(user_grade=1)
+    WinStore.objects.filter(user_id=user_id).update(store_state=-1)
+    WinSell.objects.filter(store__user_id=user_id).update(sell_state=-1)
 
 
 def check_store_product_info(user_id: str) -> dict or None:
@@ -136,6 +137,8 @@ def check_store_product_info(user_id: str) -> dict or None:
         .values("sell_id")
         .first()
     )
+
+    return info
 
 
 def check_passwd(user_id: str, passwd: str) -> int:
@@ -317,3 +320,74 @@ def get_store_revenue(user_id: str, term: int = 0):
     # ).filter(
     #     purchase__purchase_time=F("revenue_date")
     # )
+
+
+def search_receive_code(receive_code: str) -> str or dict:
+    start = time.time()
+
+    result = (
+        WinReceiveCode.objects.annotate(
+            purchase_det_number=F("purchase_detail__purchase_det_number"),
+            purchase_det_price=F("purchase_detail__purchase_det_price"),
+            store_name=F("purchase_detail__sell__store__store_name"),
+            user_name=F("purchase_detail__purchase__user__user_name"),
+            wine_name=F("purchase_detail__sell__wine__wine_name"),
+            purchase_state=F("purchase_detail__purchase_det_state"),
+        )
+        .filter(receive_code=receive_code, purchase_state=1)
+        .values(
+            "purchase_detail_id",
+            "purchase_det_number",
+            "purchase_det_price",
+            "store_name",
+            "user_name",
+            "wine_name",
+        )
+    )
+    end = time.time()
+    print(end - start)
+    print(len(result))
+    if result.count() == 0:
+        return {
+            "purchase_detail_id": -1,
+            "purchase_det_number": -1,
+            "purchase_det_price": -1,
+            "store_name": "",
+            "user_name": "",
+            "wine_name": "",
+        }
+
+    else:
+        return result[0]
+
+
+from rest_framework import serializers
+
+
+class PurchaseDetailSerializer(serializers.ModelSerializer):
+    # purchase_detail_id = serializers.PrimaryKeyRelatedField(many=True)
+    store_name = serializers.ReadOnlyField()  # (source="store_name")
+    user_name = serializers.ReadOnlyField()  # (source="user_name")
+    wine_name = serializers.ReadOnlyField()
+    # purchase_detail_id = serializers.CharField()
+    # purchase_det_number = serializers.CharField()
+    # purchase_det_price = serializers.CharField()
+
+    class Meta:
+        model = WinPurchaseDetail
+        fields = [
+            "purchase_detail_id",
+            "purchase_det_number",
+            "purchase_det_price",
+            "store_name",
+            "user_name",
+            "wine_name",
+        ]
+
+    # , "purchase", "sell"
+    # def to_representation(self, instance):
+    #     response = super().to_representation(instance)
+    #     response["WinReceiveCode"] = ReceiveCodeSerializer(
+    #         instance.purchase_detail_id
+    #     ).data
+    #     return response
