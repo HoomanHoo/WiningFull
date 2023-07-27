@@ -1,4 +1,5 @@
 import time
+from detail.models import WinWine
 from purchasing.models import WinPurchase, WinPurchaseDetail, WinReceiveCode
 from store.models import WinStore, WinStoreUrl, WinSell, WinRevenue
 from django.db import transaction
@@ -123,7 +124,7 @@ def delete_store_info(store_id: str) -> None:
     store_info.delete()
 
 
-@transaction.atomic  # Á¶ÀÎÇØ¼­ ¾÷µ¥ÀÌÆ® ÇÏ´Â ¹ý ÀÖ´ÂÁö È®ÀÎÇÒ °Í
+@transaction.atomic  # ì¡°ì¸í•´ì„œ ì—…ë°ì´íŠ¸ í•˜ëŠ” ë²• ìžˆëŠ”ì§€ í™•ì¸í•  ê²ƒ
 def drop_store_info(user_id: str) -> None:
     WinUser.objects.filter(user_id=user_id).update(user_grade=1)
     WinStore.objects.filter(user_id=user_id).update(store_state=-1)
@@ -208,6 +209,15 @@ def get_detail_sell_list(user_id: str, start: int, end: int):
         list_info.append(detail_sell_list)
 
     return list_info
+
+
+def get_product_list(start: int, end: int) -> QuerySet:
+    wines = WinWine.objects.values("wine_id", "wine_name", "wine_capacity", "wine_alc")
+
+    list_length = wines.count()
+    result = [list_length, wines[start:end]]
+
+    return result
 
 
 def get_product_list_by_seller(user_id: str) -> QuerySet:

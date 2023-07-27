@@ -1,9 +1,5 @@
 const search = document.getElementById("btnSearch");
 
-
-
-
-
 search.addEventListener("click", () => {
     let code = document.getElementById("searchReceiveCode").value;
     let url = "receive-code/codes/" + code;
