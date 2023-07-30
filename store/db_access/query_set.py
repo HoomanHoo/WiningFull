@@ -3,11 +3,12 @@ from detail.models import WinWine
 from purchasing.models import WinPurchase, WinPurchaseDetail, WinReceiveCode
 from store.models import WinStore, WinStoreUrl, WinSell, WinRevenue
 from django.db import transaction
-from user.models import WinUser, WinUserGrade
+from store.usecase.pagination import db_preprocessing
+from user.models import WinReview, WinUser, WinUserGrade
 from django.db.models.query import QuerySet
 from django.db.models import F
 from django.db.models.aggregates import Sum
-from django.db.models.fields import DateTimeField, CharField
+from django.db.models.fields import CharField
 from django.db.models.functions.datetime import (
     TruncDate,
     TruncMonth,
@@ -15,6 +16,7 @@ from django.db.models.functions.datetime import (
     TruncYear,
 )
 from django.db.models.functions.comparison import Cast
+from rest_framework import serializers
 
 
 @transaction.atomic
@@ -115,6 +117,7 @@ def delete_product(wine_id: str, user_id: str):
     )
 
 
+@transaction.atomic
 def delete_store_info(store_id: str) -> None:
     store_url = WinStoreUrl.objects.filter(store_id=store_id)
     if len(store_url) == 1:
@@ -171,22 +174,22 @@ def get_store_info(user_id: str) -> QuerySet:
             "store_email",
             "storeUrl__store_map_url",
         )
-    )
-
+    )[0]
+    print(type(store_info))
     return store_info
 
 
-def get_sell_list(user_id: str, start: int, end: int):
-    store_id = WinStore.objects.get(user_id=user_id)
-    sell_list = (
-        # WinSell.objects.filter(store_id=50).prefetch_related("winpurchasedetail_set", "winpurchasedetail_set__purchase").values("winpurchasedetail__purchase__purchase_id", "winpurchasedetail__purchase__purchase_time",).exclude(sell_id in F(WinSell.objects.exclude(store_id = 50)))
-    )
-    # group_detail_infos =
+# def get_sell_list(user_id: str, start: int, end: int):
+#     store_id = WinStore.objects.get(user_id=user_id)
+#     sell_list = (
+# WinSell.objects.filter(store_id=50).prefetch_related("winpurchasedetail_set", "winpurchasedetail_set__purchase").values("winpurchasedetail__purchase__purchase_id", "winpurchasedetail__purchase__purchase_time",).exclude(sell_id in F(WinSell.objects.exclude(store_id = 50)))
+# )
+# group_detail_infos =
 
 
-def get_detail_sell_list(user_id: str, start: int, end: int):
+def get_detail_sell_list(user_id: str):
     # store_id = WinStore.objects.get(user_id=user_id)
-    list_info = []
+
     detail_sell_list = (
         WinSell.objects.select_related("sellPurchaseDetail", "wine")
         .filter(store__user_id=user_id)
@@ -201,23 +204,28 @@ def get_detail_sell_list(user_id: str, start: int, end: int):
         .exclude(sellPurchaseDetail__purchase_detail_id=None)
     )
 
-    list_length = detail_sell_list.count()
-    list_info.append(list_length)
-    if list_length != 1:
-        list_info.append(detail_sell_list[start:end])
-    else:
-        list_info.append(detail_sell_list)
-
-    return list_info
+    return detail_sell_list
 
 
-def get_product_list(start: int, end: int) -> QuerySet:
+def get_product_list() -> QuerySet:
     wines = WinWine.objects.values("wine_id", "wine_name", "wine_capacity", "wine_alc")
 
-    list_length = wines.count()
-    result = [list_length, wines[start:end]]
+    return wines
 
-    return result
+
+class PageSerializer(serializers.Serializer):
+    def to_representation(self, instance):
+        pages = instance["pages"]
+        wines = self.context["wines"]
+
+        return {"pages": pages, "wines": wines}
+
+
+class ProductListSerializer(serializers.Serializer):
+    wine_id = serializers.IntegerField()
+    wine_name = serializers.CharField()
+    wine_capacity = serializers.IntegerField()
+    wine_alc = serializers.IntegerField()
 
 
 def get_product_list_by_seller(user_id: str) -> QuerySet:
@@ -268,7 +276,7 @@ def get_store_revenue(user_id: str, term: int = 0):
         .order_by("-date")
     )
 
-    return list(queryset)
+    return queryset
 
     # WinRevenue.objects.filter(revenue_date__gte = timezone.now() - datetime.timedelta(days=1))
     # , "date", output_field=DateTimeField()
@@ -371,9 +379,6 @@ def search_receive_code(receive_code: str) -> str or dict:
         return result[0]
 
 
-from rest_framework import serializers
-
-
 class PurchaseDetailSerializer(serializers.ModelSerializer):
     # purchase_detail_id = serializers.PrimaryKeyRelatedField(many=True)
     store_name = serializers.ReadOnlyField()  # (source="store_name")
@@ -401,3 +406,12 @@ class PurchaseDetailSerializer(serializers.ModelSerializer):
     #         instance.purchase_detail_id
     #     ).data
     #     return response
+
+
+def get_reviews_by_seller(sell_id: str):
+    reviews = (
+        WinReview.objects.annotate(reg_date=TruncDate("review_reg_time"))
+        .filter(sell_id=sell_id)
+        .values("user", "review_content", "review_score", "reg_date")
+    )
+    return reviews

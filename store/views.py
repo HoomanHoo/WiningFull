@@ -11,8 +11,11 @@ from detail.models import WinWine
 from django.utils.dateformat import DateFormat
 from datetime import datetime
 from store.db_access.query_set import (
+    PageSerializer,
+    ProductListSerializer,
     PurchaseDetailSerializer,
     get_product_list,
+    get_reviews_by_seller,
     insert_store_info,
     insert_sell_info,
     delete_store_info,
@@ -32,6 +35,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 import json
+
+from store.usecase.pagination import db_preprocessing, pagenation
 
 # Create your views here.
 
@@ -87,15 +92,15 @@ class StoreRegistrationView(View):
         except DatabaseError:
             redirect("errorhandling:storeError")
 
-        return redirect("productAddition", page_num=1)
+        return redirect("productAddition")
 
     # insert_store_info 라는 함수를 정의하여 사용했다.
 
 
 class CheckStoreRegistNumberView(View):
-    def get(self, request):
-        reg_num = request.GET.get("regnum", None)
-
+    def get(self, request, **kwargs):
+        reg_num = kwargs.get("regnum", None)
+        print(reg_num)
         if reg_num == None:
             return JsonResponse({"result": "문제가 발생했습니다 잠시 후 다시 시도해주세요"}, status=200)
 
@@ -124,6 +129,7 @@ class ProductAdditionView(View):
     def get(self, request, **kwargs):
         modify = kwargs.get("mdfy", None)
         user_id = request.session.get("temp_id")
+
         if user_id == None:
             user_id = request.session.get("memid")
 
@@ -131,26 +137,38 @@ class ProductAdditionView(View):
             modify = 1
         else:
             modify = 0
-        page_num = kwargs.get("page_num", 1)
+
+        page_num = 1
         show_length = 28
         end = int(show_length) * int(page_num)
         start = end - 28
-        # if page_num == 1:
-        #     start = 0
-        result = get_product_list(start=start, end=end)
-        list_length = result[0]
-        wines = result[1]
-        print(list_length)
+        result = get_product_list()
+        list_info = db_preprocessing(db_data=result, end_page=end, start_page=start)
+        list_length = list_info[0]
+        wines = list_info[1]
+
         if (list_length % show_length) == 0:
-            page_count = list_length // show_length
+            page_length = list_length // show_length
         else:
-            page_count = (list_length // show_length) + 1
-        pages = [i + 1 for i in range(page_count)]
+            page_length = (list_length // show_length) + 1
+
+        if 0 < page_num and page_num < 6:
+            start_page = 1
+        elif page_num % 5 == 0:
+            start_page = page_num - 5
+        else:
+            start_page = page_num - (page_num % 5) + 1
+
+        if page_length - page_num < 5:
+            end_page = page_length
+        else:
+            end_page = start_page + 5
+
+        pages_count = list(range(start_page, end_page))
         product_list = get_product_list_by_seller(user_id=user_id)
         store_id = WinStore.objects.filter(user_id=user_id).values_list(
             "store_id", flat=True
         )[0]
-        print("store_id: ", store_id)
 
         template = loader.get_template("store/productAddition.html")
         context = {
@@ -158,7 +176,8 @@ class ProductAdditionView(View):
             "store_id": store_id,
             "product_list": product_list,
             "modify": modify,
-            "pages": pages,
+            "pages_count": pages_count,
+            "next": end_page,
         }
         return HttpResponse(template.render(context, request))
 
@@ -190,20 +209,51 @@ class ProductAdditionView(View):
                     sell_promots,
                     sell_state,
                 )
-                if len(sell_ids) != 0:
-                    return redirect("productList")
+                if request.session.get("memid"):
+                    return redirect("sellList")
                 else:
-                    return redirect("storeMyPage")
+                    return redirect("login")
             except DatabaseError:
                 return redirect("errorhandling:storeError")
 
         elif btn_cancel_regist != None:
             delete_store_info(store_id=store_id)
-            return redirect("storeRegistration")  # user mypage로 리다이렉트 해야함
+            return redirect("login")
 
         elif btn_back != None:
             delete_store_info(store_id=store_id)
             return redirect("storeRegistration")
+
+
+class ProductListView(APIView):
+    def get(self, request, **kwargs):
+        page_num = kwargs.get("page_num", 1)
+
+        show_length = 28
+        end = int(show_length) * int(page_num)
+        start = end - 28
+        wines = get_product_list()
+        list_info = db_preprocessing(db_data=wines, end_page=end, start_page=start)
+        paging_result = pagenation(
+            show_length=show_length,
+            page_num=page_num,
+            end_page=end,
+            start_page=start,
+            datas=list_info,
+        )
+        pages = {}
+
+        pages["pages"] = paging_result["pages_count"]
+        print(pages)
+        serializer = ProductListSerializer(
+            paging_result["db_data"],
+            many=True,
+        ).data
+        page_serializer = PageSerializer(pages, context={"wines": serializer})
+
+        json_result = JSONRenderer().render(page_serializer.data)
+
+        return Response(json_result)
 
 
 class SearchProduct(View):
@@ -315,7 +365,7 @@ class StoreInfoView(View):
     def get(self, request):
         template = loader.get_template("store/storeInfo.html")
         user_id = request.session.get("memid")
-        info = get_store_info(user_id=user_id)[0]
+        info = get_store_info(user_id=user_id)
         full_address = info.get("store_address").split("@")
         main_address = full_address[0]
         detail_address = full_address[1]
@@ -339,7 +389,7 @@ class StoreInfoModificationView(View):
     def get(self, request):
         template = loader.get_template("store/storeInfoModification.html")
         user_id = request.session.get("memid")
-        info = get_store_info(user_id=user_id)[0]
+        info = get_store_info(user_id=user_id)
         full_address = info.get("store_address").split("@")
         main_address = full_address[0]
         detail_address = full_address[1]
@@ -379,43 +429,66 @@ class StoreInfoModificationView(View):
         return redirect("storeInfo")
 
 
-class SellListView(View):
-    def get(self, request):
-        user_id = request.session.get("memid")
-        page_num = request.GET.get("pageNum", 1)
-        template = loader.get_template("store/sellList.html")
-        list_count = 30
-        end = int(list_count) * int(page_num)
-        start = end - 29
-        # list_info =
+# class SellListView(View):
+#     def get(self, request):
+#         user_id = request.session.get("memid")
+#         page_num = request.GET.get("pageNum", 1)
+#         template = loader.get_template("store/sellList.html")
+#         list_count = 30
+#         end = int(list_count) * int(page_num)
+#         start = end - 29
+#         # list_info =
 
 
 class SellDetailListView(View):
-    def get(self, request):
+    def get(self, request, **kwargs):
         user_id = request.session.get("memid")
-        page_num = request.GET.get("pageNum", 1)
+        page_num = kwargs.get("pageNum", 1)
         template = loader.get_template("store/sellDetailList.html")
-        list_count = 30
-        end = int(list_count) * int(page_num)
+        show_length = 30
+        end = int(show_length) * int(page_num)
         start = end - 30
-        list_info = get_detail_sell_list(user_id=user_id, start=start, end=end)
-        list_length = list_info[0]
-        detail_sell_list = list_info[1]
-        pages = (list_length // list_count) + 1
-
-        pages = [i + 1 for i in range(pages)]
-
-        context = {"list": detail_sell_list, "pages": pages}
+        detail_sell_list = get_detail_sell_list(user_id=user_id)
+        list_info = db_preprocessing(
+            db_data=detail_sell_list, end_page=end, start_page=start
+        )
+        pagination_result = pagenation(
+            show_length=show_length,
+            page_num=page_num,
+            end_page=end,
+            start_page=start,
+            datas=list_info,
+        )
+        db_data = pagination_result["db_data"]
+        pages_count = pagination_result["pages_count"]
+        print(pages_count)
+        context = {"list": db_data, "pages_count": pages_count}
         return HttpResponse(template.render(context, request))
 
 
-class ProductListView(View):
-    def get(self, request):
+class SellMerchandiseView(View):
+    def get(self, request, **kwargs):
+        page_num = kwargs.get("page_num", 1)
+        show_length = 30
+        end = int(show_length) * int(page_num)
+        start = end - 30
         template = loader.get_template("store/productList.html")
         user_id = request.session.get("memid")
+        print(user_id)
         product_list = get_product_list_by_seller(user_id=user_id)
-
-        context = {"product_list": product_list}
+        list_info = db_preprocessing(
+            db_data=product_list, end_page=end, start_page=start
+        )
+        paging_result = pagenation(
+            show_length=show_length,
+            page_num=page_num,
+            end_page=end,
+            start_page=start,
+            datas=list_info,
+        )
+        db_data = paging_result["db_data"]
+        pages_count = paging_result["pages_count"]
+        context = {"product_list": db_data, "pages_count": pages_count}
 
         return HttpResponse(template.render(context, request))
 
@@ -453,12 +526,27 @@ class DropStoreView(View):
 
 
 class StoreRevenueMainView(View):
-    def get(self, request):
+    def get(self, request, **kwargs):
+        page_num = kwargs.get("page_num", 1)
         user_id = request.session.get("memid")
         template = loader.get_template("store/storeRevenueMain.html")
+        show_length = 30
+        end = int(show_length) * int(page_num)
+        start = end - 30
         revenue_info = get_store_revenue(user_id=user_id)
-
-        context = {"revenue_info": revenue_info}
+        list_info = db_preprocessing(
+            db_data=revenue_info, end_page=end, start_page=start
+        )
+        paging_result = pagenation(
+            show_length=show_length,
+            page_num=page_num,
+            end_page=end,
+            start_page=start,
+            datas=list_info,
+        )
+        db_data = paging_result["db_data"]
+        pages_count = paging_result["pages_count"]
+        context = {"revenue_info": db_data, "pages_count": pages_count}
         return HttpResponse(template.render(context, request))
 
 
@@ -467,6 +555,29 @@ class StoreRevenueTermView(View):
         user_id = request.session.get("memid")
         term = int(request.GET.get("term", 0))
         print(term)
-        revenue_info = get_store_revenue(user_id=user_id, term=term)
+        revenue_info = list(get_store_revenue(user_id=user_id, term=term))
         print(revenue_info)
         return JsonResponse({"result": revenue_info}, status=200)
+
+
+class StoreReviewView(View):
+    def get(self, request, **kwargs):
+        sell_id = kwargs.get("sell_id")
+        page_num = kwargs.get("page_num", 1)
+        template = loader.get_template("store/storeShowReviews.html")
+        show_length = 30
+        end = int(show_length) * int(page_num)
+        start = end - 30
+        reviews = get_reviews_by_seller(sell_id=sell_id)
+        list_info = db_preprocessing(db_data=reviews, end_page=end, start_page=start)
+        paging_result = pagenation(
+            show_length=show_length,
+            page_num=page_num,
+            end_page=end,
+            start_page=start,
+            datas=list_info,
+        )
+        db_data = paging_result["db_data"]
+        pages_count = paging_result["pages_count"]
+        context = {"reviews": db_data, "pages_count": pages_count}
+        return HttpResponse(template.render(context, request))

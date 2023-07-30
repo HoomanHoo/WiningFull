@@ -56,16 +56,34 @@
 			{{dto.storeSell__sell_promot}}
 		</div>
 		<div class="col">
-			<input type="button" name="btnShowProductReview" value="리뷰 보기">
+			<input id="{{dto.storeSell__sell_id}}" type="button" name="btnShowProductReview" value="리뷰 보기" onclick="location='../{{dto.storeSell__sell_id}}/reviews/1'">
 		</div>
 	</div>
 {% endfor %}
 <br>
+<div id="pages" class="row">
+	<nav >
+		<ul class="pagination">
+			<li id="prev" class="page-item disabled">
+				<a class="page-link prev" name="pages">Previous</a>
+			</li>
+			{% for i in pages_count %}
+				<li class="page-item page-num-list">
+					<a id="{{i}}" class="page-link page-num" name="pages">{{i}}</a>
+				</li>
+			{% endfor %}
+			<li id="next" class="page-item">
+				<a id="{{next}}" class="page-link next" name="pages">Next</a>
+			</li>
+		</ul>
+	</nav>
+</div>
+
 <div class="row">
 	<div class="col" style="text-align:center">
-		<input type="button" id="btnProductAdd" value="추가 및 삭제" onclick="location='product-addition/pages/1/mdfy'">
+		<input type="button" id="btnProductAdd" value="추가 및 삭제" onclick="location='../../../product/addition/mdfy'">
 		<input type="button" id="btnExcelUpload" value="엑셀로추가">
-		<input type="button" id="btnBack" value="뒤로가기" onclick="location='store-mypage'">
+		<input type="button" id="btnBack" value="뒤로가기" onclick="location='../../../mypage'">
 	</div>
 </div>
 
