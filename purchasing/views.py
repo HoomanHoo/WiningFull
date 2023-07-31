@@ -14,6 +14,7 @@ from purchasing.usecase.receive_code_create_enc_module import (
 from django.utils.dateformat import DateFormat
 from django.utils.datetime_safe import datetime
 from purchasing.db_access.query_set import (
+    StoreListSerializer,
     get_product_info,
     get_info_of_buy_one,
     get_user_point,
@@ -31,18 +32,53 @@ from django.db import DatabaseError
 import json
 from purchasing.models import WinCartDetail, WinReceiveCode, WinPurchaseDetail
 import base64
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
+from store.usecase.pagination import db_preprocessing, pagenation
 
 
 # Create your views here.
 class StoreListView(View):
-    def get(self, request):
-        wine_id = request.GET.get("wine_id", None)
+    def get(self, request, **kwargs):
+        wine_id = kwargs.get("wine_id", None)
+        page_num = 1
         template = loader.get_template("purchasing/storeList.html")
+        show_length = 30
+        end = int(show_length) * int(page_num)
+        start = end - show_length
+        store_list = get_store_lists(wine_id=wine_id)
 
-        store_lists = get_store_lists(wine_id=wine_id)
-        context = {"store_lists": store_lists}
+        list_info = db_preprocessing(db_data=store_list, end_page=end, start_page=start)
+
+        context = {"store_list": list_info[1]}
 
         return HttpResponse(template.render(context, request))
+
+
+class LoadAdditionalStoreListAPI(APIView):
+    def get(self, request, **kwargs):
+        wine_id = kwargs.get("wine_id", None)
+        page_num = kwargs.get("page_num", 1)
+        show_length = 30
+        end = int(show_length) * int(page_num)
+        start = end - show_length
+        store_list = get_store_lists(wine_id=wine_id)
+
+        list_info = db_preprocessing(db_data=store_list, end_page=end, start_page=start)
+        paging_result = pagenation(
+            show_length=show_length,
+            page_num=page_num,
+            end_page=end,
+            start_page=start,
+            datas=list_info,
+        )
+        db_data = paging_result["db_data"]
+        print(type(db_data), db_data)
+
+        serializer = StoreListSerializer(db_data, many=True)
+        json_result = JSONRenderer().render(serializer.data)
+        return Response(json_result)
 
 
 class DetailProductInfoView(View):

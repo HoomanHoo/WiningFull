@@ -3,7 +3,16 @@ from purchasing import views
 
 app_name = "purchasing"
 urlpatterns = [
-    path("store-list", views.StoreListView.as_view(), name="storeList"),
+    path(
+        "wine/<int:wine_id>/stores",
+        views.StoreListView.as_view(),
+        name="storeList",
+    ),
+    path(
+        "wine/<int:wine_id>/stores/<int:page_num>",
+        views.LoadAdditionalStoreListAPI.as_view(),
+        name="storeList",
+    ),
     path(
         "detail-product-info",
         views.DetailProductInfoView.as_view(),

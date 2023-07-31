@@ -17,6 +17,8 @@ def calc(
     for i in range(len(price_per_ones)):
         _quantity_all += int(quantity_per_ones[i])
     if int(user_point) >= int(all_price):
+        print("USER_POINT: ", user_point)
+        print("ALL_PRICE: ", all_price)
         user_point = int(user_point) - int(all_price)
 
         result = {
@@ -35,6 +37,7 @@ def calc(
             print("product_info: ", type(result["product_infos"]))
 
     else:
+        print("CALCULATING_NONE")
         result = None
 
     return result

@@ -10,6 +10,7 @@ from purchasing.models import (
 )
 from store.models import WinSell, WinRevenue
 from user.models import WinUser
+from rest_framework import serializers
 
 
 @transaction.atomic(durable=True)
@@ -60,6 +61,7 @@ def insert_purchase(result: dict) -> list:
 
     update_point = WinUser.objects.get(user_id=user_id)
     update_point.user_point = user_point
+    update_point.save()
 
     for i in range(len(sell_ids)):
         print(sell_ids[i])
@@ -168,19 +170,43 @@ def get_store_lists(wine_id: str) -> QuerySet:
     WHERE `win_sell`.`wine_id` = wine_id
     """
 
+    # store_lists = (
+    #     WinSell.objects.filter(wine_id=wine_id, sell_state=0)
+    #     .select_related("wine", "store")
+    #     .values(
+    #         "sell_id",
+    #         "wine__wine_name",
+    #         "sell_price",
+    #         "store__store_name",
+    #         "store__store_address",
+    #     )
+    # )
+
     store_lists = (
-        WinSell.objects.filter(wine_id=wine_id)
-        .select_related("wine", "store")
+        WinSell.objects.select_related("wine", "store")
+        .annotate(
+            wine_name=F("wine__wine_name"),
+            store_name=F("store__store_name"),
+            store_address=F("store__store_address"),
+        )
         .values(
             "sell_id",
-            "wine__wine_name",
+            "wine_name",
             "sell_price",
-            "store__store_name",
-            "store__store_address",
+            "store_name",
+            "store_address",
         )
     )
 
     return store_lists
+
+
+class StoreListSerializer(serializers.Serializer):
+    sell_id = serializers.IntegerField()
+    wine_name = serializers.CharField()
+    sell_price = serializers.IntegerField()
+    store_name = serializers.CharField()
+    store_address = serializers.CharField()
 
 
 def get_product_info(sell_id: str) -> dict:

@@ -58,7 +58,7 @@
   <div class="row">
   		{% if request.session.memid %}
 		    <input class="inputbutton" type="button" value="매장 리스트업"
-		    	onclick="location='../purchasing/store-list?wine_id={{ wine_info.wine_id }}'">
+		    	onclick="location='../purchasing/wine/{{ wine_info.wine_id }}/stores'">
 		{% else %}
 		    	
 		    <input class="inputbutton" type="button" value="매장 리스트업"
