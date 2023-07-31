@@ -60,6 +60,7 @@ def insert_purchase(result: dict) -> list:
 
     update_point = WinUser.objects.get(user_id=user_id)
     update_point.user_point = user_point
+    update_point.save()
 
     for i in range(len(sell_ids)):
         print(sell_ids[i])

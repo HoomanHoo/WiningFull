@@ -144,27 +144,16 @@ class ProductAdditionView(View):
         start = end - 28
         result = get_product_list()
         list_info = db_preprocessing(db_data=result, end_page=end, start_page=start)
-        list_length = list_info[0]
-        wines = list_info[1]
-
-        if (list_length % show_length) == 0:
-            page_length = list_length // show_length
-        else:
-            page_length = (list_length // show_length) + 1
-
-        if 0 < page_num and page_num < 6:
-            start_page = 1
-        elif page_num % 5 == 0:
-            start_page = page_num - 5
-        else:
-            start_page = page_num - (page_num % 5) + 1
-
-        if page_length - page_num < 5:
-            end_page = page_length
-        else:
-            end_page = start_page + 5
-
-        pages_count = list(range(start_page, end_page))
+        paging_result = pagenation(
+            show_length=show_length,
+            page_num=page_num,
+            end_page=end,
+            start_page=start,
+            datas=list_info,
+        )
+        pages_count = paging_result["pages_count"]
+        db_data = paging_result["db_data"]
+        state = paging_result["pages_count"]
         product_list = get_product_list_by_seller(user_id=user_id)
         store_id = WinStore.objects.filter(user_id=user_id).values_list(
             "store_id", flat=True
@@ -172,12 +161,12 @@ class ProductAdditionView(View):
 
         template = loader.get_template("store/productAddition.html")
         context = {
-            "wines": wines,
+            "wines": db_data,
             "store_id": store_id,
             "product_list": product_list,
             "modify": modify,
             "pages_count": pages_count,
-            "next": end_page,
+            "next": pages_count[-1] + 1,
         }
         return HttpResponse(template.render(context, request))
 
@@ -210,7 +199,7 @@ class ProductAdditionView(View):
                     sell_state,
                 )
                 if request.session.get("memid"):
-                    return redirect("sellList")
+                    return redirect("sellList", page_num=1)
                 else:
                     return redirect("login")
             except DatabaseError:
@@ -352,6 +341,7 @@ class SearchReceiveCodeApi(APIView):
         )
         # print("result: ", result, type(result))
         # serializer = json.dumps(result[0])
+        print(result)
         serializer = PurchaseDetailSerializer(result)  # , many=True)
         # print("SERIALIZE: ", serializer.data)
         json_result = JSONRenderer().render(serializer.data)
@@ -472,7 +462,7 @@ class SellMerchandiseView(View):
         show_length = 30
         end = int(show_length) * int(page_num)
         start = end - 30
-        template = loader.get_template("store/productList.html")
+
         user_id = request.session.get("memid")
         print(user_id)
         product_list = get_product_list_by_seller(user_id=user_id)
@@ -486,8 +476,11 @@ class SellMerchandiseView(View):
             start_page=start,
             datas=list_info,
         )
+
         db_data = paging_result["db_data"]
         pages_count = paging_result["pages_count"]
+        print("merchandise page_count: ", pages_count)
+        template = loader.get_template("store/productList.html")
         context = {"product_list": db_data, "pages_count": pages_count}
 
         return HttpResponse(template.render(context, request))

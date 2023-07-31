@@ -2,7 +2,7 @@ const search = document.getElementById("btnSearch");
 
 search.addEventListener("click", () => {
     let code = document.getElementById("searchReceiveCode").value;
-    let url = "receive-code/codes/" + code;
+    let url = "../receive-code/codes/" + code;
     fetch(url).then((response) => response.json()).then((data) => {
         console.log(data);
         let result = JSON.parse(data);

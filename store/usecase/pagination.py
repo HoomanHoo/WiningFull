@@ -35,12 +35,12 @@ def pagenation(
         if 0 < page_num and page_num < 6:
             start_page = 1
         elif page_num % 5 == 0:
-            start_page = page_num - 5
+            start_page = page_num - 4
         else:
             start_page = page_num - (page_num % 5) + 1
-
-        if page_length - page_num < 5:
-            end_page = page_length
+        print("page_length: ", page_length)
+        if page_length - page_num < 3:
+            end_page = page_length + 1
         else:
             end_page = start_page + 5
         pages_count = list(range(start_page, end_page))

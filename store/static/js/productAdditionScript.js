@@ -38,20 +38,21 @@ function paging() {
 			newWineId.setAttribute("value", wineId);
 			let newWineCapacity = document.createElement("input");
 			newWineCapacity.setAttribute("type", "hidden");
-			newWineCapacity.setAttribute("id", wineName + 1);
+			newWineCapacity.setAttribute("id", wineName + 2);
 			newWineCapacity.setAttribute("value", wineCapacity);
 			let newWineAlc = document.createElement("input");
 			newWineAlc.setAttribute("type", "hidden");
-			newWineAlc.setAttribute("id", wineName + 1);
+			newWineAlc.setAttribute("id", wineName + 3);
 			newWineAlc.setAttribute("value", wineAlc);
 
 
 			wineList.appendChild(newRow);
 			newRow.appendChild(newWineInfo);
+			newWineInfo.innerText = wineName;
 			newWineInfo.appendChild(newWineId);
 			newWineInfo.appendChild(newWineCapacity);
 			newWineInfo.appendChild(newWineAlc);
-			newWineInfo.innerText = wineName;
+
 
 			const wineNames = document.querySelectorAll(".wineName");
 			for (let i = 0; i < wineNames.length; i++) {
