@@ -60,21 +60,22 @@ class LoadAdditionalStoreListAPI(APIView):
     def get(self, request, **kwargs):
         wine_id = kwargs.get("wine_id", None)
         page_num = kwargs.get("page_num", 1)
+        print(page_num)
         show_length = 30
         end = int(show_length) * int(page_num)
-        start = end - show_length
+        start = end - int(show_length)
         store_list = get_store_lists(wine_id=wine_id)
 
         list_info = db_preprocessing(db_data=store_list, end_page=end, start_page=start)
-        paging_result = pagenation(
-            show_length=show_length,
-            page_num=page_num,
-            end_page=end,
-            start_page=start,
-            datas=list_info,
-        )
-        db_data = paging_result["db_data"]
-        print(type(db_data), db_data)
+        # paging_result = pagenation(
+        #     show_length=show_length,
+        #     page_num=page_num,
+        #     end_page=end,
+        #     start_page=start,
+        #     datas=list_info,
+        # )
+        db_data = list_info[1]
+        # print(type(db_data), db_data)
 
         serializer = StoreListSerializer(db_data, many=True)
         json_result = JSONRenderer().render(serializer.data)

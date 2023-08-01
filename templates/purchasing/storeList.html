@@ -19,22 +19,14 @@
       crossorigin="anonymous"
       defer
     ></script>
-    <script type="module" src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script
+      type="module"
+      src="https://unpkg.com/vue@3/dist/vue.global.js"
+    ></script>
     <script type="module" src="/static/js/storeListScript.js" defer></script>
   </head>
   <body>
-    
-
-    <div class="row">
-      <div class="col" style="text-align: center">
-        <input
-          type="button"
-          id="btnBack"
-          value="뒤로가기"
-          onclick="history.back()"
-        />
-      </div>
-    </div>
+    <div class="row"></div>
     <div id="storeList">
       <div class="row">
         <div class="col">상품명</div>
@@ -43,7 +35,10 @@
         <div class="col">점포 위치</div>
       </div>
       {% for store in store_list %}
-      <div class="row" onclick="location='detail-product-info?sellid={{store.sell_id}}'">
+      <div
+        class="row"
+        onclick="location='detail-product-info?sellid={{store.sell_id}}'"
+      >
         <div class="col">
           <input type="hidden" name="sellId" value="{{store.sell_id}}" />
           <p>{{store.wine_name}}</p>
@@ -62,25 +57,36 @@
       {% endfor %}
     </div>
     <div id="newList">
-      <div v-for="(responseData) in datas">
-        <div class="row" onclick="location='detail-product-info?sellid=[[responseData.sell_id]]'">
+      <div v-for="data, index in responseData" :key="data.sell_id">
+        <div
+          class="row"
+          onclick="location='detail-product-info?sellid=[[data.sell_id]]'"
+        >
           <div class="col">
-            <input type="hidden" name="sellId" value="[[responseData.sell_id]]" />
-            <p>[[responseData.wine_name]]</p>
+            <input type="hidden" name="sellId" value="[[data.sell_id]]" />
+            <p>[[data.wine_name]]</p>
           </div>
           <div class="col">
-            <p>[[responseData.sell_price]]</p>
+            <p>[[data.sell_price]]</p>
           </div>
           <div class="col">
-            <p>[[responseData.store_name]]</p>
-            <!-- 점포명에 이벤트 리스너 주기 -->
+            <p>[[data.store_name]]</p>
           </div>
           <div class="col">
-            <p>[[responseData.store_address]]</p>
+            <p>[[data.store_address]]</p>
           </div>
         </div>
       </div>
     </div>
-    <div id="scrollArea"></div>
+    <div id="scrollArea" style="height: 20vh">
+      <div class="col" style="text-align: center">
+        <input
+          type="button"
+          id="btnBack"
+          value="뒤로가기"
+          onclick="history.back()"
+        />
+      </div>
+    </div>
   </body>
 </html>
