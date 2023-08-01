@@ -14,17 +14,18 @@ Vue.createApp({
 
       fetch(targetUrl).then((response) => response.json()).then((data) => {
         if (pageNum == 2){
-        oldList  = JSON.parse(data);
-        setTimeout(() => {
-          responseData.value = oldList;
-        }, 1000);     //setTimeout 함수 수치 조절해서 적당히 보이도록 해주기
-       
-        console.log(data);
-        console.log(responseData.value)
-        console.log("responseData");
+          if(oldList.length > 1){
+            oldList  = JSON.parse(data);
+            setTimeout(() => {
+              responseData.value = oldList;
+            }, 1000);     //setTimeout 함수 수치 조절해서 적당히 보이도록 해주기
+          }
+          else if(oldList.length == 1){
+            return false;
+          }
         }
         else if(pageNum > 2){
-          console.log("responseData: pageNum > 2");
+
           let newList = oldList.concat(JSON.parse(data));
           console.log(newList)
           setTimeout(() => {
@@ -36,8 +37,6 @@ Vue.createApp({
         
       })
     }
- 
-
 
     const autoScroll = () => {
       let callback = (entries, observer) => {
@@ -67,12 +66,18 @@ Vue.createApp({
       fetchList();
     }
 
+    const move = function (event) {
+      console.log(event);
+      console.log(event[0]);
+      location.href = "../../sell/" + event[0]
+    }
+
     Vue.onMounted(()=> {
       autoScroll();
       console.log("mounted");
     })
 
-    return {responseData}
+    return {responseData, move}
   },
   //  mounted() {
   //   this.autoScroll();

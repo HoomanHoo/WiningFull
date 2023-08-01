@@ -9,7 +9,7 @@ from purchasing.models import (
     WinReceiveCode,
 )
 from store.models import WinSell, WinRevenue
-from user.models import WinUser
+from user.models import WinReview, WinUser
 from rest_framework import serializers
 
 
@@ -183,7 +183,8 @@ def get_store_lists(wine_id: str) -> QuerySet:
     # )
 
     store_lists = (
-        WinSell.objects.select_related("wine", "store")
+        WinSell.objects.filter(wine_id=wine_id, sell_state=1)
+        .select_related("wine", "store")
         .annotate(
             wine_name=F("wine__wine_name"),
             store_name=F("store__store_name"),
@@ -244,7 +245,7 @@ def get_product_info(sell_id: str) -> dict:
             "store__storeUrl__store_map_url",
             "sell_promot",
             "sell_price",
-        )[0]
+        )
     )
 
     return product_info
@@ -319,3 +320,94 @@ def get_detail_info(purchase_id):
     )
 
     return detail_infos
+
+
+from django.db.models.functions.comparison import Cast
+from django.db.models.functions.datetime import TruncDate, TruncHour
+from django.db.models.fields import CharField
+from django.db.models import CharField, Value as V
+from django.db.models.functions import (
+    ExtractYear,
+    ExtractMonth,
+    ExtractDay,
+    ExtractHour,
+    ExtractMinute,
+    Concat,
+)
+
+#  year=ExtractYear("review_reg_time"),
+#             month=ExtractMonth("review_reg_time"),
+#             day=ExtractDay("review_reg_time"),
+#             hour=ExtractHour("review_reg_time"),
+#             minute=ExtractMinute("review_reg_time"),
+#             review_time=Concat(
+#                 "year",
+#                 V("-"),
+#                 "month",
+#                 V("-"),
+#                 "day",
+#                 V(" "),
+#                 "hour",
+#                 V(":") + "minute",
+#                 output_field=CharField(),
+#             ),
+# review_time=(Cast(TruncHour("review_reg_time"), CharField()))
+
+
+def get_product_reviews(sell_id: int, select_code: int) -> QuerySet:
+    if select_code == 1:
+        order = "-review_reg_time"
+    elif select_code == 2:
+        order = "-review_score"
+    elif select_code == 3:
+        order = "review_score"
+    #
+    review_list = (
+        WinReview.objects.filter(sell_id=sell_id)
+        .annotate(
+            year=ExtractYear("review_reg_time"),
+            month=ExtractMonth("review_reg_time"),
+            day=ExtractDay("review_reg_time"),
+            hour=ExtractHour("review_reg_time"),
+            minute=ExtractMinute("review_reg_time"),
+            review_time=Concat(
+                "year",
+                V("-"),
+                "month",
+                V("-"),
+                "day",
+                V(" "),
+                "hour",
+                V(":"),
+                "minute",
+                output_field=CharField(),
+            ),
+        )
+        .values("user_id", "review_content", "review_time", "review_score")
+        .order_by(order)
+    )
+    print(review_list)
+    list_length = review_list.count()
+    if list_length > 5:
+        print("list is longer then 6")
+        return print(review_list[:6])
+
+    elif list_length <= 5 and list_length > 1:
+        print("list is short")
+        return review_list
+
+
+class ReviewSerializer(serializers.Serializer):
+    user_id = serializers.CharField()
+    review_content = serializers.CharField()
+    review_time = serializers.CharField()
+    review_score = serializers.IntegerField()
+
+
+# class WinReview(models.Model):
+#     review_id = models.AutoField(primary_key=True)
+#     user = models.ForeignKey("WinUser", models.CASCADE)  #
+#     sell = models.ForeignKey("store.WinSell", models.CASCADE)  #
+#     review_content = models.CharField(max_length=500)
+#     review_score = models.DecimalField(max_digits=2, decimal_places=1)
+#     review_reg_time = models.DateTimeField()

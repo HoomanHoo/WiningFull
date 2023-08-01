@@ -14,9 +14,14 @@ urlpatterns = [
         name="storeList",
     ),
     path(
-        "detail-product-info",
+        "sell/<int:sell_id>",
         views.DetailProductInfoView.as_view(),
         name="detailProductInfo",
+    ),
+    path(
+        "sell/<int:sell_id>/reviews",
+        views.ReviewLoadAPI.as_view(),
+        name="reviewLoad",
     ),
     path("buy-list", views.BuyListView.as_view(), name="buyList"),
     path("add-cart-list", views.AddPickListView.as_view(), name="addCartList"),

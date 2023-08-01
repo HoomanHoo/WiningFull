@@ -35,10 +35,7 @@
         <div class="col">점포 위치</div>
       </div>
       {% for store in store_list %}
-      <div
-        class="row"
-        onclick="location='detail-product-info?sellid={{store.sell_id}}'"
-      >
+      <div class="row" onclick="location='../../sell/{{store.sell_id}}'">
         <div class="col">
           <input type="hidden" name="sellId" value="{{store.sell_id}}" />
           <p>{{store.wine_name}}</p>
@@ -58,12 +55,9 @@
     </div>
     <div id="newList">
       <div v-for="data, index in responseData" :key="data.sell_id">
-        <div
-          class="row"
-          onclick="location='detail-product-info?sellid=[[data.sell_id]]'"
-        >
+        <div class="row" @click="move([[data.sell_id]])" :id="[[data.sell_id]]">
           <div class="col">
-            <input type="hidden" name="sellId" value="[[data.sell_id]]" />
+            <input type="hidden" name="sellId" :value="[[data.sell_id]]" />
             <p>[[data.wine_name]]</p>
           </div>
           <div class="col">

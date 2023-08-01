@@ -14,9 +14,11 @@ from purchasing.usecase.receive_code_create_enc_module import (
 from django.utils.dateformat import DateFormat
 from django.utils.datetime_safe import datetime
 from purchasing.db_access.query_set import (
+    ReviewSerializer,
     StoreListSerializer,
     get_product_info,
     get_info_of_buy_one,
+    get_product_reviews,
     get_user_point,
     insert_enc_receive_codes,
     insert_purchase,
@@ -87,32 +89,46 @@ class DetailProductInfoView(View):
     def dispatch(self, request, *args, **kwargs):
         return View.dispatch(self, request, *args, **kwargs)
 
-    def get(self, request):
-        sell_id = request.GET.get("sellid", None)
+    def get(self, request, **kwargs):
+        sell_id = kwargs.get("sell_id", 0)
         user_id = request.session.get("memid")
+
         template = loader.get_template("purchasing/detailProductInfo.html")
 
         product_info = get_product_info(sell_id=sell_id)
         print(product_info)
 
-        # 리뷰 코드는 아직 model에 존재하지 않기 때문에 차후 작성
-
-        rdtos = []
-        product_info = product_info
-        if product_info["store__storeUrl__store_map_url"] == None:
-            url_value = 0
-
+        if product_info:
+            if product_info[0]["store__storeUrl__store_map_url"] == "":
+                url_value = 0
+                print(url_value)
+            else:
+                url_value = 1
+                print(url_value)
+            product_info = product_info[0]
         else:
-            url_value = 1
+            url_value = None  # 에러 페이지로 리다이렉트 시킬 것
 
         context = {
             "product_info": product_info,
             "url_value": url_value,
             "user_id": user_id,
-            "rdtos": rdtos,
+            # "rdtos": rdtos,
         }
 
         return HttpResponse(template.render(context, request))
+
+
+class ReviewLoadAPI(APIView):
+    def get(self, request, **kwargs):
+        sell_id = kwargs.get("sell_id", 0)
+        select_code = int(request.GET.get("selectcode", 1))
+
+        rdtos = get_product_reviews(sell_id=sell_id, select_code=select_code)
+        print(rdtos)
+        serialzered = ReviewSerializer(rdtos, many=True)
+        json_result = JSONRenderer().render(serialzered.data)
+        return Response(json_result)
 
 
 class BuyListView(View):
