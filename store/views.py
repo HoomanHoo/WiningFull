@@ -28,6 +28,7 @@ from store.db_access.query_set import (
     check_passwd,
     drop_store_info,
     get_store_revenue,
+    search_product_list,
     search_receive_code,
 )
 from django.db.utils import DatabaseError
@@ -217,11 +218,16 @@ class ProductAdditionView(View):
 class ProductListView(APIView):
     def get(self, request, **kwargs):
         page_num = kwargs.get("page_num", 1)
+        search_keyword = request.GET.get("srhkeyword", None)
 
         show_length = 28
         end = int(show_length) * int(page_num)
         start = end - 28
-        wines = get_product_list()
+        if search_keyword is not None:
+            wines = search_product_list(search_keyword=search_keyword)
+        else:
+            wines = get_product_list()
+        print(wines)
         list_info = db_preprocessing(db_data=wines, end_page=end, start_page=start)
         paging_result = pagenation(
             show_length=show_length,
@@ -245,42 +251,39 @@ class ProductListView(APIView):
         return Response(json_result)
 
 
-class SearchProduct(View):
-    def get(self, request):
-        search_keyword = request.GET.get("srhkeyword", None)
+# class SearchProduct(View):
+#     def get(self, request):
+#         search_keyword = request.GET.get("srhkeyword", None)
 
-        result_obj1 = WinWine.objects.filter(
-            wine_name__icontains=search_keyword, wine_name__range=("가", "힣")
-        ).values_list("wine_id", "wine_name", "wine_capacity", "wine_alc")
-        # print(result_obj1[0][0], result_obj1[0][1], result_obj1[0][2], result_obj1[0][3])
-        #
-        #
-        # print(result_obj1[0])
+# print(result_obj1[0][0], result_obj1[0][1], result_obj1[0][2], result_obj1[0][3])
+#
+#
+# print(result_obj1[0])
+# db_data = search_product_list(search_keyword=search_keyword)
+# result = []
+# if db_data == None:
+#     result = "no result"
 
-        result = []
-        if result_obj1 == None:
-            result = "no result"
+# else:
+#     for i in range(len(db_data)):
+#         result.append(db_data[i])
 
-        else:
-            for i in range(len(result_obj1)):
-                result.append(result_obj1[i])
+# result_obj2 = list(result_obj1.wine_id)
+# print(result_obj2)
+# result_obj3 = list(result_obj1.wine_name)
+# print(result_obj3)
+# result_obj4 = list(result_obj1.wine_alc)
+# print(result_obj4)
+# start = time()
+#
+# result = WinWine.objects.filter(wine_name_eng__iconteaints = search_keyword)
+#
+# end = time()
+#
+# print(end - start)
 
-        # result_obj2 = list(result_obj1.wine_id)
-        # print(result_obj2)
-        # result_obj3 = list(result_obj1.wine_name)
-        # print(result_obj3)
-        # result_obj4 = list(result_obj1.wine_alc)
-        # print(result_obj4)
-        # start = time()
-        #
-        # result = WinWine.objects.filter(wine_name_eng__iconteaints = search_keyword)
-        #
-        # end = time()
-        #
-        # print(end - start)
-
-        # return JsonResponse({"result":result}, status = 200)
-        return JsonResponse({"result": result}, status=200)
+# return JsonResponse({"result":result}, status = 200)
+# return JsonResponse({"result": result}, status=200)
 
 
 class DiscontinueProductView(View):

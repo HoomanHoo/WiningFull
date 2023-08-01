@@ -213,6 +213,14 @@ def get_product_list() -> QuerySet:
     return wines
 
 
+def search_product_list(search_keyword):
+    result = WinWine.objects.filter(
+        wine_name__icontains=search_keyword, wine_name__range=("가", "힣")
+    ).values("wine_id", "wine_name", "wine_capacity", "wine_alc")
+
+    return result
+
+
 class PageSerializer(serializers.Serializer):
     def to_representation(self, instance):
         pages = instance["pages"]

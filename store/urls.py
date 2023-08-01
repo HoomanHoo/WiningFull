@@ -28,7 +28,7 @@ urlpatterns = [
         name="productPages",
     ),
     path("mypage", views.StoreMyPageView.as_view(), name="storeMyPage"),
-    path("search/product", views.SearchProduct.as_view(), name="searchProduct"),
+    # path("search/product", views.SearchProduct.as_view(), name="searchProduct"),
     path("info", views.StoreInfoView.as_view(), name="storeInfo"),
     path(
         "search/receive-code",

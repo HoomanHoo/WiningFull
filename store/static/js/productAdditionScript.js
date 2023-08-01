@@ -12,7 +12,12 @@ for (var i = 0; i < pages.length; i++) {
 
 function paging() {
 	let modify = document.getElementById("modify");
-	let url = "/store/product/pages/" + this.id;
+	let url = "../../product/pages/" + this.id;
+
+	if (document.getElementById("srhByName").value){
+		const srhKeyWord = document.getElementById("srhByName").value;
+		url = "../../product/pages/" + this.id + "?srhkeyword=" + srhKeyWord
+	}
 
 	fetch(url).then((response) => response.json()).then((data) => {
 		let resultData = JSON.parse(data);
@@ -118,62 +123,145 @@ function deleteDefaultRow() {
 
 function searchByName() {
 	const srhKeyWord = this.value;
-	const url = "search-product?srhkeyword=" + srhKeyWord
+	const url = "../../product/pages/1?srhkeyword=" + srhKeyWord
 	const xhttp = new XMLHttpRequest();
 
 	xhttp.onreadystatechange = () => {
 		if (xhttp.readyState === XMLHttpRequest.DONE) {
 			if (xhttp.status === 200) {
 				const result = xhttp.response;
+				let resultData = JSON.parse(result);
+
+				let pages = resultData["pages"];
+				let wines = resultData["wines"];
+				console.log(pages);
+				wineList.replaceChildren();
+				for (var i = 0; i < wines.length; i++) {
+					let wineId = wines[i].wine_id;
+					let wineName = wines[i].wine_name;
+					let wineCapacity = wines[i].wine_capacity;
+					let wineAlc = wines[i].wine_alc;
+
+					let newRow = document.createElement("div");
+					newRow.setAttribute("class", "row");
+					let newWineInfo = document.createElement("div");
+					newWineInfo.setAttribute("id", wineName);
+					newWineInfo.setAttribute("class", "col wineName");
+					let newWineId = document.createElement("input");
+					newWineId.setAttribute("type", "hidden");
+					newWineId.setAttribute("id", wineName + 1);
+					newWineId.setAttribute("value", wineId);
+					let newWineCapacity = document.createElement("input");
+					newWineCapacity.setAttribute("type", "hidden");
+					newWineCapacity.setAttribute("id", wineName + 2);
+					newWineCapacity.setAttribute("value", wineCapacity);
+					let newWineAlc = document.createElement("input");
+					newWineAlc.setAttribute("type", "hidden");
+					newWineAlc.setAttribute("id", wineName + 3);
+					newWineAlc.setAttribute("value", wineAlc);
+
+
+					wineList.appendChild(newRow);
+					newRow.appendChild(newWineInfo);
+					newWineInfo.innerText = wineName;
+					newWineInfo.appendChild(newWineId);
+					newWineInfo.appendChild(newWineCapacity);
+					newWineInfo.appendChild(newWineAlc);
+
+
+					const wineNames = document.querySelectorAll(".wineName");
+					for (let i = 0; i < wineNames.length; i++) {
+						wineNames[i].addEventListener("click", addElement);
+					}
+
+				}
+				let prev = document.getElementById("prev");
+				let next = document.getElementById("next");
+				if (pages[0] < 6) {
+					prev.className = "page-item disabled";
+				}
+				else {
+					prev.className = "page-item";
+					document.querySelector(".prev").setAttribute("id", pages[0] - 1);
+				}
+				if (pages.length < 5) {
+					next.className = "page-item disabled";
+				}
+				else {
+					next.className = "page-item";
+					document.querySelector(".next").setAttribute("id", pages[4] + 1);
+				}
+				let pageNumList = document.querySelectorAll(".page-num-list");
+				for (var i = 0; i < pageNumList.length; i++) {
+					pageNumList[i].remove();
+				}
+				for (var i = 0; i < pages.length; i++) {
+
+
+					let newPages = document.createElement("li");
+					newPages.setAttribute("class", "page-item page-num-list");
+					let newPageNum = document.createElement("a");
+					newPageNum.setAttribute("id", pages[i]);
+					newPageNum.setAttribute("class", "page-link page-num");
+					newPageNum.setAttribute("name", "pages");
+					newPageNum.innerText = pages[i];
+
+					newPages.appendChild(newPageNum);
+					next.before(newPages);
+					newPageNum.addEventListener("click", paging);
+
+				}
+
+
 				//해야할 행동(리스폰스 값 받아서 html에 div row - div col - innerText로 뿌려주기)
 				//	alert(result.result[0]);
-				wineList.replaceChildren();
+				// wineList.replaceChildren();
 
-				for (let i = 0; i < result.result.length; i++) {
+				// for (let i = 0; i < result.result.length; i++) {
 
-					console.log(result.result[i][1]);
+				// 	console.log(result.result[i][1]);
 
 
 
-					const newWineRow = document.createElement("div");
-					newWineRow.setAttribute("id", "wineRow" + i);
-					newWineRow.setAttribute("class", "row wineRow");
+				// 	const newWineRow = document.createElement("div");
+				// 	newWineRow.setAttribute("id", "wineRow" + i);
+				// 	newWineRow.setAttribute("class", "row wineRow");
 
-					const newWineCol = document.createElement("div");
-					newWineCol.setAttribute("id", result.result[i][1]);
-					newWineCol.setAttribute("class", "col wineName");
+				// 	const newWineCol = document.createElement("div");
+				// 	newWineCol.setAttribute("id", result.result[i][1]);
+				// 	newWineCol.setAttribute("class", "col wineName");
 
-					const newWineId = document.createElement("input");
-					newWineId.setAttribute("type", "hidden");
-					newWineId.setAttribute("id", result.result[i][1] + 1);
-					newWineId.setAttribute("value", result.result[i][0]);
+				// 	const newWineId = document.createElement("input");
+				// 	newWineId.setAttribute("type", "hidden");
+				// 	newWineId.setAttribute("id", result.result[i][1] + 1);
+				// 	newWineId.setAttribute("value", result.result[i][0]);
 
-					const newWineCapacity = document.createElement("input");
-					newWineCapacity.setAttribute("type", "hidden");
-					newWineCapacity.setAttribute("id", result.result[i][1] + 2);
-					newWineCapacity.setAttribute("value", result.result[i][2]);
+				// 	const newWineCapacity = document.createElement("input");
+				// 	newWineCapacity.setAttribute("type", "hidden");
+				// 	newWineCapacity.setAttribute("id", result.result[i][1] + 2);
+				// 	newWineCapacity.setAttribute("value", result.result[i][2]);
 
-					const newWineAlc = document.createElement("input");
-					newWineAlc.setAttribute("type", "hidden");
-					newWineAlc.setAttribute("id", result.result[i][1] + 3);
-					newWineAlc.setAttribute("value", result.result[i][3]);
+				// 	const newWineAlc = document.createElement("input");
+				// 	newWineAlc.setAttribute("type", "hidden");
+				// 	newWineAlc.setAttribute("id", result.result[i][1] + 3);
+				// 	newWineAlc.setAttribute("value", result.result[i][3]);
 
-					wineList.appendChild(newWineRow);
+				// 	wineList.appendChild(newWineRow);
 
-					const newListRow = document.getElementById("wineRow" + i);
-					newListRow.appendChild(newWineCol);
+				// 	const newListRow = document.getElementById("wineRow" + i);
+				// 	newListRow.appendChild(newWineCol);
 
-					const newListeCol = document.getElementById(result.result[i][1]);
-					newListeCol.innerText = result.result[i][1];
-					newListeCol.appendChild(newWineId);
-					newListeCol.appendChild(newWineCapacity);
-					newListeCol.appendChild(newWineAlc);
+				// 	const newListeCol = document.getElementById(result.result[i][1]);
+				// 	newListeCol.innerText = result.result[i][1];
+				// 	newListeCol.appendChild(newWineId);
+				// 	newListeCol.appendChild(newWineCapacity);
+				// 	newListeCol.appendChild(newWineAlc);
 
-				}
-				const wineNames = document.querySelectorAll(".wineName");
-				for (let i = 0; i < wineNames.length; i++) {
-					wineNames[i].addEventListener("click", addElement);
-				}
+				// }
+				// const wineNames = document.querySelectorAll(".wineName");
+				// for (let i = 0; i < wineNames.length; i++) {
+				// 	wineNames[i].addEventListener("click", addElement);
+				// }
 			}
 			else if (xhttp.status === 500) {
 				console.log("서버에 문제가 발생했습니다. 잠시 뒤 다시 시도해주세요");
@@ -192,6 +280,21 @@ function searchByName() {
 	xhttp.send();
 }
 
+function checkValue(){
+	prices = document.querySelectorAll("input[name=sellPrice]");
+	promots = document.querySelectorAll("input[name=sellPromot]");
+
+	for (var i = 0; i < prices.length; i++){
+		if(! prices[i].value){
+			alert("판매하고자 하는 상품의 가격을 입력해주세요");
+			return false;
+		}
+		else if(! promots[i].value){
+			alert("상품 설명을 입력해주세요");
+			return false;
+		}
+	}
+}
 
 
 
@@ -252,7 +355,7 @@ function addElement() {
 		newPdtAlc.setAttribute("readonly", "true");
 
 		const newPdtPrice = document.createElement("input");
-		newPdtPrice.setAttribute("type", "text");
+		newPdtPrice.setAttribute("type", "number");
 		newPdtPrice.setAttribute("class", "col-1");
 		newPdtPrice.setAttribute("name", "sellPrice");
 		newPdtPrice.setAttribute("maxlength", "5")
