@@ -24,8 +24,9 @@ urlpatterns = [
         name="reviewLoad",
     ),
     path("payment", views.BuyListView.as_view(), name="buyList"),
-    path("add-cart", views.AddPickListView.as_view(), name="addCartList"),
-    path("carts/<int:cart_id>", views.PickListView.as_view(), name="cartList"),
-    path("order-page", views.OrderPageView.as_view(), name="orderPage"),
+    path("cart", views.AddPickListView.as_view(), name="addCartList"),
+    path("cart/<int:cart_id>", views.PickListView.as_view(), name="cartList"),
+    path("order", views.OrderPageView.as_view(), name="orderPage"),
     path("remove-buy-list", views.RemoveBuyList.as_view(), name="removeBuyList"),
+    path("templogin", views.TempLoginView.as_view(), name="tempLogin"),
 ]

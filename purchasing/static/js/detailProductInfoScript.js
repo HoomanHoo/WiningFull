@@ -20,10 +20,16 @@ function buyListLocation(){
 
 function checkLogin(event){
 	if (document.getElementById("userId").value == "None"){
-		const isUser = confirm("로그인 후 장바구니 기능을 이용하실 수 있습니다 \n 로그인 하시겠습니까?")
-		console.log(isUser);
-		if (isUser == false){
+		const doLogin = confirm("장바구니에 해당 상품을 추가하시려면 로그인 하셔야 합니다 \n 로그인 하시겠습니까?")
+		console.log(doLogin);
+		if (doLogin == false){
 			event.preventDefault();
+			return false;
+		}
+
+		else if(doLogin==true){
+			event.preventDefault();
+			window.open("../templogin", "_black", "width=500, height=700");
 			return false;
 		}
 		

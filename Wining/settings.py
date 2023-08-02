@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import mimetypes
 from pathlib import Path
 from django.conf.global_settings import STATICFILES_DIRS
 from django.test.signals import static_finders_changed
@@ -222,3 +223,5 @@ STATICFILES_FINDERS = (
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+mimetypes.add_type("application/javascript", ".js", True)

@@ -64,14 +64,14 @@ def insert_purchase(result: dict) -> list:
     update_point.user_point = user_point
     update_point.save()
 
-    for i in range(len(sell_ids)):
-        print(sell_ids[i])
-        store_id = WinSell.objects.filter(sell_id=sell_ids[i]).values("store_id")[0][
+    for idx, sell_id in enumerate(sell_ids):
+        print(sell_id)
+        store_id = WinSell.objects.filter(sell_id=sell_id).values("store_id")[0][
             "store_id"
         ]
         revenue = WinRevenue(
             store_id=store_id,
-            revenue_value=purchase_det_prices[i],
+            revenue_value=purchase_det_prices[idx],
             revenue_date=purchase_time,
         )
         revenues.append(revenue)
@@ -89,7 +89,7 @@ def insert_purchase(result: dict) -> list:
 def add_cart_info(user_id: str, sell_id: str, quantity: int, current_time: str) -> int:
     cart_id = get_cart_id(user_id)
     print(cart_id)
-    if cart_id == None:
+    if cart_id is None or cart_id == -1:
         cart_info = WinCart(
             user_id=user_id,
             cart_time=current_time,
@@ -119,12 +119,27 @@ def insert_enc_receive_codes(enc_receive_codes: list) -> None:
 
 
 def get_cart_id(user_id: str) -> str or None:
+    """
+    user_id가 존재하고 cart_state가 1이면 (활성화 상태) cart_id를 반환한다
+    user_id가 존재하지 않거나 cart_state가 1인 cart_id가 없으면 cart_id = -1을 반환한다
+    """
+
     cart_info = WinCart.objects.filter(user_id=user_id, cart_state=1).values("cart_id")
-    if len(cart_info) == 0:
-        cart_id = None
+    if cart_info.count() == 0:
+        cart_id = -1
     else:
         cart_id = cart_info[0].get("cart_id")
     return cart_id
+
+
+def get_cart_state(cart_id):
+    cart_state = WinCart.objects.filter(cart_id=cart_id).values("cart_state")
+
+    if cart_state.count() == 0:
+        cart_state = -1
+    else:
+        cart_state = cart_state[0].get("cart_state")
+    return cart_state
 
 
 def get_cart_detail_infos(cart_id: str) -> QuerySet:

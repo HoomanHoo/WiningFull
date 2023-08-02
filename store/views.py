@@ -102,13 +102,13 @@ class CheckStoreRegistNumberView(View):
     def get(self, request, **kwargs):
         reg_num = kwargs.get("regnum", None)
         print(reg_num)
-        if reg_num == None:
+        if reg_num is None:
             return JsonResponse({"result": "문제가 발생했습니다 잠시 후 다시 시도해주세요"}, status=200)
 
         else:
             result = check_store_regist_number(reg_num=reg_num)
 
-            if result == True:
+            if result is True:
                 return JsonResponse(
                     {"result": "유효한 사업자 등록번호입니다", "code": "1"}, status=200
                 )
@@ -131,7 +131,7 @@ class ProductAdditionView(View):
         modify = kwargs.get("mdfy", None)
         user_id = request.session.get("temp_id")
 
-        if user_id == None:
+        if user_id is None:
             user_id = request.session.get("memid")
 
         if modify == "mdfy":
@@ -173,7 +173,7 @@ class ProductAdditionView(View):
 
     def post(self, request):
         user_id = request.session.get("temp_id")
-        if user_id == None:
+        if user_id is None:
             user_id = request.session.get("memid")
         store_id = request.POST.get("storeId", None)
         sell_ids = request.POST.getlist("sellId", None)
@@ -186,7 +186,7 @@ class ProductAdditionView(View):
         btn_back = request.POST.get("btnBackRegist", None)
         current_time = DateFormat(datetime.now()).format("Y-m-d H:i:s")
 
-        if btn_product_add != None:
+        if btn_product_add is not None:
             print("product add")
             try:
                 insert_sell_info(
@@ -206,11 +206,11 @@ class ProductAdditionView(View):
             except DatabaseError:
                 return redirect("errorhandling:storeError")
 
-        elif btn_cancel_regist != None:
+        elif btn_cancel_regist is not None:
             delete_store_info(store_id=store_id)
             return redirect("login")
 
-        elif btn_back != None:
+        elif btn_back is not None:
             delete_store_info(store_id=store_id)
             return redirect("storeRegistration")
 
