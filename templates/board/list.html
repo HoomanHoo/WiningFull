@@ -2,11 +2,15 @@
 {% load mathfilters %}
 {% load static %}
 
+
+
 {% block title %}
-  <h2>자유 게시판 ( 총 : {{ count }}개 )</h2>
+  <h2 class="board-title">&nbsp;&nbsp;&nbsp;<b>자유게시판</b></h2>
 {% endblock %}
+  
 
 {% block content %}
+
 <head>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -17,16 +21,18 @@
 
 
 
-
-
 	<div class="container my-3">
 	  <div class="row">
 	    <div class="col-lg-6 mb-3">
 	      <form class="d-flex" method="get" action="{% url 'board:list' %}">
-	        <input class="form-control me-2" type="search" name="q" placeholder="검색어를 입력하세요" style="width:900px;">
+	        <input class="form-control me-2" type="search" name="q" placeholder="검색어를 입력해 주세요" style="width:900px;">
 	        <button class="btn btn-outline-primary" type="submit" style="width:150px;">검색</button>
 	      </form>
 	    </div>
+	    
+
+				
+				
 	    	{% if request.session.memid  %}
 			    <div class="col-lg-6 mb-3 text-end">
 			      <a href="{% url 'board:write' %}" class="btn btn-outline-primary">글쓰기</a>
@@ -36,14 +42,16 @@
 
   <!-- 검색 결과 표시 -->
   {% if search_query %}
-    <h3>검색 결과 : <span style="color:red;">"{{ search_query }}"</span> 에 해당하는 글이 <span style="color:red;">{{count}} </span>개 있습니다.</h3>
+    <h3>검색 결과 <span style="color:red;">"{{ search_query }}"</span> 에 해당하는 글이 <span style="color:red;">{{count}} </span>개 있습니다.</h3>
   {% endif %}
 
 
-	
-    
-    
-    <br>
+
+
+
+
+	&nbsp; 총 : <span class="red-text">{{ count }}</span>개
+
     <div class="table-responsive">
       <table class="table">
         <thead>
@@ -141,6 +149,28 @@
 	</script>
 
   <style>
+  
+  
+  
+  .red-text {
+  	color:red;
+  }
+  .right-align {
+  	text-align:right;
+  }
+  .right-margin {
+  	margin-right:120px;
+  }
+  
+  .board-title {
+  	text-align:left;
+  	margin-left:90px;
+  }
+  
+  
+  
+  
+  
   .scroll-button {
     position: fixed;
     padding: 5px;

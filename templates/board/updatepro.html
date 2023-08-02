@@ -1,12 +1,26 @@
 {% extends "board/base.html" %}
 
-{% block title %} <h2>글 수정</h2> {% endblock %}
+{% block title %} <h2 class="text-center" style="margin-right:50px;"><b>게시글 수정</b></h2> {% endblock %}
 
 {% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <input class="btn btn-secondary" type="button" value="뒤로 가기" onclick="history.go(-1)">
+        </div>
+
+    </div>
+	
+	
+	
+	<br>
+	
     <form method="post" action="updatepro" name="updateform" class="update-form" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="hidden" name="num" value="{{ dto.board_id }}">
         
+        
+       
         <div class="row justify-content-center">
             <div class="col-lg-6">
                 <div class="form-group">
@@ -15,6 +29,7 @@
                 </div>
             </div>
         </div>
+        
         
         <div class="row justify-content-center">
             <div class="col-lg-6">
@@ -30,10 +45,11 @@
                 <div class="form-group">
                     <label for="img">이미지</label>
                     <input class="form-control" type="file" name="img" id="img" accept="image/*">
-                    {% if dti and dti.board_image %}
-					    <img src="{{ dti.board_image.url }}" alt="이미지">
-					    <p>이전에 첨부했던 사진은 {{dti.board_image.name }}입니다. </p>
-					{% endif %}
+					    {% if image_name %}
+					        <p class="red-text">이전에 첨부했던 사진은 {{ image_name }}입니다.</p>
+					    {% else %}
+					        <p class="red-text">이전에 첨부한 사진이 없습니다.</p>
+					    {% endif %}
                 </div>
             </div>
         </div>
@@ -43,19 +59,32 @@
             <div class="col-lg-6">
                 <div class="form-group text-center">
                     <input class="btn btn-primary" type="submit" value="확인">
-                    <input class="btn btn-secondary" type="reset" value="수정 취소">
-                    <input class="btn btn-secondary" type="button" value="뒤로 가기" onclick="history.go(-1)">
+                    <input class="btn btn-secondary" type="reset" value="수정 초기화">
                 </div>
             </div>
         </div>
     </form>
+    
+    
+    
+</div>
 {% endblock %}
 
 
 
 
 
+<style>
+    /* 이전에 첨부했던 사진이 있는 경우에 적용할 스타일 */
+    .red-text {
+        color: red;
+    }
 
+    /* 이전에 첨부한 사진이 없는 경우에 적용할 스타일 */
+    .red-text {
+        color: red;
+    }
+</style>
 
 
 

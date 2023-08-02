@@ -1,0 +1,95 @@
+{%extends "user/base.html"%}
+{%load static%}
+{%block title%} <h2> </h2> {%endblock%}
+
+{%block content%}
+<head>
+  <meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+  	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  	<script src="{%static 'js/bootstrap.min.js' %}"></script>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="myPage">마이페이지</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#myNavbar" aria-expanded="false" aria-controls="myNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="modifyUser">회원정보수정</a></li>
+                <li class="nav-item"><a class="nav-link" href="reviewList">리뷰 관리</a></li>
+                <li class="nav-item"><a class="nav-link" href="purchaseDetail">구매 내역</a></li>
+                <li class="nav-item"><a class="nav-link" href="../purchasing/cart-list">장바구니</a></li>
+                <li class="nav-item"><a class="nav-link" href="myBoard">게시글 관리</a></li>
+                <li class="nav-item"><a class="nav-link" href="myComment">댓글 관리</a></li>
+                <li class="nav-item"><a class="nav-link" href="delete">회원 탈퇴</a></li>
+                {% if dto.user_grade_id == 1 %}
+                <li class="nav-item"><a class="nav-link" href="myReceiveCode">수령 코드 확인</a></li>
+                {% endif %}
+                {% if dto.user_grade_id == 2 %}
+                <li class="nav-item"><a class="nav-link" href="../store/mypage">점주 페이지</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+  <div class="row content">
+    <div class="col-xl-9">
+      <div class="well">
+        <!-- <h4>홍길동(aaa)님 안녕하세요</h4> -->
+        <h4>{{dto.user_name}}({{memid}})님 안녕하세요</h4>
+      </div>
+      <div class="row">
+        <div class="col-xl-3">
+          <div class="well">
+            <h4 align="center"><a href="addPointHis">포인트</a></h4>
+            <p align="center">{{dto.user_point}}</p>
+            <p align="center"><a href="addPoint">충전하기</a></p> 
+          </div>
+        </div>
+        <div class="col-xl-3">
+          <div class="well">
+            <h4 align="center">주문내역</h4>
+            <p align="center">{{purchase_c}}</p> 
+          </div>
+        </div>
+        <div class="col-xl-3">
+          <div class="well">
+            <h4 align="center">나의 리뷰</h4>
+            <p align="center">{{review_c}}</p> 
+          </div>
+        </div>
+        <div class="col-xl-3">
+          <div class="well">
+            <h4 align="center">장바구니</h4>
+            <p align="center">{{cart_c}}</p> 
+          </div>
+        </div>
+      </div>
+      <div class="row">
+      	<div class="col-xl-12">
+      		<div class="well">
+      		<h4>최근 본 상품</h4> 
+  			{%for wine_image in wine_images%}
+  			<a href="../detail/winedetail?wine_id={{wine_image.1}}">
+  				<img src="{{wine_image.0}}" width=150 height=150>  
+  			</a>
+  		
+  			{%endfor%}
+      		</div>
+      	</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
+{%endblock%}

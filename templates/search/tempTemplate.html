@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+ 
+<head>
+    <meta charset="utf-8">
+    <title>jQuery UI Slider</title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+    <script>
+        $(function() {
+            $("#slider-range-max").slider({
+                range: "max",
+                min: 1,
+                max: 10,
+                value: 2,
+                slide: function(event, ui) {
+                    $("#amount").val(ui.value);
+                }
+            });
+            $("#amount").val($("#slider-range-max").slider("value"));
+ 
+ 
+            $("#slider-range").slider({
+                range: true,
+                min: 0,
+                max: 500,
+                values: [75, 300],
+                slide: function(event, ui) {
+                    $("#amount2").val("$" + ui.values[0] + " - $" + ui.values[1]);
+                }
+            });
+            $("#amount2").val("$" + $("#slider-range").slider("values", 0) + " - $" + $("#slider-range").slider("values", 1));
+ 
+            $("#slider").slider({
+                value:10,
+                min: 0,
+                max: 100,
+                step: 10,
+                slide: function( event, ui ) {
+                    $( "#amount3" ).val( "$" + ui.value );
+                }
+            });
+            $( "#amount3" ).val( "$" + $( "#slider" ).slider( "value" ) );
+        });
+    </script>
+</head>
+ 
+<body>
+ 
+    <p>
+        <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+    </p>
+    <div id="slider-range-max"></div>
+ 
+    <p>
+        <input type="text" id="amount2" readonly style="border:0; color:#f6931f; font-weight:bold;">
+    </p>
+    <div id="slider-range"></div>
+ 
+    <p>
+        <input type="text" id="amount3" readonly style="border:0; color:#f6931f; font-weight:bold;">
+    </p>
+    <div id="slider"></div>
+</body>
+ 
+</html>

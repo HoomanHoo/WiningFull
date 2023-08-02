@@ -11,6 +11,8 @@ from _datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
 
+from django.core.paginator import Paginator
+
 PAGE_SIZE = 20  # 한페이지에 표시할 게시물 개수
 PAGE_BLOCK = 5  # 페이지 블록의 크기
 
@@ -50,6 +52,10 @@ class ListView(View):
             number = count - (pagenum - 1) * int(PAGE_SIZE)
             number = number - count - 1
             abs(number)
+
+
+            paginator = Paginator(dtos, PAGE_SIZE)
+            dtos = paginator.get_page(pagenum)
 
             startpage = pagenum // int(PAGE_BLOCK) * int(PAGE_BLOCK) + 1
             if pagenum % int(PAGE_BLOCK) == 0:
@@ -192,17 +198,24 @@ class UpdateCommentView(View):
     def post(self, request):
         comment_id = request.POST.get("comment_id")  # 수정할 댓글의 ID
         comment_content = request.POST.get("comment_content")  # 수정된 댓글 내용
-        
+        user_id = request.POST.get("user_id")  # 댓글 작성자의 ID
+
+
         # 댓글 ID와 내용이 모두 넘어왔는지 확인
-        if not comment_id or not comment_content:
+        if not comment_id or not comment_content or not user_id:
             return JsonResponse({"success": False, "message": "모든 필드를 입력해주세요."})
-        
+
         try:
             # DB에서 해당 댓글 가져오기
-            comment = WinComment.objects.get(id=comment_id)
+            comment = WinComment.objects.get(pk=comment_id)
         except WinComment.DoesNotExist:
             return JsonResponse({"success": False, "message": "해당 댓글을 찾을 수 없습니다."})
-        
+
+        # 댓글 작성자와 현재 로그인한 사용자가 같은지 검사
+
+        if comment.user_id != user_id:
+            return JsonResponse({"success": False, "message": "권한이 없습니다."}, status=403)
+
         # 댓글 내용 업데이트
         comment.comment_content = comment_content
         comment.save()
@@ -288,6 +301,7 @@ class ContentView(View):
         board_id = request.POST.get("board_id")
         user_id = request.POST.get("writer")
         comment_content = request.POST.get("content")
+        comment_id = request.POST.get("comment_id")  # 수정할 댓글의 ID
 
         if not board_id or not user_id or not comment_content:
             # 필수 입력 필드가 누락된 경우 처리
@@ -297,15 +311,28 @@ class ContentView(View):
                 "message": "모든 필드를 입력해주세요.",
             }
             return HttpResponse(template.render(context, request))
+        
+        # 댓글 수정을 위한 추가 로직
+        if comment_id:
+            dtc = get_object_or_404(WinComment, pk=comment_id)
+            # 댓글 작성자와 현재 로그인한 사용자가 같은지 검사
+            if dtc.user_id != user_id:
+                return JsonResponse({"success": False, "message": "권한이 없습니다."}, status=403)
 
-        dtc = WinComment(
-            board_id=board_id,
-            user_id=user_id,
-            comment_content=comment_content,
-            comment_reg_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            content_ip=request.META.get("REMOTE_ADDR"),
-        )
-        dtc.save()
+            dtc.comment_content = comment_content
+            dtc.save()
+
+            # JSON 응답 생성
+            return JsonResponse({"success": True, "message": "댓글이 수정되었습니다."})
+        else:
+            dtc = WinComment(
+                board_id=board_id,
+                user_id=user_id,
+                comment_content=comment_content,
+                comment_reg_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                content_ip=request.META.get("REMOTE_ADDR"),
+            )
+            dtc.save()
 
         # JSON 응답 생성
         return JsonResponse({"success": True, "dtc": dtc})
@@ -346,12 +373,14 @@ class UpdateView(View):
 
         dti = WinBoardImg.objects.filter(board=dto).first()
         image_url = dti.board_image.url if dti and dti.board_image else ""
+        image_name = dti.board_image.name if dti and dti.board_image else ""
 
         context = {
             "dto": dto,
             "num": request.GET["num"],
             "pagenum": request.GET["pagenum"],
             "image_url": image_url,
+            "image_name":image_name,
         }
         return HttpResponse(template.render(context, request))
 
@@ -384,8 +413,11 @@ class UpdateProView(View):
     def get(self, request, num):
         dto = WinBoard.objects.get(board_id=num)
         dti = WinBoardImg.objects.filter(board=dto).first()
-
-        return render(request, "updatepro.html", {"dto": dto}, {"dti": dti})
+        image_name = dti.board_image.name if dti and dti.board_image else ""
+        
+        context = {"dto": dto, "dti": dti, "image_name":image_name}
+        
+        return render(request, "updatepro.html", context)
 
     def post(self, request):
         num = request.POST["num"]
@@ -393,16 +425,14 @@ class UpdateProView(View):
         dto.board_title = request.POST["subject"]
         dto.board_content = request.POST["content"]
 
-        print(request.FILES)
-
+        # 이미지 업로드 처리
+        dti = WinBoardImg.objects.filter(board=dto).first()
         if "img" in request.FILES:
-            dti = WinBoardImg.objects.filter(board=dto).first()
             if not dti:
                 dti = WinBoardImg()
                 dti.board = dto
             dti.board_image = request.FILES["img"]
             dti.save()
-            print(f"Image uploaded successfully: {dti.board_image.url}")
 
         dto.save()
         return redirect("board:list")

@@ -14,7 +14,7 @@ class WinUser(models.Model):
     user_point = models.PositiveIntegerField()
 
     class Meta:
-        # managed = False
+        managed = False
         db_table = "win_user"
 
 
@@ -34,7 +34,7 @@ class WinUserFavorite(models.Model):
     fav_third_priority = models.IntegerField()
 
     class Meta:
-        # managed = False
+        managed = False
         db_table = "win_user_favorite"
 
 
@@ -43,7 +43,7 @@ class WinUserGrade(models.Model):
     user_grade_name = models.CharField(unique=True, max_length=30)
 
     class Meta:
-        # managed = False
+        managed = False
         db_table = "win_user_grade"
 
 
@@ -54,7 +54,7 @@ class WinPointHis(models.Model):
     point_add = models.IntegerField()
 
     class Meta:
-        # managed = False
+        managed = False
         db_table = "win_point_his"
 
 
@@ -67,5 +67,5 @@ class WinReview(models.Model):
     review_reg_time = models.DateTimeField()
 
     class Meta:
-        # managed = False
+        managed = False
         db_table = "win_review"

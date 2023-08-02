@@ -1,4 +1,4 @@
-import * as Vue from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
+import * as Vue from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
 let pageNum = 1;
 let oldList = [];
 

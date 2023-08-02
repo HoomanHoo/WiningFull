@@ -10,18 +10,159 @@
 	</head>
 	<body>
 	
+		
+	
 	{% block input %}
 			{% csrf_token %}
 			
-		1 : {{list_kind}} <br>
+		
+			<form method="post" action="searchbycategorylist" name="searchbycategory">
+				<div style="text-align:center"> 
+					<div> 
+						 와인 종류 <br>
+						<input type="checkbox" name="winekind" id="k0" value="0" checked="checked" onClick="default_k_check();">
+        				<label for="red">선택 없음</label>
+        				<input type="checkbox" name="winekind" id="k1" value="1" onClick="select_k_check();">
+        				<label for="red">레드</label>
+        				<input type="checkbox" name="winekind" id="k2" value="2" onClick="select_k_check();">
+        				<label for="purple">화이트</label>
+        				<input type="checkbox" name="winekind" id="k3" value="3" onClick="select_k_check();">
+        				<label for="black">로제</label>
+        				<input type="checkbox" name="winekind" id="k4" value="4" onClick="select_k_check();">
+        				<label for="black">스파클링</label>
+        				<input type="checkbox" name="winekind" id="k5" value="5" onClick="select_k_check();">
+        				<label for="black">주정강화</label>
+					</div>
+
+
+	
+					
+					<br>
+					<div> 
+						 와인 용량 <br>
+						<input type="checkbox" name="winecapacity" id="c0" value="1" checked="checked" onClick="default_c_check();">
+        				<label for="red">선택 없음</label>
+        				<input type="checkbox" name="winecapacity" id="c1" value="750" onClick="select_c_check();">
+        				<label for="red">750</label>
+        				<input type="checkbox" name="winecapacity" id="c2" value="0" onClick="select_c_check();">
+        				<label for="purple">not 750</label>
+					</div>
+					<br>
+					<div> 
+						 와인 도수 <br>  
+						<input type="number" name="alcmin" id="alcmin" value="0" min="0" max="25">
+        				
+        				~
+        				
+						<input type="number" name="alcmax" id="alcmax" value="25" min="0" max="25">
+        				
+					</div>
+					<br>
+					<div> 
+						 당도 <br>
+						<input type="checkbox" name="dangdo" id="d0" value="0" checked="checked" onClick="default_d_check();">
+        				<label for="red">선택 없음</label> 
+        				<input type="checkbox" name="dangdo" id="d1" value="1" onClick="select_d_check();">
+        				<label for="red">1</label>
+        				<input type="checkbox" name="dangdo" id="d2" value="2" onClick="select_d_check();">
+        				<label for="purple">2</label>
+        				<input type="checkbox" name="dangdo" id="d3" value="3" onClick="select_d_check();">
+        				<label for="black">3</label>
+        				<input type="checkbox" name="dangdo" id="d4" value="4" onClick="select_d_check();">
+        				<label for="black">4</label>
+        				<input type="checkbox" name="dangdo" id="d5" value="5" onClick="select_d_check();">
+        				<label for="black">5</label>
+					</div>
+					<br>
+					<div> 
+						 산도 <br>
+						<input type="checkbox" name="sando" id="s0" value="0" checked="checked" onClick="default_s_check();">
+        				<label for="red">선택 없음</label> 
+        				<input type="checkbox" name="sando" id="s1" value="1" onClick="select_s_check();">
+        				<label for="red">1</label>
+        				<input type="checkbox" name="sando" id="s2" value="2" onClick="select_s_check();">
+        				<label for="purple">2</label>
+        				<input type="checkbox" name="sando" id="s3" value="3" onClick="select_s_check();">
+        				<label for="black">3</label>
+        				<input type="checkbox" name="sando" id="s4" value="4" onClick="select_s_check();">
+        				<label for="black">4</label>
+        				<input type="checkbox" name="sando" id="s5" value="5" onClick="select_s_check();">
+        				<label for="black">5</label>
+					</div>
+					<br>
+					<div> 
+						 탄닌 <br>
+						<input type="checkbox" name="tannin" id="t0" value="0" checked="checked" onClick="default_t_check();">
+        				<label for="red">선택 없음</label> 
+        				<input type="checkbox" name="tannin" id="t1" value="1" onClick="select_t_check();">
+        				<label for="red">1</label>
+        				<input type="checkbox" name="tannin" id="t2" value="2" onClick="select_t_check();">
+        				<label for="purple">2</label>
+        				<input type="checkbox" name="tannin" id="t3" value="3" onClick="select_t_check();">
+        				<label for="black">3</label>
+        				<input type="checkbox" name="tannin" id="t4" value="4" onClick="select_t_check();">
+        				<label for="black">4</label>
+        				<input type="checkbox" name="tannin" id="t5" value="5" onClick="select_t_check();">
+        				<label for="black">5</label>
+					</div>
+					<br>
+					<div> 
+						 추천 음식 <br>
+						<input type="checkbox" name="winefood" id="f0" value="0" checked="checked" onClick="default_f_check();">
+        				<label for="red">선택 없음</label> 
+        				<input type="checkbox" name="winefood" id="f1" value="1" onClick="select_f_check();">
+        				<label for="red">스테이크</label>
+        				<input type="checkbox" name="winefood" id="f2" value="2" onClick="select_f_check();">
+        				<label for="purple">삼겹살</label>
+        				<input type="checkbox" name="winefood" id="f3" value="3" onClick="select_f_check();">
+        				<label for="black">생선</label>
+        				<input type="checkbox" name="winefood" id="f4" value="4" onClick="select_f_check();">
+        				<label for="black">치킨</label>
+        				<input type="checkbox" name="winefood" id="f5" value="5" onClick="select_f_check();">
+        				<label for="black">해산물</label>
+					</div>
+					<br>
+					<!--  
+					<input type="checkbox" name="category[]" id="category" value="{{ ct.id }}"> {{ ct.name }}
+					-->
+					
+
+					
+					
+					<div> 
+						 지역 <br>
+						<input type="checkbox" name="wineregion" id="r0" value="0" checked="checked" onClick="default_r_check();">
+        				<label for="red">선택 없음</label> 
+        				<input type="checkbox" name="wineregion" id="r1" value="1" onClick="select_r_check();">
+        				<label for="red">프랑스</label>
+        				<input type="checkbox" name="wineregion" id="r2" value="2" onClick="select_r_check();">
+        				<label for="purple">이탈리아</label>
+        				<input type="checkbox" name="wineregion" id="r3" value="3" onClick="select_r_check();">
+        				<label for="black">스페인</label>
+        				<input type="checkbox" name="wineregion" id="r4" value="4" onClick="select_r_check();">
+        				<label for="black">미국</label>
+        				<input type="checkbox" name="wineregion" id="r5" value="5" onClick="select_r_check();">
+        				<label for="black">칠레</label>
+        				<input type="checkbox" name="wineregion" id="r6" value="6" onClick="select_r_check();">
+        				<label for="black">그 외</label>
+					</div>
+					<br>
+							
+				</div>
+									
+	<script src="{% static 'js/searchByCategory.js' %}" ></script>
+
+				<input class="inputbutton" type="submit" value="검색">
+				
+			</form>
+	1 : {{list_kind}} <br>
         2 : {{list_capacity}} <br>
-        3 : {{list_alcohol}} <br>
+        <!--  3 : {{list_alc}} <br> -->
         4 : {{list_dangdo}} <br>
         5 : {{list_sando}} <br>
         6 : {{list_tannin}} <br>
         7 : {{list_food}} <br> 
         8 : {{list_region}} <br>
-	
 			
 	{% endblock %}	
 	<br><br>
@@ -32,11 +173,18 @@
 		{% if count == 0 %}										<!-- 검색 결과 유무에 따라 나눈다 -->
 				검색 결과가 없습니다
 		{% else %}
-			{% for dto_result in dtos_results %}								<!-- 검색 결과가 있다면 반복문으로 나타낸다 -->
-				<a href="../detail/winedetail?wine_id={{ index }}">
-					<div align="center" style="width:60%; height: 100px; border: 5px solid red; border-radius: 2em;">													<!-- 리스트 요소는 <div> 태그로 나타내고 <div> 영역 안에 image, 이름이 있다 -->
+			{% for category_result in category_results %}								<!-- 검색 결과가 있다면 반복문으로 나타낸다 -->
+				<a href="../detail/winedetail?wine_id={{category_result.wine_id}}">
+					<div align="center" style="width:60%; height: 100px; border: 5px solid rgb(170, 0, 4); border-radius: 2em;">													<!-- 리스트 요소는 <div> 태그로 나타내고 <div> 영역 안에 image, 이름이 있다 -->
 				 		<div align="left" ><img src="images/50x50.png" alt="Image"> </div>
-						<div style="text-align:left"> {{dto.wine_name}} </div>
+						<div style="text-align:left"> 이름 : {{category_result.wine_name}}  
+						용량 : {{category_result.wine_capacity}} 
+						도수 : {{category_result.wine_alc}}
+						당도 : {{category_result.wine_dangdo}}
+						산도 : {{category_result.wine_sando}}
+						탄닌 : {{category_result.wine_tannin}}
+						음식 : {{category_result.wine_food}}
+						생산지 : {{category_result.wine_region.wine_region_name}}</div>
 					</div>
 				</a>
 				<br><br>

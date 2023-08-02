@@ -69,12 +69,17 @@
           </div>
         </div>
 
-        {% if user_id %} {% csrf_token %}
-        <form method="post" action="../add-cart">
+        {% csrf_token %}
+        <form method="post" id="sellForm" action="../add-cart">
           <div class="row">
             <div class="col" style="text-align: right">수량</div>
             <div class="col">
-              <input type="hidden" name="userId" value="{{user_id}}" />
+              <input
+                type="hidden"
+                id="userId"
+                name="userId"
+                value="{{user_id}}"
+              />
               <input
                 type="hidden"
                 id="sellId"
@@ -122,7 +127,6 @@
             </div>
           </div>
         </form>
-        {% endif %}
       </div>
     </div>
     <div class="row">

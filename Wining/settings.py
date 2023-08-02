@@ -43,7 +43,7 @@ LOGGING = {
             "class": "logging.handlers.RotatingFileHandler",
             "filename": os.path.join(BASE_DIR, "log/logfile.log"),
             "encoding": "utf-8",
-            "maxBytes": 1024 * 1024 * 5,
+            "maxBytes": 1024 * 1024 * 256,
             "backupCount": 5,
             "formatter": "format1",
         },
@@ -194,7 +194,7 @@ TIME_ZONE = "Asia/Seoul"
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)

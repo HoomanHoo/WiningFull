@@ -11,10 +11,39 @@
 		<!-- ♠ bootstrap 적용 -->
 	</head>
 	<body> 
+		{% block title %} 
+			<h2 align="center"> Wining </h2> 
+		{% endblock %}
+	<br><br>						
+		{% block select %}								<!-- 검색 방법 선택 -->
 		
-		<br><br>						
-
-		<br><br>
+		<a href="/search/main">
+			<div>
+				검색어 검색 
+			</div>
+		</a>
+		<a href="/search/searchbycategory">
+			<div>
+				카테고리 검색 
+			</div>
+		</a>
+		{% if request.session.memid %}
+		<a href="/search/searchbyuser">
+			<div>
+				추천 검색 
+			</div>
+		</a>
+		{% else %}
+		
+		{% endif %}
+		<a href="/search/searchbyrank">
+			<div>
+				순위별 검색 
+			</div>
+		</a>
+		{% endblock %}
+	<br><br>
+	
 		{% block input %}
 			{% csrf_token %}
 <!--  

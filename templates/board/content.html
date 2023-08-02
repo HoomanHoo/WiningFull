@@ -34,21 +34,15 @@
 	
 	<div class="row">
 	    <div class="col-lg-6">
-	        <input class="btn btn-primary ml-2" type="button" value="이전으로" onclick="location='list?pagenum={{ pagenum }}'">
-			<button class="btn btn-primary" onclick="toggleLike('{{ dto.board_id }}')">
-			    {% if dto.board_like > 0 %}
-			        <i class="fas fa-heart"></i> <!-- 이미 좋아요를 누른 경우 하트 아이콘 표시 -->
-			    {% else %}
-			        <i class="far fa-heart"></i> <!-- 좋아요를 누르지 않은 경우 빈 하트 아이콘 표시 -->
-			    {% endif %}
-			    좋아요
-			</button>
+	        <input class="btn btn-primary ml-2" type="button" value="뒤로가기" onclick="location='list?pagenum={{ pagenum }}'">
 	    </div>
 	    <div class="col-lg-6 text-right">
 	        {% if request.session.memid == dto.user_id %}
-		        <input class="btn btn-lg btn-transparent btn-hover-primary" type="button" value="글수정" onclick="location='update?num={{ dto.board_id }}&pagenum={{ pagenum }}'">
-		        <input class="btn btn-lg btn-transparent btn-hover-primary" type="button" value="글삭제" onclick="confirmDelete('{{dto.board_id}}', '{{pagenum}}')">
-	    	{% endif %}
+	            <div class="d-flex justify-content-end">
+	                <input class="btn btn-lg btn-transparent btn-hover-primary ml-2" type="button" value="글수정" onclick="location='update?num={{ dto.board_id }}&pagenum={{ pagenum }}'">
+	                <input class="btn btn-lg btn-transparent btn-hover-primary ml-2" type="button" value="글삭제" onclick="confirmDelete('{{dto.board_id}}', '{{pagenum}}')">
+	            </div>	    	
+            {% endif %}
 	    </div>
 	</div>				
 						
@@ -123,6 +117,10 @@
 	    </div>
 	</div>
 	
+	<div class="row mt-3">
+		<input class="btn btn-primary ml-2" type="button" value="뒤로가기" onclick="location='list?pagenum={{ pagenum }}'">
+	</div>
+	
 	<br><br><br><br>
 	
 	<div class="comment-section mt-4">
@@ -130,25 +128,32 @@
 	
 		<!-- 댓글 작성 폼 -->
 		<form id="comment-form" class="comment-form d-flex flex-column justify-content-end">
-			<input type="hidden" name="board_id" value="{{ dto.board_id }}">
-			{% if request.session.memid %}
-				<div class="form-group">
-					<input type="text" name="writer" class="form-control input-small" placeholder="{{request.session.memid}}">
-				</div>
-			{% endif %}
-			<br>
-			<div class="form-group d-flex">
-				<textarea name="content" class="form-control flex-grow-1" placeholder="댓글 내용을 입력하세요..."></textarea>
-			</div>
-			<br>
-			<button type="submit" class="btn btn-primary ml-2">댓글입력</button>
+		    <input type="hidden" name="board_id" value="{{ dto.board_id }}">
+		    {% if request.session.memid %}
+		        <div class="form-group">
+		            <input type="text" name="writer" class="form-control input-small" value="{{ request.session.memid }}" readonly>
+		        </div>
+		        <br>
+		        <div class="form-group d-flex">
+		            <textarea name="content" class="form-control flex-grow-1" placeholder="댓글을 남겨보세요"></textarea>
+		        </div>
+		        <br>
+		        <button type="button" class="btn btn-primary ml-2" onclick="submitComment()">등록</button>
+		    {% else %}    
+		        <br>
+		        <div class="form-group d-flex">
+		            <textarea name="content" class="form-control flex-grow-1" placeholder="로그인한 회원만 댓글을 작성할 수 있습니다." readonly></textarea>
+		        </div>
+		        <br>
+		        <button type="button" class="btn btn-primary ml-2" onclick="checkLogin()">댓글입력</button>
+		    {% endif %}
 		</form>
 	
 		<br><br>
 	
 	
 	
-		<h3 class="section-title">&nbsp;<span class="comment-count"> 총 댓글 : {{ comment_count }}개</span></h3>
+		<h5 class="section-title">&nbsp;<span class="comment-count"> 총 댓글 : <span style="color:red">{{ comment_count }}</span>개</span></h5>
 		
 		<table class="table table-striped">
 			<thead class="table table-dark">
@@ -164,12 +169,23 @@
 				{% for dtc in dtcs %}
 				<tr>
 					<td>{{ dtc.user_id }}</td>
-					<td>{{ dtc.comment_content }}</td>
-					<td> <!-- 추가된 부분 -->
-						<button class="edit-button" onclick="editComment('{{ dtc.comment_id }}')">수정</button>
-						&nbsp;
-						<button class="delete-button" onclick="confirmDeleteComment('{{ dtc.comment_id }}')">삭제</button>
-					</td>
+					
+			        <td>
+			            <div class="comment-content" data-commentid="{{ dtc.comment_id }}">{{ dtc.comment_content }}</div>
+			            <div class="edit-comment-form d-none" data-commentid="{{ dtc.comment_id }}">
+			                <textarea class="form-control">{{ dtc.comment_content }}</textarea>
+			                <button class="btn btn-primary mt-2 save-button">저장</button>
+			                <button class="btn btn-secondary mt-2 cancel-button">취소</button>
+			            </div>
+			        </td>
+			        <td>
+			            {% if request.session.memid == dtc.user_id %}
+			            <button class="edit-button" data-commentid="{{ dtc.comment_id }}">수정</button>
+			            &nbsp;
+			            <button class="delete-button">삭제</button>
+			            {% endif %}
+			        </td>
+			        
 					<td>{{ dtc.comment_reg_time }}</td>
 				</tr>
 				{% empty %}
@@ -185,96 +201,6 @@
 
 <!-- 사용자별로 색상 다르게 하는 코드 -->
 <script>
-
-		function toggleLike(boardId) {
-		    // AJAX를 이용하여 서버에 좋아요 처리 요청 보내기
-		    fetch(`/board/toggle_like?num=${boardId}`, {
-		        method: 'POST',
-		        headers: {
-		            'Content-Type': 'application/json',
-		            'X-CSRFToken': getCookie('csrftoken'), // CSRF 토큰 설정
-		        },
-		    })
-		    .then(response => response.json())
-		    .then(data => {
-		        if (data.success) {
-		            // 서버에서 좋아요 처리가 성공한 경우, 좋아요 버튼을 업데이트
-		            const likeButton = document.querySelector(`[onclick="toggleLike('${boardId}')"]`);
-		            const likeIcon = likeButton.querySelector('i');
-		            if (data.liked) {
-		                likeIcon.className = 'fas fa-heart';
-		            } else {
-		                likeIcon.className = 'far fa-heart';
-		            }
-		        } else {
-		            alert('좋아요 처리에 실패했습니다.');
-		        }
-		    })
-		    .catch(error => {
-		        console.error('Error:', error);
-		        alert('좋아요 처리에 실패했습니다.');
-		    });
-		}
-		
-		// CSRF 토큰을 가져오는 함수
-		function getCookie(name) {
-		    var cookieValue = null;
-		    if (document.cookie && document.cookie !== '') {
-		        var cookies = document.cookie.split(';');
-		        for (var i = 0; i < cookies.length; i++) {
-		            var cookie = cookies[i].trim();
-		            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-		                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-		                break;
-		            }
-		        }
-		    }
-		    return cookieValue;
-		}	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	function copyUrlToClipboard() {
-	    // 복사할 URL 가져오기
-	    var url = window.location.href;
-	
-	    // 가상의 textarea 엘리먼트를 생성하여 값을 할당하고 복사
-	    var textarea = document.createElement("textarea");
-	    textarea.value = url;
-	    document.body.appendChild(textarea);
-	    textarea.select();
-	    document.execCommand("copy");
-	    document.body.removeChild(textarea);
-	
-	    // 복사 성공 메시지 등 필요한 작업 추가
-	    alert("URL이 클립보드에 복사되었습니다.");
-	  }
-
-
-	function scrollToTop() {
-	  window.scrollTo(0, 0);
-	}
-
-	function scrollToBottom() {
-	  window.scrollTo(0, document.body.scrollHeight);
-	}
-
-
-
-
-
-
 	function getRandomColor() {
 		var letters = '0123456789ABCDEF';
 		var color = '#';
@@ -294,18 +220,19 @@
 		}
 		usernames[i].style.color = usernameColors[username];
 	}
+	
+	
+	
+	
+	
+	
+	
 
-	
-	
-	
-	
-	
-	
 	document.getElementById("comment-form").addEventListener("submit", function (event) {
 		event.preventDefault(); // 기본 동작 중단
 
 		var form = new FormData(this);
-
+		var csrfToken = getCookie('csrftoken');
 		var xhr = new XMLHttpRequest();
 		xhr.open("POST", "{% url 'board:writecomment' %}", true);
 		xhr.onreadystatechange = function () {
@@ -318,9 +245,9 @@
 							// 새로운 댓글을 추가하고 목록 업데이트
 							var commentTableBody = document.getElementById("comment-table-body");
 							var newRow = commentTableBody.insertRow();
-							//var newCell1 = newRow.insertCell();
+							var newCell1 = newRow.insertCell();
 							var newCell2 = newRow.insertCell();
-							//newCell1.textContent = response.dtc.user_id;
+							newCell1.textContent = response.dtc.user_id;
 							newCell2.innerHTML = response.dtc.comment_content.replace(/\n/g, "<br>");
 							
 						} else {
@@ -337,6 +264,7 @@
 				}
 			}
 		};
+		xhr.setRequestHeader('X-CSRFToken', csrfToken);
 		xhr.send(form);
 		this.reset();
 		//location.reload();
@@ -346,70 +274,498 @@
 	
 	
 	
-	
-	
-	function confirmDeleteComment(commentId, pageNum) {
-		if (confirm('댓글을 삭제하시겠습니까?')) {
-			var csrftokenElement = document.querySelector('[name=csrfmiddlewaretoken]');
-			if (csrftokenElement) {
-				var csrftoken = csrftokenElement.value;
 
-				fetch('deletecomment/' + commentId + '/?pagenum=' + pageNum, {
-					method: 'DELETE',
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded',
-						'X-CSRFToken': csrftoken
-					}
-				})
-					.then(response => {
-						if (response.ok) {
-							return response.json();
-						} else {
-							throw new Error('댓글 삭제에 실패했습니다.');
-						}
-					})
-					.then(data => {
-						if (data.success) {
-							location.reload(); // 삭제 후 페이지를 새로고침합니다.
-						} else {
-							throw new Error('댓글 삭제에 실패했습니다.');
-						}
-					})
-					.catch(error => {
-						console.error('Error:', error);
-						alert(error.message);
-					});
-			} else {
-				console.error('CSRF 토큰을 찾을 수 없습니다.');
-			}
+	
+	
+	
+	
+	
+
+	// 댓글 삭제 버튼 클릭 시 이벤트 리스너 추가
+	document.querySelectorAll('.delete-button').forEach(button => {
+	    button.addEventListener('click', () => {
+	        const commentId = button.parentElement.parentElement.querySelector('.comment-content').dataset.commentid;
+	        const csrfToken = getCookie('csrftoken'); // CSRF 토큰 가져오기
+	        const pageNum = '{{ pagenum }}'; // Django 템플릿에서 페이지 번호 가져오기
+
+	        if (confirm('댓글을 삭제하시겠습니까?')) {
+	            if (!csrfToken) {
+	                console.error('CSRF 토큰을 찾을 수 없습니다.');
+	                return;
+	            }
+
+	            fetch('deletecomment/' + commentId + '/?pagenum=' + pageNum, {
+	                method: 'DELETE',
+	                headers: {
+	                    'Content-Type': 'application/x-www-form-urlencoded',
+	                    'X-CSRFToken': csrfToken
+	                }
+	            })
+	            .then(response => {
+	                if (response.ok) {
+	                    return response.json();
+	                } else {
+	                    throw new Error('댓글 삭제에 실패했습니다.');
+	                }
+	            })
+	            .then(data => {
+	                if (data.success) {
+	                    location.reload(); // 삭제 후 페이지를 새로고침합니다.
+	                } else {
+	                    throw new Error('댓글 삭제에 실패했습니다.');
+	                }
+	            })
+	            .catch(error => {
+	                console.error('Error:', error);
+	                alert(error.message);
+	            });
+	        }
+	    });
+	});
+	
+	
+	
+
+
+	
+	function saveEditedComment(commentId) {
+	    // 수정된 부분 1: 해당 commentId를 가진 수정 폼 찾기
+	    const commentForm = document.querySelector(`[data-commentid="${commentId}"] .edit-comment-form`);
+	    if (!commentForm) {
+	        console.error(`Comment form with commentId ${commentId} not found.`);
+	        return;
+	    }
+	    
+	    // 수정된 부분 2: textarea 요소 찾기
+	    const textarea = commentForm.querySelector('textarea');
+	   
+
+	    // 수정된 부분 3: 댓글 내용 가져오기
+	    const commentContent = textarea.value.trim();
+	    
+	    if (!commentContent) {
+	        alert('댓글 내용을 입력해주세요.');
+	        return;
+	    }
+
+	    // 수정된 부분 4: CSRF 토큰 가져오기
+	    const csrfToken = getCookie('csrftoken');
+
+	    // 수정된 부분 5: 서버로 수정된 댓글 내용 전송
+	    fetch('/updatecomment/', {
+	        method: 'POST',
+	        headers: {
+	            'Content-Type': 'application/json',
+	            'X-CSRFToken': csrfToken,
+	        },
+	        body: JSON.stringify({
+	            comment_id: commentId,
+	            comment_content: commentContent,
+	        }),
+	    })
+	    .then(response => response.json())
+	    .then(data => {
+	        if (data.success) {
+	            // 수정된 댓글 내용으로 업데이트
+	            const commentContentDiv = document.querySelector(`[data-commentid="${commentId}"] .comment-content`);
+	            commentContentDiv.textContent = commentContent;
+
+	            // 폼 토글
+	            toggleEditCommentForm(commentId);
+	        } else {
+	            alert(data.message);
+	        }
+	    })
+	    .catch(error => {
+	        console.error('Error:', error);
+	    });
+	}
+	
+
+	
+	
+
+	
+	// 수정된 부분 6: "저장" 버튼에 이벤트 리스너 추가
+    document.querySelectorAll('.save-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const commentId = button.parentElement.dataset.commentid;
+            saveEditedComment(commentId);
+        });
+    });
+
+    // 수정된 부분 7: 폼 토글 함수
+    function toggleEditCommentForm(commentId) {
+        const commentContentDiv = document.querySelector(`[data-commentid="${commentId}"] .comment-content`);
+        const editCommentForm = document.querySelector(`[data-commentid="${commentId}"] .edit-comment-form`);
+
+        if (commentContentDiv && editCommentForm) {
+            commentContentDiv.classList.toggle('d-none');
+            editCommentForm.classList.toggle('d-none');
+        } else {
+            console.error(`Comment element with commentId ${commentId} not found.`);
+        }
+    }
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+
+
+
+	// 댓글 입력창 열기
+	function openCommentInput() {
+		const commentInput = document.getElementById('comment-input');
+		if (commentInput) {
+			commentInput.classList.toggle('d-none');
 		}
 	}
-
 	
 	
 	
 	
 	
 	
-	
-	function getCookie(name) {
-		var cookieValue = null;
-		if (document.cookie && document.cookie !== '') {
-			var cookies = document.cookie.split(';');
-			for (var i = 0; i < cookies.length; i++) {
-				var cookie = cookies[i].trim();
-				if (cookie.substring(0, name.length + 1) === (name + '=')) {
-					cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-					break;
+	function submitComment() {
+		// 폼 데이터를 가져옴
+		var form = new FormData(document.getElementById("comment-form"));
+		var csrfToken = getCookie('csrftoken');
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", "{% url 'board:writecomment' %}", true);
+		xhr.onreadystatechange = function () {
+			if (xhr.readyState === XMLHttpRequest.DONE) {
+				if (xhr.status === 200) {
+					// 서버로부터 받은 응답 처리
+					try {
+						var response = JSON.parse(xhr.responseText);
+						if (response.success) {
+							// 새로운 댓글을 추가하고 목록 업데이트
+							var commentTableBody = document.getElementById("comment-table-body");
+							var newRow = commentTableBody.insertRow();
+							var newCell1 = newRow.insertCell();
+							var newCell2 = newRow.insertCell();
+							newCell1.textContent = response.dtc.user_id;
+							newCell2.innerHTML = response.dtc.comment_content.replace(/\n/g, "<br>");
+						} else {
+							alert("댓글 작성에 실패했습니다.");
+						}
+					} catch (error) {
+						console.error('Error : ', error);
+						//alert("댓글 작성에 성공했습니다...");
+						location.reload();
+					}
+				} else {
+					alert("댓글 작성에 실패했습니다...");
 				}
 			}
-		}
-		return cookieValue;
+		};
+		xhr.setRequestHeader('X-CSRFToken', csrfToken);
+		xhr.send(form);
+		//this.reset(); // form 요소의 reset() 함수는 사용하지 않음
+		//location.reload(); // 새로고침은 필요 없음
 	}
+	
+	
+	
+    // "등록" 버튼에 이벤트 리스너 추가
+    document.querySelector('.btn-primary').addEventListener('click', function() {
+        var form = new FormData(document.getElementById('comment-form'));
+        var csrfToken = getCookie('csrftoken');
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '{% url "board:writecomment" %}', true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        if (response.success) {
+                            var commentTableBody = document.getElementById('comment-table-body');
+                            var newRow = commentTableBody.insertRow();
+                            var newCell1 = newRow.insertCell();
+                            var newCell2 = newRow.insertCell();
+                            newCell1.textContent = response.dtc.user_id;
+                            newCell2.innerHTML = response.dtc.comment_content.replace(/\n/g, '<br>');
+                        } else {
+                            alert('댓글 작성에 실패했습니다.');
+                        }
+                    } catch (error) {
+                        console.error('Error : ', error);
+                        location.reload();
+                    }
+                } else {
+                    alert('댓글 작성에 실패했습니다.');
+                }
+            }
+        };
+        xhr.setRequestHeader('X-CSRFToken', csrfToken);
+        xhr.send(form);
+    });
+	
+	
+	document.querySelectorAll('.edit-button').forEach(button => {
+		button.addEventListener('click', () => {
+			const commentId = button.parentElement.parentElement.querySelector('.comment-content').dataset.commentid;
+			const commentContentDiv = button.parentElement.parentElement.querySelector('.comment-content');
+			const editCommentForm = button.parentElement.parentElement.querySelector('.edit-comment-form');
+
+			if (commentContentDiv && editCommentForm) {
+				const commentContent = commentContentDiv.textContent.trim(); // 댓글 내용 가져오기
+				const textarea = editCommentForm.querySelector("textarea"); // textarea 요소 가져오기
+				textarea.value = commentContent; // 댓글 내용을 textarea에 설정
+
+				commentContentDiv.classList.add('d-none');
+				editCommentForm.classList.remove('d-none');
+				
+				//saveEditedComment(commentId);
+			} else {
+				console.error(`Comment element with commentId ${commentId} not found.`);
+			}
+		});
+	});
+	
+	
+	
+	
+	
+	document.querySelectorAll('.cancel-button').forEach(button => {
+		button.addEventListener('click', () => {
+			const commentId = button.parentElement.dataset.commentid;
+			const commentContentDiv = button.parentElement.parentElement.querySelector('.comment-content');
+			const editCommentForm = button.parentElement;
+
+			if (commentContentDiv && editCommentForm) {
+				commentContentDiv.classList.remove('d-none');
+				editCommentForm.classList.add('d-none');
+			} else {
+				console.error(`Comment element with commentId ${commentId} not found.`);
+			}
+		});
+	});
+	
+	
+	
+
+	
+	
+	
+	
+	
+	function saveEditedComment(commentId) {
+	    // 수정된 부분 1: 해당 commentId를 가진 수정 폼 찾기
+	    const commentForm = document.querySelector(`[data-commentid="${commentId}"] .edit-comment-form`);
+	    if (!commentForm) {
+	        console.error(`Comment form with commentId ${commentId} not found.`);
+	        return;
+	    }
+	    
+	    // 수정된 부분 2: textarea 요소 찾기
+	    const textarea = commentForm.querySelector('textarea');
+	   
+
+	    // 수정된 부분 3: 댓글 내용 가져오기
+	    const commentContent = textarea.value.trim();
+	    
+	    if (!commentContent) {
+	        alert('댓글 내용을 입력해주세요.');
+	        return;
+	    }
+
+	    // 수정된 부분 4: CSRF 토큰 가져오기
+	    const csrfToken = getCookie('csrftoken');
+
+	    // 수정된 부분 5: 서버로 수정된 댓글 내용 전송
+	    fetch('/updatecomment/', {
+	        method: 'POST',
+	        headers: {
+	            'Content-Type': 'application/json',
+	            'X-CSRFToken': csrfToken,
+	        },
+	        body: JSON.stringify({
+	            comment_id: commentId,
+	            comment_content: commentContent,
+	        }),
+	    })
+	    .then(response => response.json())
+	    .then(data => {
+	        if (data.success) {
+	            // 수정된 댓글 내용으로 업데이트
+	            const commentContentDiv = document.querySelector(`[data-commentid="${commentId}"] .comment-content`);
+	            commentContentDiv.textContent = commentContent;
+
+	            // 폼 토글
+	            toggleEditCommentForm(commentId);
+	        } else {
+	            alert(data.message);
+	        }
+	    })
+	    .catch(error => {
+	        console.error('Error:', error);
+	    });
+	}
+	
+	
+	
+    // 폼 토글 함수
+    function toggleEditCommentForm(commentId) {
+        const commentContentDiv = document.querySelector(`[data-commentid="${commentId}"] .comment-content`);
+        const editCommentForm = document.querySelector(`[data-commentid="${commentId}"] .edit-comment-form`);
+
+        if (commentContentDiv && editCommentForm) {
+            commentContentDiv.classList.toggle('d-none');
+            editCommentForm.classList.toggle('d-none');
+        } else {
+            console.error(`Comment element with commentId ${commentId} not found.`);
+        }
+    }
+	
+	
+	
+	
+	
+
+	// 스크롤 이벤트 리스너 추가
+	window.addEventListener('scroll', function () {
+		var scrollButtonTop = document.querySelector('.scroll-button.top-button');
+		if (scrollButtonTop) {
+			if (window.scrollY > 100) {
+				scrollButtonTop.classList.add('show');
+			} else {
+				scrollButtonTop.classList.remove('show');
+			}
+		}
+
+		var scrollButtonBottom = document.querySelector('.scroll-button.bottom-button');
+		if (scrollButtonBottom) {
+			if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 100) {
+				scrollButtonBottom.classList.add('show');
+			} else {
+				scrollButtonBottom.classList.remove('show');
+			}
+		}
+	});
+
+	
+	// 페이지 상단으로 스크롤
+	function scrollToTop() {
+		window.scrollTo({ top: 0, behavior: 'smooth' });
+	}
+
+	// 페이지 하단으로 스크롤
+	function scrollToBottom() {
+		window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+	}
+
+	// URL을 클립보드에 복사
+	function copyUrlToClipboard() {
+		var dummy = document.createElement('textarea');
+		document.body.appendChild(dummy);
+		dummy.value = window.location.href;
+		dummy.select();
+		document.execCommand('copy');
+		document.body.removeChild(dummy);
+		alert('URL이 복사되었습니다.');
+	}
+	
+	
+	
+	// 로그인 여부 확인 후 로그인 페이지로 이동
+	function checkLogin() {
+		alert('로그인이 필요합니다.');
+		location.href = '/accounts/login/?next=' + window.location.pathname;
+	}
+	
+	
+	
+	
+	
+	
+	
+	// CSRF 토큰을 가져오는 함수
+	function getCookie(name) {
+	    var cookieValue = null;
+	    if (document.cookie && document.cookie !== '') {
+	        var cookies = document.cookie.split(';');
+	        for (var i = 0; i < cookies.length; i++) {
+	            var cookie = cookies[i].trim();
+	            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+	                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+	                break;
+	            }
+	        }
+	    }
+	    return cookieValue;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 </script>
 
 
 <style>
+
+
+  /* 작성자 라벨 스타일 */
+  .my-comment .label {
+    background-color: gold;
+    color: #000;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-right: 5px;
+  }
+
+  /* 작성자 댓글 스타일 */
+  .my-comment {
+    background-color: #03c75a;
+    color: #ffffff;
+    font-weight: bold;
+  }
+
+  /* 작성자 아이콘 스타일 */
+  .my-comment i {
+    color: gold;
+    margin-right: 5px;
+  }
+
+
+
+
+
+
+  .red-text {
+  	color:red;
+  }
+  .right-align {
+  	text-align:right;
+  }
+  .right-margin {
+  	margin-right:120px;
+  }
+  
+  .board-title {
+  	text-align:left;
+  	margin-left:90px;
+  }
+
+
+
+
+
+
+
+
   .scroll-button {
     position: fixed;
     padding: 5px;
@@ -455,9 +811,11 @@
 
 	.edit-button,
 	.delete-button {
-		border: none;
-		background-color: transparent;
-		padding: 0;
+	  color: grey;
+	  background-color: transparent;
+	  border: none;
+	  cursor: pointer;
+	  transition: color 0.3s; /* 색 변화에 대한 트랜지션 설정 */
 	}
 
 	.edit-button:hover,

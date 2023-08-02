@@ -31,7 +31,8 @@ urlpatterns = [  # init_url == "http://localhost:8000/board/list"
     #    path("image", views.ImageView.as_view(), name="image"),
     #    path("imagedown", views.ImageDownView.as_view(), name="imagedown"),
     path("uploadimage", views.UploadImageView.as_view(), name="uploadimage"),
-	path('updatecomment/', views.UpdateCommentView.as_view(), name="updatecomment") 
+	#path('updatecomment/', views.UpdateCommentView.as_view(), name="updatecomment"),
+    path('updatecomment/', views.UpdateCommentView.as_view(), name='update_comment'),
 ]
 urlpatterns += static(
     settings.STATIC_URL, document_root=settings.STATIC_URL

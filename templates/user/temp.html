@@ -1,0 +1,73 @@
+{%extends "user/modifyUser.html"%}
+{%csrf_token%}
+{%load static%}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<div class="container-fluid">
+	<div class="row content">
+		<div class="col-sm-3 sidenav">
+			<h4><a href="myPage">마이페이지</a></h4>
+			<ul class="nav nav-pills nav-stacked">
+				<li><a href="modifyUser">회원정보수정</a></li>
+				<li><a href="reviewList">리뷰 관리</a></li>
+				<li><a href="purchaseDetail">구매 내역</a></li>
+				<li><a href="../purchasing/cart-list">장바구니</a></li>
+				<li class="active"><a href="myBoard">게시글 관리</a></li>
+				<li><a href="myComment">댓글 관리</a></li>
+				<li><a href="delete">회원 탈퇴</a></li>
+			</ul><br>
+		</div>
+		
+		<div class="container mt-4">
+			{%for dto, image in dtos_and_images%}
+		    <div class="card p-3">
+		        <div class="row">
+		            <div class="col-md-4">
+		                <div class="position-relative snipimage">
+		                	<img src="{{image}}" class="rounded img-fluid w-100 img-responsive">
+		                    <!-- <img src="https://item.kakaocdn.net/do/227099b086918f895eaa636a43fdc9234022de826f725e10df604bf1b9725cfd" class="rounded img-fluid w-100 img-responsive"> -->
+		                </div>
+		            </div>
+		            <div class="col-md-8">
+		                <div class="mt-2">
+		                  <div class="d-flex justify-content-between align-items-center">
+		                    <h5><span class="days-ago">{{dto.board_reg_time}}</span></h5>
+		                    <span><i class="fa fa-heart text-danger"></i> </span>
+		                  </div>
+		                  <div class="d-flex justify-content-md-start justify-content-between views-content mt-2">
+		                      <div class="d-flex flex-row align-items-center">
+		                          <i class="fa fa-eye"></i>
+		                          <h6><span class="ms-1 views">조회수 : {{dto.board_read_count}}</span></h6>
+		                      </div>
+		                        <div class="d-flex flex-row align-items-center ms-2">
+		                          <i class="fa fa-heart"></i>
+		                            <h6><span class="ms-1 views">추천수 : {{dto.board_read_count}}</span></h6>  
+		                      </div> 
+		                  </div>
+		                  <div class="d-flex flex-row mt-3">
+		                      <div class="ms-2 d-flex flex-column">
+		                         <div class="d-flex flex-row align-items-center">
+		                         	<a href="../board/content?num={{dto.board_id}}">
+		                              <h3 class="mb-1">{{dto.board_title}}</h3>
+		                            </a>  
+		                         <span class="dots"></span>
+		                         </div>
+		                         <h4>{{dto.board_content}}</h4>
+		                      </div>
+		                  </div>
+		                </div>
+		            </div>
+		        </div>
+		    </div>
+		    {%endfor%}
+		</div>
+	</div>
+	</div>
+</body>
+</html>

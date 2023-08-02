@@ -1,4 +1,9 @@
-<!DOCTYPE html>
+
+
+{% load static %}
+
+
+
 <html lang="en">
 <head>
   <title>와인 상세 정보</title>
@@ -15,9 +20,26 @@
 </head>
 <body>
 
+{% if request.session.memid  %}
+			<div class="right-align">
+  				<a href="/user/logout" class="btn btn-primary"> 로그아웃 </a> &nbsp;&nbsp;&nbsp;
+  				<a href="/user/myPage" class="btn btn-primary"> 마이페이지 </a> &nbsp;&nbsp;&nbsp;
+				<a href="/board/list" class="btn btn-primary"> 게시판 </a> &nbsp;&nbsp;&nbsp;&nbsp;
+				<a href="/search/main" class="btn btn-primary"> 메인/검색 </a> &nbsp;&nbsp;&nbsp;&nbsp;
+			</div>
+		{% else %}
+			<div class="right-align">
+  				<a href="/user/login" class="btn btn-primary"> 로그인 </a> &nbsp;&nbsp;&nbsp;
+				<a href="/board/list" class="btn btn-primary"> 게시판 </a> &nbsp;&nbsp;&nbsp;&nbsp;
+				<a href="/search/main" class="btn btn-primary"> 메인/검색 </a> &nbsp;&nbsp;&nbsp;&nbsp;
+			</div>
+		{% endif %}	
+
+
+{% block detail %}
 <br><br><br>
 	<div style="text-align:center"> 
-		<img src="{{ wine_info.wine_image.url }}" width="300" height="400"> 
+		<img src="{{ wine_info.wine_image }}" width="300" height="400"> 
 	</div>
 
 <div class="row" style="text-align:center">
@@ -26,45 +48,131 @@
 <div class="row" style="text-align:center">
 	<h5>{{ wine_info.wine_name_eng }} </h5>
 </div>
+<br>
+<br>
 
-
-<div class="container mt-5">
-  <div class="row">
+<div class="container mt-5" style="text-align:center">
+  <div class="row" style="text-align:center">
     <div class="col-sm-4">
-      <div class="fakeimg">{{ wine_info.wine_sort }} </div>
+      <div class="fakeimg"> <span class="info"> 분류 : {{ det_kind }} </span> </div>
     </div>
     <div class="col-sm-4">
-      <div class="fakeimg">{{ region.wine_region_name }} </div>
+      <div class="fakeimg"> <span class="info"> 생산 국가 : {{ region.wine_region_name }} </span> </div>
     </div>
     <div class="col-sm-4">
-      <div class="fakeimg">{{ wine_info.wine_food }} </div>
+      <div class="fakeimg"> <span class="info"> 사이드 음식 : {{ det_food }} </span> </div>
     </div>
    <div class="row">
    </div>
   </div>
-  <div class="row">
+  <br><br>
+  <div class="row" style="text-align:center">
    <div class="col-sm-4">
-     <div class="fakeimg">{{ wine_info.wine_alc }} </div>
+     <div class="fakeimg"> <span class="info"> 도수 : {{ wine_info.wine_alc }} </span> </div>
    </div>
    <div class="col-sm-8">
      <div class="fakeimg">
-		{{ wine_info.wine_dangdo }}
-		{{ wine_info.wine_sando }}
-		{{ wine_info.wine_tannin }}
+		당도 : {{ wine_info.wine_dangdo }}
+		산도 : {{ wine_info.wine_sando }}
+		탄닌 : {{ wine_info.wine_tannin }}
+		
+		
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+		<canvas id="myChart" width="100" height="100"></canvas>
+		<script>
+		
+		let taste_spec = [];
+		taste_spec.push("{{ wine_info.wine_dangdo }}");
+		taste_spec.push("{{ wine_info.wine_sando }}");
+		taste_spec.push("{{ wine_info.wine_tannin }}");
+		
+		let taste_spec_name = ["당도", "산도", "탄닌"];
+		
+		const ctxTaste = document.getElementById('chartTaste').getContext('2d');
+		const chartTaste = new Chart(chartTaste, {
+		    type: 'bar',
+		    data: {
+		        labels: taste_spec_name,
+		        datasets: [{
+		            label: '# of Votes',
+		            data: taste_spec,
+		            backgroundColor: [
+		                'rgba(255, 99, 132, 0.2)'
+		            ],
+		            borderColor: [
+		                'rgba(255, 99, 132, 1)'
+		            ],
+		            borderWidth: 1
+		        }]
+		    },
+		    options: {
+		    	responsive: false,
+		        scales: {
+		            y: {
+		                beginAtZero: true
+		            }
+		        }
+		    }
+		});
+</script>
+		
+		
 	 </div>
    </div>
-  </div>
-
+  	</div>
+  </div>  
+ <br><br>
   <div class="row">
+ 	<div class="col">
   		{% if request.session.memid %}
 		    <input class="inputbutton" type="button" value="매장 리스트업"
-		    	onclick="location='../purchasing/wine/{{ wine_info.wine_id }}/stores'">
-		{% else %}
-		    	
+		    	onclick="location='../purchasing/wine/{{ wine_info.wine_id }}/stores'">    
+		    	<!-- onclick="location='../purchasing/store-list?wine_id={{ wine_info.wine_id }}'"> -->	    	
+		{% else %}   	
 		    <input class="inputbutton" type="button" value="매장 리스트업"
 		    	value="구매하려면 로그인을 해야합니다." disabled="disabled">
-  		{% endif %}
+		</div>
+		{% endif %}
+	<div class="col">
+		    	<input class="inputbutton" type="button" value="뒤로 가기"
+		    	onclick="history.back()">
+  	</div>	
   </div>
+		
+	{% endblock %}	
+	{% block recommend %}	
+
+	<div class="row">
+	     <div class="col-sm-12">
+	      	<div class="well">
+	  			{%for recommend in recommend_list %}
+	  			<a href="winedetail?wine_id={{recommend.wine_id}}">
+	  				<img src="../{{recommend.wine_image}}" width=150 height=150>
+	  			</a>
+	  			{%endfor%}
+	      	</div>
+	      </div>
+	</div>
+
+	
+	{% endblock %}	
+
+
+<style>
+.fakeimg {
+            height: 200px;
+            background-color: #F5A9A9;
+        }
+
+.info 	{
+			font-size : x-large;
+		}
+
+.row	{
+			text-align : center;
+		}
+</style>
 
 <br>
 <div class="mt-5 p-4 bg-dark text-white text-center">

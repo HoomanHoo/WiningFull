@@ -8,10 +8,17 @@
 		<!-- ♠ bootstrap 적용 -->
 	</head>
 	<body> 
-		
+		{% block title %} 
+			<h2 align="center"> Wining </h2> 
+		{% endblock %}
 		<br><br>						
 		{% block select %}								<!-- 검색 방법 선택 -->
 		
+		<a href="/search/main">
+			<div>
+				검색어 검색 
+			</div>
+		</a>
 		<a href="/search/searchbycategory">
 			<div>
 				카테고리 검색 
@@ -40,7 +47,13 @@
 		
 			{% csrf_token %}
 			<form method="post" action="searchbynamelist" name="searchbyname">				<!-- 검색어 입력하고 submit 하면 "http://localhost:8000/search/searchbynamelist" -->
-				<div style="text-align:center"> 
+				
+				
+				<div style="text-align:center">
+					<select name="namelanguage">
+						<option value="winenamekor"> 한국어 </option> 
+						<option value="winenameeng"> 영문이름 </option>
+					</select> 
 					<input class="input" type="text" name="searchname" maxlength="100"
 						style="width:400px; height:30px"  autofocus>	
 					<input class="inputbutton" type="submit" value="검색">	

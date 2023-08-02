@@ -1,0 +1,293 @@
+{% load static %}
+
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
+		<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+		<meta charset="UTF-8">
+		<title> 게시판 </title>
+	
+	
+	
+		<style>
+		
+		    body {
+		      font-family: 'Noto Sans', Arial, sans-serif;
+		      background-color: #f5f5f5;
+		      margin: 0;
+		    }
+		    .header {
+		      background-color: #03c75a;
+		      color: #ffffff;
+		      padding: 10px;
+		      text-align: center;
+		    }
+		    .right-align {
+		      text-align: right;
+		    }
+		    .btn {
+		      display: inline-block;
+		      background-color: #03c75a;
+		      color: #ffffff;
+		      padding: 8px 16px;
+		      border: none;
+		      text-decoration: none;
+		      border-radius: 20px;
+		      margin-right: 10px;
+		      font-weight: bold;
+		      cursor: pointer;
+		      transition: background-color 0.3s;
+		    }
+		    
+		    .btn:hover {
+		      background-color: #00af4a;
+		    }
+		    
+		    .btn-primary {
+		      background-color: #03c75a;
+		    }
+		    
+		    .center-text {
+		      display: flex;
+		      justify-content: center;
+		    }
+		    
+		    .left-align {
+		      text-align: left;
+		      margin-left: 10px;
+		    }
+		    
+		    .left-margin {
+		      margin-left: 10px;
+		    }
+		    
+		    .right-margin {
+		      margin-right: 10px;
+		    }
+		    
+		    footer {
+		      text-align: center;
+		      padding: 3px;
+		      background-color: #b0c4de;
+		      color: #ffffff;
+		    }
+		    
+		    footer p {
+		      font-size: 90%;
+		      margin: 4px;
+		    }
+		    
+		    .red-text {
+		      color: #ff0000;
+		      font-weight: bold;
+		    }
+				
+		
+
+		
+			.all-browsers {
+			  margin: 0;
+			  padding: 5px;
+			  background-color: lightgray;
+			}
+			
+			.all-browsers > h1, .browser {
+			  margin: 10px;
+			  padding: 5px;
+			}
+			
+			.browser {
+			  background: white;
+			}
+			
+			.browser > h2, p {
+			  margin: 4px;
+			  font-size: 90%;
+			}
+			
+			footer {
+			  text-align: center;
+			  padding: 3px;
+			  background-color: lightsteelblue;
+			  color: white;
+			}
+		</style>
+	
+	
+	
+	
+	
+
+		<link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">	
+		<script src="{% static 'js/jquery-3.6.4.js'%}"></script>
+		<script src="{% static 'js/script_board.js'%}"></script>
+			<style>
+				.center-text {
+					display: flex;
+					justify-content: center;
+				}
+				.right-align {
+					float:right;
+				}
+			</style>
+	</head>
+	<body>
+		
+
+		
+		<br>&nbsp;&nbsp;&nbsp;
+  		&nbsp;&nbsp;&nbsp;
+  		
+  		{% if request.session.memid %}
+		    <div class="form-group right-align right-margin">
+		    	<i class="fas fa-user"></i>
+		    	<span class='red-text'>{{ request.session.memid }}</span>님이 로그인하였습니다.
+		    	
+		    </div>
+		{% else %}
+		    <div class="form-group right-align right-margin">
+		        <span class='red-text'>로그인되지 않은 상태입니다.</span>
+		    </div>
+		{% endif %}
+  		
+  		
+  		
+		{% if request.session.memid  %}			<!-- 로그인 상단 바 -->
+			<div class="right-align">
+  				<a href="/user/myPage" class="btn btn-primary"> 마이페이지 </a> &nbsp;&nbsp;&nbsp;
+				<a href="/board/list" class="btn btn-primary"> 게시판 </a> &nbsp;&nbsp;&nbsp;&nbsp;
+				<a href="/search/main" class="btn btn-primary"> 메인/검색 </a> &nbsp;&nbsp;&nbsp;&nbsp;
+				
+				
+				
+				<a href="#" class="logout-button btn btn-primary"> 로그아웃 </a> &nbsp;&nbsp;&nbsp;
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<!--  <i class="fas fa-sign-in-alt"></i>-->
+			</div><br>
+		{% else %}								<!-- 비로그인 상단 바 -->
+			<div class="right-align">
+				<a href="/board/list" class="btn btn-primary"> 게시판 </a> &nbsp;&nbsp;&nbsp;&nbsp;
+				<a href="/search/main" class="btn btn-primary"> 메인/검색 </a> &nbsp;&nbsp;&nbsp;&nbsp;
+				<a href="/user/login" class="btn btn-primary"> 로그인 </a> &nbsp;&nbsp;&nbsp;
+			</div>
+		{% endif %}
+	
+	
+
+	
+		<br><br>
+		<div class="left-align left-margin">
+			{% block title %} <h2> 자유게시판 </h2> {% endblock %}
+		</div>
+		
+		{% block content %}
+		
+		
+		
+		{% endblock %}
+		
+		
+		
+    		<!-- 하단 내용 작성 -->
+   		<footer>
+   			<br>
+   			<p>&copy; 2023 WINING website. All rights reserved.</p>
+   			<br>
+  			<p>Author: 비트교육센터 종강좀 해라 방학이라도 해<br>
+  				<a>IN CONTACT : www.naver.com<br>
+  				   9월에 몽골가는 날만 간절히 기다리는 중이다.</a>
+  		    </p>
+		
+				
+				<br>
+				
+		</footer>
+		
+		
+		
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.17/dist/sweetalert2.all.min.js"></script>
+
+<script>
+// 확인 창을 띄우는 함수
+function confirmLogout() {
+    Swal.fire({
+        title: '로그아웃 하겠습니까?',
+        icon: 'success',
+        showCancelButton: true,
+        
+        confirmButtonText: '로그아웃',
+        cancelButtonText: '취소',
+        reverseButtons: true,
+        customClass: {
+            container: 'custom-modal-container', // 사용자 정의 컨테이너 클래스
+            title: 'custom-modal-title', // 사용자 정의 타이틀 클래스
+            confirmButton: 'custom-modal-confirm-button', // 사용자 정의 확인 버튼 클래스
+            cancelButton: 'custom-modal-cancel-button', // 사용자 정의 취소 버튼 클래스
+        },
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // 확인을 누르면 로그아웃 URL로 이동
+            window.location.href = '/user/logout';
+        } else {
+            // 취소를 누르면 아무 동작도 하지 않음
+            return false;
+        }
+    });
+}
+
+// 로그아웃 버튼에 onclick 이벤트 추가
+document.querySelector(".logout-button").addEventListener("click", confirmLogout);
+</script>
+
+			<style>
+				/* 사용자 정의 모달 스타일 */
+				.custom-modal-container {
+				    border: 2px solid #555;
+				    border-radius: 8px;
+				    background-color: #f8f8f8;
+				}
+				
+				.custom-modal-title {
+				    color: #555;
+				}
+				
+				.custom-modal-confirm-button, .custom-modal-cancel-button {
+				    background-color: #03c75a;
+				    color: #ffffff;
+				    padding: 8px 16px;
+				    border: none;
+				    text-decoration: none;
+				    border-radius: 20px;
+				    margin-right: 10px;
+				    font-weight: bold;
+				    cursor: pointer;
+				    transition: background-color 0.3s;
+				}
+				
+				.custom-modal-confirm-button:hover, .custom-modal-cancel-button:hover {
+				    background-color: #00af4a;
+				}
+			</style>
+		
+		
+		
+	</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -28,27 +28,4 @@
 	</div> 
 </div>
 </form>
-
-
-<!-- 
-<script>
-	function calculatePoints() {
-		var chargePoint = parseInt(document.getElementById("chargePoint").value);
-		var currentPoint = parseInt(document.getElementById("currentPoint").value);
-		
-		$.ajax({
-			url: "/addPoint",
-			type: "post",
-			data : {amount: chargePoint, points: currentPoint},
-			success: function(response) {
-				var afterChargePoint = response.afterchargepoint;
-				document.getElementById("afterChargePoint").textContent = afterChargePoint;
-			},
-			error: function(xhr, status, error) {
-				console, log("Error :", error);
-			}
-		});
-	}
-</script>
- -->
 {%endblock%}

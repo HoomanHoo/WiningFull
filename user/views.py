@@ -10,11 +10,13 @@ from django.utils.dateformat import DateFormat
 from datetime import datetime
 from board.models import WinBoard, WinComment, WinBoardImg
 from store.models import WinSell
-from purchasing.models import WinPurchase, WinPurchaseDetail, WinCart, WinReceiveCode
+from purchasing.models import WinPurchase, WinPurchaseDetail, WinCart, WinReceiveCode,\
+    WinCartDetail
 from detail.models import WinDetailView
 from django.contrib.messages.context_processors import messages
 from django.urls.base import reverse
 from django.db.models import F
+from django.core.files.storage import default_storage
 
 
 class LoginView(View):
@@ -80,14 +82,14 @@ class InputUserView(View):
         # default_grade = 1
 
         dto = WinUser(
-            user_id=request.POST["user_id"],
-            user_grade=WinUserGrade.objects.get(user_grade=1),
-            user_passwd=request.POST["user_passwd"],
-            user_name=request.POST["user_name"],
-            user_email=request.POST["user_email"],
-            user_tel=request.POST["user_tel"],
-            user_reg_date=DateFormat(datetime.now()).format("Y-m-d h:i:s"),
-            user_point=user_point,
+            user_id = request.POST["user_id"],
+            user_grade = WinUserGrade.objects.get(user_grade=1),
+            user_passwd = request.POST["user_passwd"],
+            user_name = request.POST["user_name"],
+            user_email = request.POST["user_email"],
+            user_tel = request.POST["user_tel"],
+            user_reg_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            user_point = user_point,
         )
         dto.save()
 
@@ -95,12 +97,15 @@ class InputUserView(View):
             user=WinUser.objects.get(user_id=dto.user_id),
             fav_wine_color=request.POST["color"],
             fav_alc=request.POST["alc"],
-            fav_numbwith=request.POST["num"],
+            fav_numbwith=request.POST["comp_num"],
             fav_sweet=request.POST["sweet"],
             fav_bitter=request.POST["bitter"],
             fav_sour=request.POST["sour"],
             fav_season=request.POST["season"],
             fav_food=request.POST["food"],
+            fav_first_priority=request.POST["fav_first"],
+            fav_second_priority=request.POST["fav_second"],
+            fav_third_priority=request.POST["fav_third"],
         )
         fdto.save()
 
@@ -203,13 +208,15 @@ class ModifyUserView(View):
         template = loader.get_template("user/modifyUser.html")
         user_id = request.session.get("memid")
         dto = WinUser.objects.get(user_id=user_id)
-
-        try:
-            fdto = WinUserFavorite.objects.get(user_id=user_id)
-        except WinUserFavorite.DoesNotExist:
-            fdto = None
-
-        context = {"user_id": user_id, "dto": dto, "fdto": fdto}
+        print(dto.user_grade_id)
+        if (dto.user_grade_id == 1) : 
+            try:
+                fdto = WinUserFavorite.objects.get(user_id=user_id)
+            except WinUserFavorite.DoesNotExist:
+                fdto = None
+            context = {"user_id": user_id, "dto": dto, "fdto": fdto}
+        else: 
+            context = {"user_id": user_id, "dto": dto}
 
         return HttpResponse(template.render(context, request))
 
@@ -234,6 +241,9 @@ class ModifyUserView(View):
             fdto.fav_sour = request.POST["sour"]
             fdto.fav_season = request.POST["season"]
             fdto.fav_food = request.POST["food"]
+            fdto.fav_first_priority=request.POST["fav_first"]
+            fdto.fav_second_priority=request.POST["fav_second"]
+            fdto.fav_third_priority=request.POST["fav_third"]
 
             fdto.save()
 
@@ -248,6 +258,9 @@ class ModifyUserView(View):
             fdto.fav_sour = request.POST["sour"]
             fdto.fav_season = request.POST["season"]
             fdto.fav_food = request.POST["food"]
+            fdto.fav_first_priority=request.POST["fav_first"]
+            fdto.fav_second_priority=request.POST["fav_second"]
+            fdto.fav_third_priority=request.POST["fav_third"]
 
             fdto.save()
 
@@ -261,17 +274,21 @@ class MyPageView(View):
         dto = WinUser.objects.get(user_id=memid)
         purchase_c = WinPurchase.objects.filter(user_id=memid).count()
         review_c = WinReview.objects.filter(user_id=memid).count()
-        cart_c = WinCart.objects.filter(user_id=memid).count()
+        cart_c = WinCartDetail.objects.select_related("cart").filter(cart__user_id=memid).count()
         detail_v = WinDetailView.objects.filter(user_id=memid).order_by(
             "-detail_view_time"
-        )[:6]
+        )[:6].select_related("wine")
         user_grade = dto.user_grade_id
 
         wine_images = []
-
+        
+        
         for v in detail_v:
-            wine_images.append(v.wine.wine_image)
-
+            wine_images.append([v.wine.wine_image, v.wine.wine_id])
+        
+        print(detail_v)    
+        print(wine_images)
+            
         if memid:
             context = {
                 "memid": memid,
@@ -316,11 +333,11 @@ class ReviewWriteView(View):
         user_id = request.session.get("memid")
         sell_id = request.POST.get("sell_id")
         dto = WinReview(
-            user=WinUser.objects.get(user_id=user_id),
-            sell_id=sell_id,
-            review_content=request.POST["content"],
-            review_score=request.POST["rating"],
-            review_reg_time=DateFormat(datetime.now()).format("Y-m-d h:i:s"),
+            user = WinUser.objects.get(user_id=user_id),
+            sell_id = sell_id,
+            review_content = request.POST["content"],
+            review_score = request.POST["rating"],
+            review_reg_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         )
         dto.save()
 
@@ -345,6 +362,7 @@ class PurchaseDetailView(View):
 
             for purchase_detail in purchase_details:
                 wine_name = purchase_detail.sell.wine.wine_name
+                wine_name_eng = purchase_detail.sell.wine.wine_name_eng
                 wine_image = purchase_detail.sell.wine.wine_image
                 purchase_price = purchase_detail.purchase_det_price
                 purchase_number = purchase_detail.purchase_det_number
@@ -354,6 +372,7 @@ class PurchaseDetailView(View):
                 dtos.append(
                     {
                         "wine_name": wine_name,
+                        "wine_name_eng": wine_name_eng,
                         "wine_image": wine_image,
                         "purchase_price": purchase_price,
                         "purchase_number": purchase_number,
@@ -373,18 +392,42 @@ class MyBoardView(View):
         user_id = request.session.get("memid")
         dtos = WinBoard.objects.filter(user_id=user_id).order_by("-board_reg_time")
 
+        print(dtos)
+        print(dtos.count())
+
         board_images = []
+        
 
         for dto in dtos:
             images = WinBoardImg.objects.filter(board=dto)
 
             if images.exists():
-                board_images.append(images[0].board_image.url)
+                board_images.append(images[0].board_image)
+                
+                
             else:
                 board_images.append("")
+                
 
-        context = {"dtos_and_images": zip(dtos, board_images)}
+        
+        
+        dtos_and_images = zip(dtos, board_images)
+            
+        for dto in dtos:
+            
+            print(dto.board_reg_time)
+            print(dto.board_read_count)
+            print(dto.board_title)
+            print(dto.board_content)
+            print(board_images)
+            
 
+            
+        context = {"dtos_and_images": dtos_and_images,
+                   "user_id" : user_id,
+                  }
+        
+        
         return HttpResponse(template.render(context, request))
 
 
@@ -423,9 +466,9 @@ class AddPointView(View):
         dto.save()
 
         pdto = WinPointHis(
-            user=WinUser.objects.get(user_id=dto.user_id),
-            point_reg=DateFormat(datetime.now()).format("Y-m-d h:i:s"),
-            point_add=chargepoint,
+            user = WinUser.objects.get(user_id=dto.user_id),
+            point_reg = datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            point_add = chargepoint,
         )
 
         pdto.save()
