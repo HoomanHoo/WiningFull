@@ -13,6 +13,6 @@ function priceCalc(){
 
 
 function buyListLocation(){
-	link = "buy-list?sellid=" + sellId.value + "&qnty=" + document.getElementById("qnty").value;
+	link = "../payment?sellid=" + sellId.value + "&qnty=" + document.getElementById("qnty").value;
 	location.href = link;
 }

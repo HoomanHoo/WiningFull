@@ -50,7 +50,6 @@ function paging() {
 			newWineAlc.setAttribute("id", wineName + 3);
 			newWineAlc.setAttribute("value", wineAlc);
 
-
 			wineList.appendChild(newRow);
 			newRow.appendChild(newWineInfo);
 			newWineInfo.innerText = wineName;
@@ -58,12 +57,10 @@ function paging() {
 			newWineInfo.appendChild(newWineCapacity);
 			newWineInfo.appendChild(newWineAlc);
 
-
 			const wineNames = document.querySelectorAll(".wineName");
 			for (let i = 0; i < wineNames.length; i++) {
 				wineNames[i].addEventListener("click", addElement);
 			}
-
 		}
 		let prev = document.getElementById("prev");
 		let next = document.getElementById("next");
@@ -87,7 +84,6 @@ function paging() {
 		}
 		for (var i = 0; i < pages.length; i++) {
 
-
 			let newPages = document.createElement("li");
 			newPages.setAttribute("class", "page-item page-num-list");
 			let newPageNum = document.createElement("a");
@@ -99,12 +95,9 @@ function paging() {
 			newPages.appendChild(newPageNum);
 			next.before(newPages);
 			newPageNum.addEventListener("click", paging);
-
 		}
-
 	})
 }
-
 
 function deleteRow() {
 	const row = this.parentNode;
@@ -116,7 +109,6 @@ function deleteDefaultRow() {
 	wineId = row.querySelector("input[name=wineId]").value
 	url = "/store/discontinue-product?wineid=" + wineId
 	fetch(url).then((response) => response.json()).then((data) => alert(data["result"]))
-
 
 	row.replaceChildren();
 }
@@ -160,7 +152,6 @@ function searchByName() {
 					newWineAlc.setAttribute("id", wineName + 3);
 					newWineAlc.setAttribute("value", wineAlc);
 
-
 					wineList.appendChild(newRow);
 					newRow.appendChild(newWineInfo);
 					newWineInfo.innerText = wineName;
@@ -173,7 +164,6 @@ function searchByName() {
 					for (let i = 0; i < wineNames.length; i++) {
 						wineNames[i].addEventListener("click", addElement);
 					}
-
 				}
 				let prev = document.getElementById("prev");
 				let next = document.getElementById("next");
@@ -197,7 +187,6 @@ function searchByName() {
 				}
 				for (var i = 0; i < pages.length; i++) {
 
-
 					let newPages = document.createElement("li");
 					newPages.setAttribute("class", "page-item page-num-list");
 					let newPageNum = document.createElement("a");
@@ -212,56 +201,6 @@ function searchByName() {
 
 				}
 
-
-				//해야할 행동(리스폰스 값 받아서 html에 div row - div col - innerText로 뿌려주기)
-				//	alert(result.result[0]);
-				// wineList.replaceChildren();
-
-				// for (let i = 0; i < result.result.length; i++) {
-
-				// 	console.log(result.result[i][1]);
-
-
-
-				// 	const newWineRow = document.createElement("div");
-				// 	newWineRow.setAttribute("id", "wineRow" + i);
-				// 	newWineRow.setAttribute("class", "row wineRow");
-
-				// 	const newWineCol = document.createElement("div");
-				// 	newWineCol.setAttribute("id", result.result[i][1]);
-				// 	newWineCol.setAttribute("class", "col wineName");
-
-				// 	const newWineId = document.createElement("input");
-				// 	newWineId.setAttribute("type", "hidden");
-				// 	newWineId.setAttribute("id", result.result[i][1] + 1);
-				// 	newWineId.setAttribute("value", result.result[i][0]);
-
-				// 	const newWineCapacity = document.createElement("input");
-				// 	newWineCapacity.setAttribute("type", "hidden");
-				// 	newWineCapacity.setAttribute("id", result.result[i][1] + 2);
-				// 	newWineCapacity.setAttribute("value", result.result[i][2]);
-
-				// 	const newWineAlc = document.createElement("input");
-				// 	newWineAlc.setAttribute("type", "hidden");
-				// 	newWineAlc.setAttribute("id", result.result[i][1] + 3);
-				// 	newWineAlc.setAttribute("value", result.result[i][3]);
-
-				// 	wineList.appendChild(newWineRow);
-
-				// 	const newListRow = document.getElementById("wineRow" + i);
-				// 	newListRow.appendChild(newWineCol);
-
-				// 	const newListeCol = document.getElementById(result.result[i][1]);
-				// 	newListeCol.innerText = result.result[i][1];
-				// 	newListeCol.appendChild(newWineId);
-				// 	newListeCol.appendChild(newWineCapacity);
-				// 	newListeCol.appendChild(newWineAlc);
-
-				// }
-				// const wineNames = document.querySelectorAll(".wineName");
-				// for (let i = 0; i < wineNames.length; i++) {
-				// 	wineNames[i].addEventListener("click", addElement);
-				// }
 			}
 			else if (xhttp.status === 500) {
 				console.log("서버에 문제가 발생했습니다. 잠시 뒤 다시 시도해주세요");
@@ -270,9 +209,7 @@ function searchByName() {
 				alert("문제가 발생했습니다 잠시 뒤 다시 시도해주세요");
 			}
 		}
-		//		else{
-		//			alert("문제가 발생했습니다 잠시 뒤 다시 시도해주세요 xhttp.readState");
-		//		}
+
 	};
 
 	xhttp.open("GET", url);
@@ -296,9 +233,6 @@ function checkValue(){
 	}
 }
 
-
-
-
 function addElement() {
 	const tid = this.id;
 	const tid1 = tid + 1;
@@ -312,7 +246,6 @@ function addElement() {
 		alert("이미 추가된 상품입니다")
 	}
 	else {
-
 		const wineId = document.getElementById(tid1);
 		const wineCapacity = document.getElementById(tid2);
 		const wineAlc = document.getElementById(tid3);
@@ -342,7 +275,6 @@ function addElement() {
 		newPdtCpcity.setAttribute("type", "text");
 		newPdtCpcity.setAttribute("class", "col-1");
 		newPdtCpcity.setAttribute("name", "wineCapacity");
-		//		newPdtCpcity.setAttribute("style", "width:8%");
 		newPdtCpcity.setAttribute("value", wineCapacity.value);
 		newPdtCpcity.setAttribute("readonly", "true");
 
@@ -351,7 +283,6 @@ function addElement() {
 		newPdtAlc.setAttribute("class", "col-1");
 		newPdtAlc.setAttribute("name", "wineAlc");
 		newPdtAlc.setAttribute("value", wineAlc.value);
-		//		newPdtAlc.setAttribute("style", "width:8%");
 		newPdtAlc.setAttribute("readonly", "true");
 
 		const newPdtPrice = document.createElement("input");
@@ -373,7 +304,6 @@ function addElement() {
 		newDelBtn.setAttribute("value", "삭제");
 
 		productAdd.appendChild(newRow);
-		//		document.getElementById(tid4).appendChild(newCol);
 		document.getElementById(tid4).appendChild(newPdtId);
 		document.getElementById(tid4).appendChild(newPdtName);
 		document.getElementById(tid4).appendChild(newPdtCpcity);

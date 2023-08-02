@@ -55,7 +55,7 @@ btnCancel.addEventListener("click", function(){
 	const checkCancel = confirm("결제를 취소하시겠습니까?\n메인 페이지로 이동합니다");
 	
 	if (checkCancel == true){
-		location.href = "store-list";
+		location.href = "store-list";	//메인페이지 url 입력
 	}
 	else{
 		return false;

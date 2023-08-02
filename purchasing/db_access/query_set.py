@@ -1,6 +1,6 @@
 from django.db import transaction
 from django.db.models.query import QuerySet, Prefetch
-from django.db.models import F
+from django.db.models import F, Q
 from purchasing.models import (
     WinPurchase,
     WinPurchaseDetail,
@@ -8,6 +8,7 @@ from purchasing.models import (
     WinCartDetail,
     WinReceiveCode,
 )
+from django.core.exceptions import ObjectDoesNotExist
 from store.models import WinSell, WinRevenue
 from user.models import WinReview, WinUser
 from rest_framework import serializers
@@ -85,7 +86,7 @@ def insert_purchase(result: dict) -> list:
 
 
 @transaction.atomic
-def add_cart_info(user_id: str, sell_id: str, quantity: int, current_time: str) -> None:
+def add_cart_info(user_id: str, sell_id: str, quantity: int, current_time: str) -> int:
     cart_id = get_cart_id(user_id)
     print(cart_id)
     if cart_id == None:
@@ -97,10 +98,20 @@ def add_cart_info(user_id: str, sell_id: str, quantity: int, current_time: str) 
         cart_info.save()
         cart_id = cart_info.cart_id
 
-    cart_detail_info = WinCartDetail(
-        sell_id=sell_id, cart_id=cart_id, cart_det_qnty=quantity
-    )
-    cart_detail_info.save()
+    try:
+        cart_detail_info = WinCartDetail.objects.get(
+            Q(sell_id=sell_id), Q(cart_id=cart_id)
+        )
+        cart_detail_info.cart_det_qnty += quantity
+        cart_detail_info.save()
+    except ObjectDoesNotExist as ex:
+        print(ex)
+        cart_detail_info = WinCartDetail(
+            sell_id=sell_id, cart_id=cart_id, cart_det_qnty=quantity
+        )
+        cart_detail_info.save()
+
+    return cart_id
 
 
 def insert_enc_receive_codes(enc_receive_codes: list) -> None:

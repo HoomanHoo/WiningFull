@@ -235,35 +235,35 @@ class AddPickListView(View):
         current_time = DateFormat(datetime.now()).format("Y-m-d H:i:s")
 
         try:
-            add_cart_info(
+            cart_id = add_cart_info(
                 user_id=user_id,
                 sell_id=sell_id,
                 quantity=quantity,
                 current_time=current_time,
             )
-
+            return redirect("purchasing:cartList", cart_id=cart_id)
         except DatabaseError as dbError:
             print(dbError)
             return redirect("errorhandling:purchaseError")
 
-        return redirect("purchasing:cartList")
-
 
 class PickListView(View):
-    def get(self, request):
+    def get(self, request, **kwargs):
         user_id = request.session.get("memid")
-        cart_id = get_cart_id(user_id=user_id)
-        if cart_id != None:
-            page_infos = get_cart_list_page_info(cart_id=cart_id)
-            cart_id = cart_id
-            all_price = 0
-            for page_info in page_infos:
-                all_price += page_info.get("purchase_price")
+        cart_id = kwargs.get("cart_id", None)
 
-        else:
-            page_infos = []
-            all_price = 0
-            cart_id = -1
+        page_infos = []
+        all_price = 0
+
+        if cart_id == None:
+            cart_id = get_cart_id(user_id=user_id)
+            if cart_id == "":
+                cart_id = -1
+
+        page_infos = get_cart_list_page_info(cart_id=cart_id)
+
+        for page_info in page_infos:
+            all_price += page_info.get("purchase_price")
 
         template = loader.get_template("purchasing/pickList.html")
         context = {
