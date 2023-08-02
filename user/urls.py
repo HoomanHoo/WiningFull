@@ -18,4 +18,6 @@ urlpatterns = [  # init_url == "http://localhost:8000/user/login"
     path("addPointHis", views.AddPointHisView.as_view(), name="addPointHis"),
     path("myComment", views.MyCommentView.as_view(), name="myComment"),
     path("myReceiveCode", views.MyReceiveCodeView.as_view(), name="myReceiveCode"),
+    path("kakaologin", views.KaKaoLogin.as_view(), name="kakaoLogin"),
+    path("kakaoredirect", views.KakaoRedirectUri.as_view(), name="kakaoRedirect"),
 ]

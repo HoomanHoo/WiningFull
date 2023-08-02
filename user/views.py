@@ -4,14 +4,21 @@ from django.template import loader
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+import requests
+from Wining import settings
 from user.models import WinUser, WinUserGrade, WinUserFavorite, WinReview, WinPointHis
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.dateformat import DateFormat
 from datetime import datetime
 from board.models import WinBoard, WinComment, WinBoardImg
 from store.models import WinSell
-from purchasing.models import WinPurchase, WinPurchaseDetail, WinCart, WinReceiveCode,\
-    WinCartDetail
+from purchasing.models import (
+    WinPurchase,
+    WinPurchaseDetail,
+    WinCart,
+    WinReceiveCode,
+    WinCartDetail,
+)
 from detail.models import WinDetailView
 from django.contrib.messages.context_processors import messages
 from django.urls.base import reverse
@@ -67,6 +74,53 @@ class LogoutView(View):
 # return redirect("user/login.html")
 
 
+class KaKaoLogin(View):
+    def get(self, request):
+        REST_API_KEY = getattr(settings, "KAKAO_REST_API_KEY")
+        KAKAO_REDIRECT_URI = getattr(settings, "KAKAO_REDIRECT_URI")
+        print(KAKAO_REDIRECT_URI)
+        url = (
+            "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="
+            + REST_API_KEY
+            + "&redirect_uri="
+            + KAKAO_REDIRECT_URI
+        )
+
+        return redirect(url)
+
+
+class KakaoRedirectUri(View):
+    def get(self, request):
+        code = request.GET.get("code", None)
+        login_error = request.GET.get("error", None)
+        error_description = request.GET.get("error_description", None)
+        state = request.GET.get("state", None)
+        REST_API_KEY = getattr(settings, "KAKAO_REST_API_KEY")
+        KAKAO_REDIRECT_URI = getattr(settings, "KAKAO_REDIRECT_URI")
+        token_url = "https://kauth.kakao.com/oauth/token"
+        print(KAKAO_REDIRECT_URI)
+        print(code)
+        request_body = {
+            "grant_type": "authorization_code",
+            "client_id": REST_API_KEY,
+            "redirect_uri": KAKAO_REDIRECT_URI,
+            "code": code,
+        }
+
+        request_header = {
+            "Content-type": "application/x-www-form-urlencoded;charset=utf-8"
+        }
+
+        token_response = requests.post(
+            token_url, data=request_body, headers=request_header
+        )
+
+        token_json = token_response.json()
+        access_token = token_json["access_token"]
+
+        print(token_json)
+
+
 class InputUserView(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -82,14 +136,14 @@ class InputUserView(View):
         # default_grade = 1
 
         dto = WinUser(
-            user_id = request.POST["user_id"],
-            user_grade = WinUserGrade.objects.get(user_grade=1),
-            user_passwd = request.POST["user_passwd"],
-            user_name = request.POST["user_name"],
-            user_email = request.POST["user_email"],
-            user_tel = request.POST["user_tel"],
-            user_reg_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            user_point = user_point,
+            user_id=request.POST["user_id"],
+            user_grade=WinUserGrade.objects.get(user_grade=1),
+            user_passwd=request.POST["user_passwd"],
+            user_name=request.POST["user_name"],
+            user_email=request.POST["user_email"],
+            user_tel=request.POST["user_tel"],
+            user_reg_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            user_point=user_point,
         )
         dto.save()
 
@@ -209,13 +263,13 @@ class ModifyUserView(View):
         user_id = request.session.get("memid")
         dto = WinUser.objects.get(user_id=user_id)
         print(dto.user_grade_id)
-        if (dto.user_grade_id == 1) : 
+        if dto.user_grade_id == 1:
             try:
                 fdto = WinUserFavorite.objects.get(user_id=user_id)
             except WinUserFavorite.DoesNotExist:
                 fdto = None
             context = {"user_id": user_id, "dto": dto, "fdto": fdto}
-        else: 
+        else:
             context = {"user_id": user_id, "dto": dto}
 
         return HttpResponse(template.render(context, request))
@@ -241,9 +295,9 @@ class ModifyUserView(View):
             fdto.fav_sour = request.POST["sour"]
             fdto.fav_season = request.POST["season"]
             fdto.fav_food = request.POST["food"]
-            fdto.fav_first_priority=request.POST["fav_first"]
-            fdto.fav_second_priority=request.POST["fav_second"]
-            fdto.fav_third_priority=request.POST["fav_third"]
+            fdto.fav_first_priority = request.POST["fav_first"]
+            fdto.fav_second_priority = request.POST["fav_second"]
+            fdto.fav_third_priority = request.POST["fav_third"]
 
             fdto.save()
 
@@ -258,9 +312,9 @@ class ModifyUserView(View):
             fdto.fav_sour = request.POST["sour"]
             fdto.fav_season = request.POST["season"]
             fdto.fav_food = request.POST["food"]
-            fdto.fav_first_priority=request.POST["fav_first"]
-            fdto.fav_second_priority=request.POST["fav_second"]
-            fdto.fav_third_priority=request.POST["fav_third"]
+            fdto.fav_first_priority = request.POST["fav_first"]
+            fdto.fav_second_priority = request.POST["fav_second"]
+            fdto.fav_third_priority = request.POST["fav_third"]
 
             fdto.save()
 
@@ -274,10 +328,16 @@ class MyPageView(View):
         dto = WinUser.objects.get(user_id=memid)
         purchase_c = WinPurchase.objects.filter(user_id=memid).count()
         review_c = WinReview.objects.filter(user_id=memid).count()
-        cart_c = WinCartDetail.objects.select_related("cart").filter(cart__user_id=memid).count()
-        detail_v = WinDetailView.objects.filter(user_id=memid).order_by(
-            "-detail_view_time"
-        )[:6].select_related("wine")
+        cart_c = (
+            WinCartDetail.objects.select_related("cart")
+            .filter(cart__user_id=memid)
+            .count()
+        )
+        detail_v = (
+            WinDetailView.objects.filter(user_id=memid)
+            .order_by("-detail_view_time")[:6]
+            .select_related("wine")
+        )
         user_grade = dto.user_grade_id
 
         wine_images = []

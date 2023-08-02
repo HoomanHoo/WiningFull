@@ -224,4 +224,7 @@ STATICFILES_FINDERS = (
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+KAKAO_REST_API_KEY = "3928e19c741cff6d9be9122659cfc5ce"
+KAKAO_REDIRECT_URI = "http://localhost:8000/user/kakaoredirect"
+
 mimetypes.add_type("application/javascript", ".js", True)

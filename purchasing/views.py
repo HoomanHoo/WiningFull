@@ -264,9 +264,11 @@ class PickListView(View):
 
             return HttpResponse(template.render(context, request))
 
-    def post(self, request):
+    def post(self, request, **kwargs):
         request_body = json.loads(request.body)
         cart_detail_id = request_body.get("cartDetailId", None)
+
+        print(cart_detail_id)
         if cart_detail_id is not None:
             detail_cart = WinCartDetail.objects.get(cart_det_id=cart_detail_id)
             detail_cart.delete()
