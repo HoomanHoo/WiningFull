@@ -31,7 +31,18 @@
             <div class="col">
                 수령 코드
             </div>
+            <div class="col">
+                수령 상태
+            </div>
         </div>
+        {% if state == -1 %} 
+        <div class="row" style="text-align:center">
+            <div class="col">
+                구매 이력이 없습니다 
+            </div>
+        </div>
+        {% endif %}
+        {% if state != -1 %}
         {% for pdto in pdtos %}
             <div class="row">
                 <div class="col">
@@ -49,13 +60,61 @@
                 <div class="col">
                     {{pdto.receive_code}}
                 </div>
+                {% if pdto.purchase_state == 1 %}
+                <div class="col">
+                    미수령
+                </div>
+                {% endif %}
+                {% if pdto.purchase_state == 2 %}
+                <div class="col">
+                    수령
+                </div>
+                {% endif %}
             </div>
         {% endfor %}
-        <div class="row">
-            {% for pages in  pages_list %}
-                <a href="myReceiveCode?pageNum={{i}}">{{i}}</a>
-            {% endfor %}
+        <br />
+        <div id="pages" class="row" style="text-align:center">
+            <div class="col"></div>
+            <div class="col">
+                <nav>
+                    <ul class="pagination">
+                    {% with start=pages_count.0 %} {% if start < 6 %}
+                    <li id="prev" class="page-item disabled">
+                        <a class="page-link prev" name="pages">Previous</a>
+                    </li>
+                    {% endif %} {% if start >= 6 %}
+                    <li id="prev" class="page-item">
+                        <a class="page-link prev" name="pages" href="{{i|add:-1}}"
+                        >Previous</a
+                        >
+                    </li>
+                    {% endif %} {% endwith %} {% for i in pages_count %}
+                    <li class="page-item page-num-list">
+                        <a id="{{i}}" class="page-link page-num" name="pages" href="{{i}}"
+                        >{{i}}</a
+                        >
+                    </li>
+                    {% endfor %} {% with end=pages_count|last %} {% if end < 6 %}
+                    <li id="next" class="page-item disabled">
+                        <a id="{{next}}" class="page-link next" name="pages">Next</a>
+                    </li>
+                    {% endif %} {% if end >= 6 %}
+                    <li id="next" class="page-item disabled">
+                        <a
+                        id="{{next}}"
+                        class="page-link next"
+                        name="pages"
+                        href="{{i|add:1}}"
+                        >Next</a
+                        >
+                    </li>
+                    {% endif %} {% endwith %}
+                    </ul>
+                </nav>
+            </div>
+            <div class="col"></div>
         </div>
+        {% endif %}
         <div class="row" style="text-align:center">
             <div class="col">
                 <input type="button" value="뒤로가기" onclick="location='myPage'">

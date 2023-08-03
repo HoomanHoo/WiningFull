@@ -56,7 +56,7 @@ class StoreRegistrationView(View):
         user_id = request.session.get("temp_id")
         info = check_store_product_info(user_id=user_id)
 
-        if check_store_product_info(user_id=user_id):
+        if info:
             return redirect("storeMyPage")
 
         else:

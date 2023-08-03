@@ -17,6 +17,7 @@ from django.db.models.functions.datetime import (
 )
 from django.db.models.functions.comparison import Cast
 from rest_framework import serializers
+from django.core.exceptions import ObjectDoesNotExist
 
 
 @transaction.atomic
@@ -39,7 +40,8 @@ def insert_store_info(
         store.store_reg_num = store_reg_num
         store.store_email = store_email
 
-    except:
+    except ObjectDoesNotExist as ex:
+        print(ex)
         store = WinStore(
             user_id=user_id,
             store_address=store_address,
@@ -60,8 +62,8 @@ def insert_store_info(
             print("try-else")
             store_url.store_map_url = store_map_url
             store_url.save()
-    except:
-        print("except")
+    except ObjectDoesNotExist as ex:
+        print(ex)
         store_url = WinStoreUrl(store_id=store.store_id, store_map_url=store_map_url)
         store_url.save()
 
@@ -79,24 +81,24 @@ def insert_sell_info(
 ) -> None:
     win_sells_add = []
     win_sells_update = []
-    for i in range(len(wine_ids)):
-        if i < len(sell_ids):
+    for idx, wine_id in enumerate(wine_ids):
+        if idx < len(sell_ids):
             win_sell = WinSell(
-                sell_id=sell_ids[i],
-                wine_id=wine_ids[i],
+                sell_id=sell_ids[idx],
+                wine_id=wine_id,
                 sell_reg_time=current_time,
-                sell_price=sell_prices[i],
-                sell_promot=sell_promots[i],
+                sell_price=sell_prices[idx],
+                sell_promot=sell_promots[idx],
                 sell_state=sell_state,
             )
             win_sells_update.append(win_sell)
         else:
             win_sell = WinSell(
                 store_id=store_id,
-                wine_id=wine_ids[i],
+                wine_id=wine_ids[idx],
                 sell_reg_time=current_time,
-                sell_price=sell_prices[i],
-                sell_promot=sell_promots[i],
+                sell_price=sell_prices[idx],
+                sell_promot=sell_promots[idx],
                 sell_state=sell_state,
             )
             win_sells_add.append(win_sell)
@@ -127,7 +129,7 @@ def delete_store_info(store_id: str) -> None:
     store_info.delete()
 
 
-@transaction.atomic  # 조인해서 업데이트 하는 법 있는지 확인할 것
+@transaction.atomic
 def drop_store_info(user_id: str) -> None:
     WinUser.objects.filter(user_id=user_id).update(user_grade=1)
     WinStore.objects.filter(user_id=user_id).update(store_state=-1)
@@ -177,14 +179,6 @@ def get_store_info(user_id: str) -> QuerySet:
     )[0]
     print(type(store_info))
     return store_info
-
-
-# def get_sell_list(user_id: str, start: int, end: int):
-#     store_id = WinStore.objects.get(user_id=user_id)
-#     sell_list = (
-# WinSell.objects.filter(store_id=50).prefetch_related("winpurchasedetail_set", "winpurchasedetail_set__purchase").values("winpurchasedetail__purchase__purchase_id", "winpurchasedetail__purchase__purchase_time",).exclude(sell_id in F(WinSell.objects.exclude(store_id = 50)))
-# )
-# group_detail_infos =
 
 
 def get_detail_sell_list(user_id: str):
@@ -286,67 +280,6 @@ def get_store_revenue(user_id: str, term: int = 0):
 
     return queryset
 
-    # WinRevenue.objects.filter(revenue_date__gte = timezone.now() - datetime.timedelta(days=1))
-    # , "date", output_field=DateTimeField()
-    # queryset = (
-    #     WinRevenue.objects.annotate(
-    #         date_format=Cast(TruncDate("revenue_date"), CharField()),
-    #     )
-    #     .select_related(
-    #         "store__storeSell",
-    #         "store__storeSell__sellPurchaseDetail",
-    #     )
-    #     .values(("date_format"))
-    #     .filter(store__user_id="test4444")
-    #     .annotate(
-    #         value_sum=Sum("revenue_value"),
-    #         qnty_sum=Sum("store__storeSell__sellPurchaseDetail__purchase_det_number"),
-    #     )
-    #     .values(
-    #         "date_format",
-    #         "value_sum",
-    #         "qnty_sum",
-    #         "store__storeSell__sellPurchaseDetail__purchase_detail_id",
-    #     )
-    #     .distinct()
-    #     .order_by("-store__storeSell__sellPurchaseDetail__purchase_detail_id")
-    # )
-    # return queryset
-    # (
-    #     WinRevenue.objects.filter(store__user_id=user_id)
-    #     .annotate(date_format=Cast(TruncDate("revenue_date"), CharField()))
-    #     .values(("date_format"))
-    #     .annotate(sum=Sum("revenue_value"))
-    #     .values("sum", "date_format")
-    #     .order_by("-date_format")
-    # )
-
-    # WinRevenue.objects.filter(store__user_id="test5555").select_related(
-    #     "store__storeSell",
-    #     "store__storeSell__sellPurchaseDetail",
-    #     "store__storeSell__purchasePurchaseDetail",
-    # ).values(
-    #     "store__storeSell__sell_id",
-    #     "store__storeSell__sellPurchaseDetail__purchase_detail_id",
-    #     "store__storeSell__purchasePurchaseDetail_pruchase_id",
-    # )
-    # WinRevenue.objects.filter(store__user_id="test5555").annotate(
-    #     date_format=Cast(TruncDate("revenue_date"), CharField()),
-    #     sell=F("store__storeSell"),
-    #     purchase_detail=F("store__storeSell__sellPurchaseDetail"),
-    #     purchase=F("store__storeSell__sellPurchaseDetail__purchase"),
-    # ).select_related(
-    #     "sell",
-    #     "purchase_detail",
-    #     "purchase",
-    # ).values(
-    #     "sell__sell_id",
-    #     "purchase_detail__purchase_detail_id",
-    #     "purchase__user_id",
-    # ).filter(
-    #     purchase__purchase_time=F("revenue_date")
-    # )
-
 
 def search_receive_code(receive_code: str) -> str or dict:
     start = time.time()
@@ -388,13 +321,9 @@ def search_receive_code(receive_code: str) -> str or dict:
 
 
 class PurchaseDetailSerializer(serializers.ModelSerializer):
-    # purchase_detail_id = serializers.PrimaryKeyRelatedField(many=True)
     store_name = serializers.ReadOnlyField()  # (source="store_name")
     user_name = serializers.ReadOnlyField()  # (source="user_name")
     wine_name = serializers.ReadOnlyField()
-    # purchase_detail_id = serializers.CharField()
-    # purchase_det_number = serializers.CharField()
-    # purchase_det_price = serializers.CharField()
 
     class Meta:
         model = WinPurchaseDetail
@@ -406,14 +335,6 @@ class PurchaseDetailSerializer(serializers.ModelSerializer):
             "user_name",
             "wine_name",
         ]
-
-    # , "purchase", "sell"
-    # def to_representation(self, instance):
-    #     response = super().to_representation(instance)
-    #     response["WinReceiveCode"] = ReceiveCodeSerializer(
-    #         instance.purchase_detail_id
-    #     ).data
-    #     return response
 
 
 def get_reviews_by_seller(sell_id: str):

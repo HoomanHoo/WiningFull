@@ -44,12 +44,12 @@ def insert_purchase(result: dict) -> list:
     purchase_id = purchase_info.purchase_id
     purchase_infos.append(purchase_id)
 
-    for i in range(len(result.get("product_infos"))):
+    for idx, sell_id in enumerate(sell_ids):
         purchase_detail_info = WinPurchaseDetail(
             purchase_id=purchase_id,
-            sell_id=sell_ids[i],
-            purchase_det_number=purchase_det_numbers[i],
-            purchase_det_price=purchase_det_prices[i],
+            sell_id=sell_id,
+            purchase_det_number=purchase_det_numbers[idx],
+            purchase_det_price=purchase_det_prices[idx],
             purchase_det_state=1,
         )
         purchase_detail_infos.append(purchase_detail_info)
@@ -64,11 +64,11 @@ def insert_purchase(result: dict) -> list:
     update_point.user_point = user_point
     update_point.save()
 
-    for idx, sell_id in enumerate(sell_ids):
-        print(sell_id)
-        store_id = WinSell.objects.filter(sell_id=sell_id).values("store_id")[0][
-            "store_id"
-        ]
+    store_ids = list(
+        WinSell.objects.filter(sell_id__in=sell_ids).values_list("store_id", flat=True)
+    )
+
+    for idx, store_id in enumerate(store_ids):
         revenue = WinRevenue(
             store_id=store_id,
             revenue_value=purchase_det_prices[idx],
@@ -77,7 +77,7 @@ def insert_purchase(result: dict) -> list:
         revenues.append(revenue)
     WinRevenue.objects.bulk_create(revenues)
 
-    if cart_id != None:
+    if cart_id is not None:
         update_cart_info = WinCart.objects.get(cart_id=cart_id)
         update_cart_info.cart_state = -1
         update_cart_info.save()

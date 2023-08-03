@@ -43,7 +43,7 @@ def pagenation(
             end_page = page_length + 1
         else:
             end_page = start_page + 5
-        pages_count = list(range(start_page, end_page))
+        pages_count = [i for i in range(start_page, end_page)]
         state = 1
 
         result = {"pages_count": pages_count, "db_data": db_data, "state": state}

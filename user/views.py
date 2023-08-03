@@ -1,3 +1,4 @@
+import base64
 from django.shortcuts import render, redirect
 from django.views.generic.base import View
 from django.template import loader
@@ -6,6 +7,8 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from Wining import settings
+from purchasing.usecase import decrypt_receive_code
+from store.usecase.pagination import db_preprocessing, pagenation
 from user.kakao_token_module import kakao_token
 from user.models import WinUser, WinUserGrade, WinUserFavorite, WinReview, WinPointHis
 from django.core.exceptions import ObjectDoesNotExist
@@ -25,6 +28,7 @@ from django.contrib.messages.context_processors import messages
 from django.urls.base import reverse
 from django.db.models import F
 from django.core.files.storage import default_storage
+from purchasing.usecase.decrypt_receive_code import DecModule
 
 
 class LoginView(View):
@@ -400,14 +404,13 @@ class MyPageView(View):
         user_grade = dto.user_grade_id
 
         wine_images = []
-        
-        
+
         for v in detail_v:
             wine_images.append([v.wine.wine_image, v.wine.wine_id])
-        
-        print(detail_v)    
+
+        print(detail_v)
         print(wine_images)
-            
+
         if memid:
             context = {
                 "memid": memid,
@@ -452,11 +455,11 @@ class ReviewWriteView(View):
         user_id = request.session.get("memid")
         sell_id = request.POST.get("sell_id")
         dto = WinReview(
-            user = WinUser.objects.get(user_id=user_id),
-            sell_id = sell_id,
-            review_content = request.POST["content"],
-            review_score = request.POST["rating"],
-            review_reg_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            user=WinUser.objects.get(user_id=user_id),
+            sell_id=sell_id,
+            review_content=request.POST["content"],
+            review_score=request.POST["rating"],
+            review_reg_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         )
         dto.save()
 
@@ -515,25 +518,19 @@ class MyBoardView(View):
         print(dtos.count())
 
         board_images = []
-        
 
         for dto in dtos:
             images = WinBoardImg.objects.filter(board=dto)
 
             if images.exists():
                 board_images.append(images[0].board_image)
-                
-                
+
             else:
                 board_images.append("")
-                
 
-        
-        
         dtos_and_images = zip(dtos, board_images)
-            
+
         for dto in dtos:
-            
             print(dto.board_reg_time)
             print(dto.board_read_count)
             print(dto.board_title)
@@ -583,9 +580,9 @@ class AddPointView(View):
         dto.save()
 
         pdto = WinPointHis(
-            user = WinUser.objects.get(user_id=dto.user_id),
-            point_reg = datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            point_add = chargepoint,
+            user=WinUser.objects.get(user_id=dto.user_id),
+            point_reg=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            point_add=chargepoint,
         )
 
         pdto.save()
@@ -633,19 +630,31 @@ class MyReceiveCodeView(View):
                 "purchase_detail_id",
                 "purchase_det_number",
                 "purchase_det_price",
+                "purchase_state",
                 "store_name",
                 "wine_name",
                 "receive_code",
             )
         )
 
-        list_length = dtos.count()
-        if int(list_length) % int(show_length):
-            pages = int(list_length) // int(show_length)
-        else:
-            pages = int(list_length) // int(show_length) + 1
-        pdtos = dtos[start:end]
-        pages_list = [i + 1 for i in range(pages)]
+        db_data = db_preprocessing(db_data=dtos, end_page=end, start_page=start)
 
-        context = {"pdtos": pdtos, "pages_list": pages_list}
+        result = pagenation(
+            show_length=show_length,
+            page_num=page_num,
+            end_page=end,
+            start_page=start,
+            datas=db_data,
+        )
+        pages_count = result["pages_count"]
+        db_data = result["db_data"]
+        state = result["state"]
+        list_dtos = list(db_data)
+
+        for list_dto in list_dtos:
+            list_dto["receive_code"] = base64.b64decode(
+                list_dto["receive_code"]
+            ).decode("utf-8")
+
+        context = {"pdtos": list_dtos, "pages_count": pages_count, "state": state}
         return HttpResponse(template.render(context, request))
