@@ -225,6 +225,8 @@ STATICFILES_FINDERS = (
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 KAKAO_REST_API_KEY = "3928e19c741cff6d9be9122659cfc5ce"
-KAKAO_REDIRECT_URI = "http://localhost:8000/user/kakaoredirect"
+KAKAO_REDIRECT_URI1 = "http://localhost:8000/user/inputUser"
+KAKAO_REDIRECT_URI2 = "http://localhost:8000/user/inputUserInfo"
+KAKAO_REDIRECT_URI3 = "http://localhost:8000/user/inputStore"
 
 mimetypes.add_type("application/javascript", ".js", True)

@@ -4,7 +4,7 @@ from user import views
 urlpatterns = [  # init_url == "http://localhost:8000/user/login"
     path("login", views.LoginView.as_view(), name="login"),
     path("logout", views.LogoutView.as_view(), name="logout"),
-    path("inputUser", views.InputUserView.as_view(), name="inputUser"),
+    path("inputUserInfo", views.InputUserView.as_view(), name="inputUserInfo"),
     path("inputStore", views.InputStoreView.as_view(), name="inputStore"),
     path("confirmId", views.ConfirmIdView.as_view(), name="confirmId"),
     path("delete", views.DeleteView.as_view(), name="delete"),
@@ -19,5 +19,6 @@ urlpatterns = [  # init_url == "http://localhost:8000/user/login"
     path("myComment", views.MyCommentView.as_view(), name="myComment"),
     path("myReceiveCode", views.MyReceiveCodeView.as_view(), name="myReceiveCode"),
     path("kakaologin", views.KaKaoLogin.as_view(), name="kakaoLogin"),
-    path("kakaoredirect", views.KakaoRedirectUri.as_view(), name="kakaoRedirect"),
+    path("kakaologin/<str:act>", views.KaKaoLogin.as_view(), name="kakaoLoginRefresh"),
+    path("inputUser", views.KakaoRedirectURI.as_view(), name="inputUser"),
 ]

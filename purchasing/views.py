@@ -202,14 +202,13 @@ class AddPickListView(View):
         return View.dispatch(self, request, *args, **kwargs)
 
     def get(self, request):
-        user_id = request.session.get("mem_id")
-
+        user_id = request.session.get("memid")
         if user_id is None:
             return redirect("purchaseError")
 
         else:
             cart_id = get_cart_id(user_id=user_id)
-            return redirect("cartList", cart_id=cart_id)
+            return redirect("purchasing:cartList", cart_id=cart_id)
 
     def post(self, request):
         user_id = request.POST.get("userId")

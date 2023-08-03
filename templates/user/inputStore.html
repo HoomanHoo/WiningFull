@@ -10,7 +10,7 @@
         <div class="card-body">
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <a class="nav-link" id="user-tab" data-toggle="tab" href="inputUser" role="tab" aria-controls="inputUser" aria-selected="False">User</a>
+                    <a class="nav-link" id="user-tab" data-toggle="tab" href="inputUserInfo" role="tab" aria-controls="inputUser" aria-selected="False">User</a>
                 </li>
                 <li class="nav-item" role="presentation">
                     <a class="nav-link active" id="store-tab" data-toggle="tab" href="inputStore" role="tab" aria-controls="inputStore" aria-selected="true">Store</a>
@@ -45,7 +45,7 @@
 				        <div class="form-row">
 				            <div class="form-group col-md-12">
 				                <label for="inputName">Your Email Address</label>
-				                <input type="email" class="form-control" id="user_email" placeholder="Enter your email address" name="user_email">
+				                <input type="email" class="form-control" id="user_email" placeholder="Enter your email address" name="user_email" value="{{user_email}}" readonly>
 				            </div>
 				            <div class="form-group col-md-12">
 				                <label for="inputName">Your Tel Number</label>

@@ -6,6 +6,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from Wining import settings
+from user.kakao_token_module import kakao_token
 from user.models import WinUser, WinUserGrade, WinUserFavorite, WinReview, WinPointHis
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.dateformat import DateFormat
@@ -33,7 +34,13 @@ class LoginView(View):
 
     def get(self, request):
         template = loader.get_template("user/login.html")
-        context = {}
+        refusal = int(request.GET.get("refusal", 3))
+        if refusal == 1:
+            context = {"refusal": 1}
+        elif refusal == 2:
+            context = {"refusal": 2}
+        else:
+            context = {"refusal": 3}
         return HttpResponse(template.render(context, request))
 
     def post(self, request):
@@ -75,50 +82,59 @@ class LogoutView(View):
 
 
 class KaKaoLogin(View):
-    def get(self, request):
+    def get(self, request, **kwargs):
+        act = request.GET.get("act", None)
+        if act is None:
+            act = kwargs.get("act", None)
         REST_API_KEY = getattr(settings, "KAKAO_REST_API_KEY")
-        KAKAO_REDIRECT_URI = getattr(settings, "KAKAO_REDIRECT_URI")
+        if act == "login":
+            KAKAO_REDIRECT_URI = getattr(settings, "KAKAO_REDIRECT_URI1")
+        elif act == "regist":
+            KAKAO_REDIRECT_URI = getattr(settings, "KAKAO_REDIRECT_URI2")
+        elif act == "regstore":
+            KAKAO_REDIRECT_URI = getattr(settings, "KAKAO_REDIRECT_URI3")
         print(KAKAO_REDIRECT_URI)
-        url = (
+        uri = (
             "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="
             + REST_API_KEY
             + "&redirect_uri="
             + KAKAO_REDIRECT_URI
+            + "&response_type=code&scope="
+            + "account_email,age_range"
         )
 
-        return redirect(url)
+        return redirect(uri)
 
 
-class KakaoRedirectUri(View):
+class KakaoRedirectURI(View):
     def get(self, request):
         code = request.GET.get("code", None)
         login_error = request.GET.get("error", None)
         error_description = request.GET.get("error_description", None)
         state = request.GET.get("state", None)
-        REST_API_KEY = getattr(settings, "KAKAO_REST_API_KEY")
-        KAKAO_REDIRECT_URI = getattr(settings, "KAKAO_REDIRECT_URI")
-        token_url = "https://kauth.kakao.com/oauth/token"
-        print(KAKAO_REDIRECT_URI)
-        print(code)
-        request_body = {
-            "grant_type": "authorization_code",
-            "client_id": REST_API_KEY,
-            "redirect_uri": KAKAO_REDIRECT_URI,
-            "code": code,
-        }
+        KAKAO_REDIRECT_URI = getattr(settings, "KAKAO_REDIRECT_URI1")
 
-        request_header = {
-            "Content-type": "application/x-www-form-urlencoded;charset=utf-8"
-        }
+        result = kakao_token(code=code, redirect_uri=KAKAO_REDIRECT_URI, is_store=0)
+        if result["code"] == -1:
+            return redirect("kakaoLoginRefresh", act="login")
+        else:
+            user_email = result["email"]
+            min_age = result["min_age"]
+            if int(min_age) < 20:
+                template = loader.get_template("user/return.html")
+                context = {"code": -1}
+                return HttpResponse(template.render(context, request))
 
-        token_response = requests.post(
-            token_url, data=request_body, headers=request_header
-        )
-
-        token_json = token_response.json()
-        access_token = token_json["access_token"]
-
-        print(token_json)
+            else:
+                try:
+                    login_info = WinUser.objects.get(user_email=user_email)
+                    request.session["memid"] = login_info.user_id
+                    redirect("myPage")
+                except ObjectDoesNotExist as ex:
+                    print(ex)
+                    template = loader.get_template("user/return.html")
+                    context = {"code": -2}
+                    return HttpResponse(template.render(context, request))
 
 
 class InputUserView(View):
@@ -127,9 +143,30 @@ class InputUserView(View):
         return View.dispatch(self, request, *args, **kwargs)
 
     def get(self, request):
-        template = loader.get_template("user/inputUser.html")
-        context = {}
-        return HttpResponse(template.render(context, request))
+        code = request.GET.get("code", None)
+        print(code)
+        login_error = request.GET.get("error", None)
+        error_description = request.GET.get("error_description", None)
+        state = request.GET.get("state", None)
+        KAKAO_REDIRECT_URI = getattr(settings, "KAKAO_REDIRECT_URI2")
+
+        result = kakao_token(code=code, redirect_uri=KAKAO_REDIRECT_URI, is_store=0)
+        if result["code"] == -1:
+            return redirect("kakaoLoginRefresh", act="regist")
+        else:
+            user_email = result["email"]
+            min_age = result["min_age"]
+            if int(min_age) < 20:
+                template = loader.get_template("user/return.html")
+                context = {"code": -1}
+                return HttpResponse(template.render(context, request))
+
+            else:
+                template = loader.get_template("user/inputUser.html")
+                context = {
+                    "user_email": user_email,
+                }
+            return HttpResponse(template.render(context, request))
 
     def post(self, request):
         user_point = 0
@@ -175,9 +212,31 @@ class InputStoreView(View):
         return View.dispatch(self, request, *args, **kwargs)
 
     def get(self, request):
-        template = loader.get_template("user/inputStore.html")
-        context = {}
-        return HttpResponse(template.render(context, request))
+        code = request.GET.get("code", None)
+        login_error = request.GET.get("error", None)
+        error_description = request.GET.get("error_description", None)
+        state = request.GET.get("state", None)
+        KAKAO_REDIRECT_URI = getattr(settings, "KAKAO_REDIRECT_URI3")
+
+        result = kakao_token(code=code, redirect_uri=KAKAO_REDIRECT_URI, is_store=1)
+        if result["code"] == -1:
+            return redirect("kakaoLoginRefresh", act="regstore")
+        # elif result["code"] == -2:
+        #     return redirect("kakaoLoginRefresh", act="regist")
+        else:
+            user_email = result["email"]
+            min_age = result["min_age"]
+            if int(min_age) < 20:
+                template = loader.get_template("user/return.html")
+                context = {"code": -1}
+                return HttpResponse(template.render(context, request))
+
+            else:
+                template = loader.get_template("user/inputStore.html")
+                context = {
+                    "user_email": user_email,
+                }
+            return HttpResponse(template.render(context, request))
 
     def post(self, request):
         user_point = 0
@@ -480,14 +539,12 @@ class MyBoardView(View):
             print(dto.board_title)
             print(dto.board_content)
             print(board_images)
-            
 
-            
-        context = {"dtos_and_images": dtos_and_images,
-                   "user_id" : user_id,
-                  }
-        
-        
+        context = {
+            "dtos_and_images": dtos_and_images,
+            "user_id": user_id,
+        }
+
         return HttpResponse(template.render(context, request))
 
 
