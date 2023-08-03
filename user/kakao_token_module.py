@@ -59,5 +59,10 @@ def kakao_token(code, redirect_uri, is_store):
         user_age_range = user_info["kakao_account"]["age_range"]
         min_age = user_age_range.split("~")[0]
 
-        result = {"code": 1, "email": user_email, "min_age": min_age}
+        result = {
+            "code": 1,
+            "email": user_email,
+            "min_age": min_age,
+            "access_token": access_token,
+        }
         return result

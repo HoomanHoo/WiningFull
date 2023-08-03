@@ -3,7 +3,8 @@ from user import views
 
 urlpatterns = [  # init_url == "http://localhost:8000/user/login"
     path("login", views.LoginView.as_view(), name="login"),
-    path("logout", views.LogoutView.as_view(), name="logout"),
+    path("logout", views.KakaoLogoutView.as_view(), name="logout"),
+    path("locallogout", views.LogoutView.as_view(), name="localLogout"),
     path("inputUserInfo", views.InputUserView.as_view(), name="inputUserInfo"),
     path("inputStore", views.InputStoreView.as_view(), name="inputStore"),
     path("confirmId", views.ConfirmIdView.as_view(), name="confirmId"),

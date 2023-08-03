@@ -336,22 +336,14 @@ class SearchReceiveCodeView(View):
 class SearchReceiveCodeApi(APIView):
     def get(self, request, **kwargs):
         receive_code = kwargs.get("code", None).replace(" ", "")
-        # receive_code = "0x8UlPWZPyHX1"
 
-        print("RECEIVE_CODE: ", receive_code)
         result = search_receive_code(
             receive_code=EncModule().encrypt_receive_code(receive_code)
         )
-        # print("result: ", result, type(result))
-        # serializer = json.dumps(result[0])
-        print(result)
-        serializer = PurchaseDetailSerializer(result)  # , many=True)
-        # print("SERIALIZE: ", serializer.data)
+        serializer = PurchaseDetailSerializer(result)
         json_result = JSONRenderer().render(serializer.data)
-        # print("JSON RESULT: ", json_result)
-        # return Response(serializer)
+
         return Response(json_result)
-        # return Response((serializer.data))
 
 
 class StoreInfoView(View):

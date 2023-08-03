@@ -29,6 +29,7 @@ from django.urls.base import reverse
 from django.db.models import F
 from django.core.files.storage import default_storage
 from purchasing.usecase.decrypt_receive_code import DecModule
+from django.db.models import Q
 
 
 class LoginView(View):
@@ -76,8 +77,23 @@ class LoginView(View):
         return HttpResponse(template.render(context, request))
 
 
+class KakaoLogoutView(View):
+    def get(self, request):
+        REST_API_KEY = getattr(settings, "KAKAO_REST_API_KEY")
+        LOGOUT_REDIRECT_URI = getattr(settings, "LOGOUT_REDIRECT_URI1")
+        print("access_Token", request.session.get("access_Token", None))
+        logout_url = (
+            "https://kauth.kakao.com/oauth/logout?client_id="
+            + REST_API_KEY
+            + "&logout_redirect_uri="
+            + LOGOUT_REDIRECT_URI
+        )
+        return redirect(logout_url)
+
+
 class LogoutView(View):
     def get(self, request):
+        del request.session["access_Token"]
         del request.session["memid"]
         return redirect("login")
 
@@ -113,9 +129,6 @@ class KaKaoLogin(View):
 class KakaoRedirectURI(View):
     def get(self, request):
         code = request.GET.get("code", None)
-        login_error = request.GET.get("error", None)
-        error_description = request.GET.get("error_description", None)
-        state = request.GET.get("state", None)
         KAKAO_REDIRECT_URI = getattr(settings, "KAKAO_REDIRECT_URI1")
 
         result = kakao_token(code=code, redirect_uri=KAKAO_REDIRECT_URI, is_store=0)
@@ -130,15 +143,19 @@ class KakaoRedirectURI(View):
                 return HttpResponse(template.render(context, request))
 
             else:
-                try:
-                    login_info = WinUser.objects.get(user_email=user_email)
-                    request.session["memid"] = login_info.user_id
-                    redirect("myPage")
-                except ObjectDoesNotExist as ex:
-                    print(ex)
+                login_info = WinUser.objects.filter(
+                    ~Q(user_grade=-1), user_email=user_email
+                ).values("user_id", "user_grade")
+                print(login_info.count())
+                if login_info.count() == 0:
                     template = loader.get_template("user/return.html")
                     context = {"code": -2}
                     return HttpResponse(template.render(context, request))
+                else:
+                    print(login_info)
+                    request.session["memid"] = login_info[0]["user_id"]
+                    request.session["access_Token"] = result["access_token"]
+                    return redirect("myPage")
 
 
 class InputUserView(View):
@@ -149,9 +166,6 @@ class InputUserView(View):
     def get(self, request):
         code = request.GET.get("code", None)
         print(code)
-        login_error = request.GET.get("error", None)
-        error_description = request.GET.get("error_description", None)
-        state = request.GET.get("state", None)
         KAKAO_REDIRECT_URI = getattr(settings, "KAKAO_REDIRECT_URI2")
 
         result = kakao_token(code=code, redirect_uri=KAKAO_REDIRECT_URI, is_store=0)
@@ -217,16 +231,11 @@ class InputStoreView(View):
 
     def get(self, request):
         code = request.GET.get("code", None)
-        login_error = request.GET.get("error", None)
-        error_description = request.GET.get("error_description", None)
-        state = request.GET.get("state", None)
         KAKAO_REDIRECT_URI = getattr(settings, "KAKAO_REDIRECT_URI3")
 
         result = kakao_token(code=code, redirect_uri=KAKAO_REDIRECT_URI, is_store=1)
         if result["code"] == -1:
             return redirect("kakaoLoginRefresh", act="regstore")
-        # elif result["code"] == -2:
-        #     return redirect("kakaoLoginRefresh", act="regist")
         else:
             user_email = result["email"]
             min_age = result["min_age"]
@@ -305,9 +314,25 @@ class DeleteView(View):
             dto.user_grade = w_user_grade
             dto.save()
 
+            ACCESS_TOKEN = request.session.get(
+                "access_Token", None
+            )  # access token = none이면 login으로 리다이렉트 하거나 refresh 토큰으로 업데이트해야함
+            print("access_Token", request.session.get("access_Token", None))
+
+            request_header = {
+                "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
+                "Authorization": f"Bearer {ACCESS_TOKEN}",
+            }
+
+            logout_url = "https://kapi.kakao.com/v1/user/unlink"
+
+            requests.post(logout_url, headers=request_header)
+
+            del request.session["access_Token"]
             del request.session["memid"]
 
             return redirect("login")
+
         else:
             template = loader.get_template("user/delete.html")
             message = "입력하신 비밀번호가 다릅니다"

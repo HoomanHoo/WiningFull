@@ -229,4 +229,7 @@ KAKAO_REDIRECT_URI1 = "http://localhost:8000/user/inputUser"
 KAKAO_REDIRECT_URI2 = "http://localhost:8000/user/inputUserInfo"
 KAKAO_REDIRECT_URI3 = "http://localhost:8000/user/inputStore"
 
+LOGOUT_REDIRECT_URI1 = "http://localhost:8000/user/locallogout"
+
+
 mimetypes.add_type("application/javascript", ".js", True)

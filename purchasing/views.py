@@ -81,8 +81,8 @@ class LoadAdditionalStoreListAPI(APIView):
         # )
         db_data = list_info[1]
         # print(type(db_data), db_data)
-
         serializer = StoreListSerializer(db_data, many=True)
+        print(serializer.data)
         json_result = JSONRenderer().render(serializer.data)
         return Response(json_result)
 
@@ -240,10 +240,11 @@ class PickListView(View):
         if user_id is None:
             redirect("purchaseError")
         else:
-            if cart_id is None:
+            print(cart_id)
+            if cart_id == 0:
                 cart_id = get_cart_id(user_id=user_id)
 
-            elif cart_id is not None:
+            elif cart_id != 0:
                 cart_state = get_cart_state(cart_id=cart_id)
 
                 if cart_state == -1:

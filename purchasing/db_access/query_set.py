@@ -126,7 +126,7 @@ def get_cart_id(user_id: str) -> str or None:
 
     cart_info = WinCart.objects.filter(user_id=user_id, cart_state=1).values("cart_id")
     if cart_info.count() == 0:
-        cart_id = -1
+        cart_id = 0
     else:
         cart_id = cart_info[0].get("cart_id")
     return cart_id
