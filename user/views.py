@@ -93,7 +93,9 @@ class KakaoLogoutView(View):
 
 class LogoutView(View):
     def get(self, request):
-        ACCESS_TOKEN = request.session.get("access_Token", None)
+        ACCESS_TOKEN = request.session.get(
+                "access_Token", None
+            )
         if ACCESS_TOKEN is None:
             del request.session["memid"]
             return redirect("login")
@@ -186,7 +188,6 @@ class InputUserView(View):
 
             else:
                 template = loader.get_template("user/inputUser.html")
-                request.session["access_Token"] = result["access_token"]
                 context = {
                     "user_email": user_email,
                 }
@@ -255,6 +256,7 @@ class InputStoreView(View):
                 context = {
                     "user_email": user_email,
                 }
+                request.session["access_Token"] = result["access_token"]
             return HttpResponse(template.render(context, request))
 
     def post(self, request):
@@ -324,22 +326,24 @@ class DeleteView(View):
                 "access_Token", None
             )  # access token = none이면 login으로 리다이렉트 하거나 refresh 토큰으로 업데이트해야함
             print("access_Token", request.session.get("access_Token", None))
-            if ACCESS_TOKEN is not None:
-                request_header = {
-                    "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
-                    "Authorization": f"Bearer {ACCESS_TOKEN}",
-                }
 
-                logout_url = "https://kapi.kakao.com/v1/user/unlink"
-
-                requests.post(logout_url, headers=request_header)
-
-                del request.session["access_Token"]
+           
+            if ACCESS_TOKEN is None:
                 del request.session["memid"]
 
                 return redirect("login")
             else:
+                request_header = {
+                "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
+                "Authorization": f"Bearer {ACCESS_TOKEN}",
+                }
+    
+                logout_url = "https://kapi.kakao.com/v1/user/unlink"
+    
+                requests.post(logout_url, headers=request_header)
+                del request.session["access_Token"]
                 del request.session["memid"]
+    
                 return redirect("login")
         else:
             template = loader.get_template("user/delete.html")
@@ -437,13 +441,14 @@ class MyPageView(View):
         user_grade = dto.user_grade_id
 
         wine_images = []
-
+        
+        
         for v in detail_v:
             wine_images.append([v.wine.wine_image, v.wine.wine_id])
-
-        print(detail_v)
+        
+        print(detail_v)    
         print(wine_images)
-
+            
         if memid:
             context = {
                 "memid": memid,
@@ -488,11 +493,11 @@ class ReviewWriteView(View):
         user_id = request.session.get("memid")
         sell_id = request.POST.get("sell_id")
         dto = WinReview(
-            user=WinUser.objects.get(user_id=user_id),
-            sell_id=sell_id,
-            review_content=request.POST["content"],
-            review_score=request.POST["rating"],
-            review_reg_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            user = WinUser.objects.get(user_id=user_id),
+            sell_id = sell_id,
+            review_content = request.POST["content"],
+            review_score = request.POST["rating"],
+            review_reg_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         )
         dto.save()
 
@@ -536,7 +541,7 @@ class PurchaseDetailView(View):
                         "purchase_number": purchase_number,
                         "purchase_time": purchase_time,
                         "sell_id": sell_id,
-                        "purchase_det_state": purchase_det_state,
+                        "purchase_det_state" : purchase_det_state,
                     }
                 )
 
@@ -555,19 +560,25 @@ class MyBoardView(View):
         print(dtos.count())
 
         board_images = []
+        
 
         for dto in dtos:
             images = WinBoardImg.objects.filter(board=dto)
 
             if images.exists():
                 board_images.append(images[0].board_image)
-
+                
+                
             else:
                 board_images.append("")
+                
 
+        
+        
         dtos_and_images = zip(dtos, board_images)
-
+            
         for dto in dtos:
+            
             print(dto.board_reg_time)
             print(dto.board_read_count)
             print(dto.board_title)
@@ -586,15 +597,11 @@ class MyCommentView(View):
     def get(self, request):
         template = loader.get_template("user/myComment.html")
         user_id = request.session.get("memid")
-        dtos = (
-            WinComment.objects.select_related("board")
-            .filter(user_id=user_id)
-            .order_by("-comment_reg_time")
-        )
-
+        dtos = WinComment.objects.select_related("board").filter(user_id=user_id).order_by("-comment_reg_time")
+        
         for dto in dtos:
             print(dto.board.board_title)
-
+        
         context = {"dtos": dtos}
 
         return HttpResponse(template.render(context, request))
@@ -624,9 +631,9 @@ class AddPointView(View):
         dto.save()
 
         pdto = WinPointHis(
-            user=WinUser.objects.get(user_id=dto.user_id),
-            point_reg=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            point_add=chargepoint,
+            user = WinUser.objects.get(user_id=dto.user_id),
+            point_reg = datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            point_add = chargepoint,
         )
 
         pdto.save()

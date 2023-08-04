@@ -30,39 +30,49 @@ def kakao_token(code, redirect_uri, is_store):
         return result
 
     elif access_token is not None:
-        scope = token_json["scope"]
-        auth = f"Bearer {access_token}"
+        scope = token_json.get("scope", None)
+        if scope is None:
+            result = {
+                "code": -1,
+                "email": None,
+                "min_age": None,
+                "access_token": None,
+            }
+            return result
+        else:
+            auth = f"Bearer {access_token}"
+       
 
-        show_token_info_url = "https://kapi.kakao.com/v1/user/access_token_info"
-        token_info_request_header = {
-            "Authorization": auth,
-        }
-
-        token_info_response = requests.get(
-            show_token_info_url, headers=token_info_request_header
-        )
-        token_info_json = token_info_response.json()
-
-        user_info_url = "https://kapi.kakao.com/v2/user/me"
-
-        user_info_request_header = {
-            "Authorization": auth,
-            "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
-        }
-
-        user_info_response = requests.post(
-            user_info_url, headers=user_info_request_header
-        )
-        user_info = user_info_response.json()
-        print(user_info)
-        user_email = user_info["kakao_account"]["email"]
-        user_age_range = user_info["kakao_account"]["age_range"]
-        min_age = user_age_range.split("~")[0]
-
-        result = {
-            "code": 1,
-            "email": user_email,
-            "min_age": min_age,
-            "access_token": access_token,
-        }
-        return result
+            show_token_info_url = "https://kapi.kakao.com/v1/user/access_token_info"
+            token_info_request_header = {
+                "Authorization": auth,
+            }
+    
+            token_info_response = requests.get(
+                show_token_info_url, headers=token_info_request_header
+            )
+            token_info_json = token_info_response.json()
+    
+            user_info_url = "https://kapi.kakao.com/v2/user/me"
+    
+            user_info_request_header = {
+                "Authorization": auth,
+                "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
+            }
+    
+            user_info_response = requests.post(
+                user_info_url, headers=user_info_request_header
+            )
+            user_info = user_info_response.json()
+            print(user_info)
+            user_email = user_info["kakao_account"]["email"]
+            user_age_range = user_info["kakao_account"]["age_range"]
+            min_age = user_age_range.split("~")[0]
+    
+            result = {
+                "code": 1,
+                "email": user_email,
+                "min_age": min_age,
+                "access_token": access_token,
+            }
+            return result

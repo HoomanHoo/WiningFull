@@ -129,7 +129,7 @@ def delete_store_info(store_id: str) -> None:
     store_info.delete()
 
 
-@transaction.atomic
+@transaction.atomic  # 조인해서 업데이트 하는 법 있는지 확인할 것
 def drop_store_info(user_id: str) -> None:
     WinUser.objects.filter(user_id=user_id).update(user_grade=1)
     WinStore.objects.filter(user_id=user_id).update(store_state=-1)
@@ -335,6 +335,7 @@ class PurchaseDetailSerializer(serializers.ModelSerializer):
             "user_name",
             "wine_name",
         ]
+
 
 
 def get_reviews_by_seller(sell_id: str):

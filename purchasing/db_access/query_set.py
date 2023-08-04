@@ -89,7 +89,7 @@ def insert_purchase(result: dict) -> list:
 def add_cart_info(user_id: str, sell_id: str, quantity: int, current_time: str) -> int:
     cart_id = get_cart_id(user_id)
     print(cart_id)
-    if cart_id is None or cart_id == -1:
+    if cart_id is None or cart_id == 0:
         cart_info = WinCart(
             user_id=user_id,
             cart_time=current_time,

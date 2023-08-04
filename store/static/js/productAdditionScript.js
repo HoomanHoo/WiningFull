@@ -14,7 +14,7 @@ function paging() {
 	let modify = document.getElementById("modify");
 	let url = "../product/pages/" + this.id;
 
-	if (document.getElementById("srhByName").value) {
+	if (document.getElementById("srhByName").value){
 		const srhKeyWord = document.getElementById("srhByName").value;
 		url = "../product/pages/" + this.id + "?srhkeyword=" + srhKeyWord
 	}
@@ -217,16 +217,16 @@ function searchByName() {
 	xhttp.send();
 }
 
-function checkValue() {
+function checkValue(){
 	prices = document.querySelectorAll("input[name=sellPrice]");
 	promots = document.querySelectorAll("input[name=sellPromot]");
 
-	for (var i = 0; i < prices.length; i++) {
-		if (!prices[i].value) {
+	for (var i = 0; i < prices.length; i++){
+		if(! prices[i].value){
 			alert("판매하고자 하는 상품의 가격을 입력해주세요");
 			return false;
 		}
-		else if (!promots[i].value) {
+		else if(! promots[i].value){
 			alert("상품 설명을 입력해주세요");
 			return false;
 		}

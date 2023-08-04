@@ -5,3 +5,7 @@
 /errorhandling/migrations
 /detail/migrations
 /board/migrations
+*.pyc
+*.project
+*.pydevproject
+*.prefs
