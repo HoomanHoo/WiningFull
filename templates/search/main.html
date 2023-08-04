@@ -1,69 +1,72 @@
 {% extends "search/base.html" %} 
 {% load static %}
-<!DOCTYPE html>
+
 <html>
 	<head>
 		<meta charset="UTF-8">
 		<title> Wining </title>
 		<!-- ♠ bootstrap 적용 -->
+		
+		<style>
+
+			
+			.search-form-container {
+			    position: relative;
+			}
+			
+
+			.wining-image {
+                width: 300px; /* 이미지의 너비 조절 */
+                height: auto; /* 이미지의 높이 자동 조절 */
+                position: absolute;
+                top: 50px; /* 원하는 높이 값으로 조정해주세요 */
+                left: 50%; /* 가운데로 정렬 */
+                transform: translateX(-50%); /* 가운데로 정렬 */
+            }
+            
+		</style>
+		<script src="/static/js/jquery-3.6.4.js"></script>
+		<script src="/static/js/script_search.js"></script>
 	</head>
+	
 	<body> 
-		{% block title %} 
-			<h2 align="center"> Wining </h2> 
-		{% endblock %}
+		
+		
+		{% block select %}
+		
 		<br><br>						
-		{% block select %}								<!-- 검색 방법 선택 -->
-		
-		<a href="/search/main">
-			<div>
-				검색어 검색 
-			</div>
-		</a>
-		<a href="/search/searchbycategory">
-			<div>
-				카테고리 검색 
-			</div>
-		</a>
-		{% if request.session.memid %}
-		<a href="/search/searchbyuser">
-			<div>
-				추천 검색 
-			</div>
-		</a>
-		{% else %}
-		
-		{% endif %}
-		
-		
-		<a href="/search/searchbyrank">
-			<div>
-				순위별 검색 
-			</div>
-		</a>
+
 		
 		{% endblock %}
 		<br><br>
 		{% block input %}								<!-- 검색 입력 창 -->
-		
-			{% csrf_token %}
-			<form method="post" action="searchbynamelist" name="searchbyname">				<!-- 검색어 입력하고 submit 하면 "http://localhost:8000/search/searchbynamelist" -->
-				
-				
-				<div style="text-align:center">
-					<select name="namelanguage">
+		<!-- 검색어 입력하고 submit 하면 "http://localhost:8000/search/searchbynamelist" -->
+		<div class="center-container">		
+			<div class="search-form-container">
+				<img src="{% static 'logo1.png' %}" alt="logo1" class="wining-image">
+				<div class="search-form">
+					{% csrf_token %}
+		        	<form method="post" action="searchbynamelist" name="searchbyname">
+		            	{% csrf_token %}
+						
+						<select name="namelanguage">
 						<option value="winenamekor"> 한국어 </option> 
 						<option value="winenameeng"> 영문이름 </option>
-					</select> 
-					<input class="input" type="text" name="searchname" maxlength="100"
-						style="width:400px; height:30px"  autofocus>	
-					<input class="inputbutton" type="submit" value="검색">	
-				</div>
-			</form>
+						</select>
+		            	<input class="search-input" type="text" name="searchname" maxlength="100" placeholder="검색어를 입력하세요." autofocus>
+		            	<input class="search-button" type="submit" value="GO">
+		        	</form>
+		        </div>
+		   </div>
+		</div>
 		{% endblock %}
 
 		{% block list %}
 		
 		{% endblock %}
+
+
+
 
 	</body>
 </html>

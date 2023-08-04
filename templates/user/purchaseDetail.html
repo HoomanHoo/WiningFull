@@ -62,8 +62,10 @@
 			    <i class="fa fa-star"></i>
 			</div>
 			<div class="text-muted">구매수량 {{dto.purchase_number}}</div>
-				{%if dto.sell_id not in reviews%}
+				{%if dto.sell_id not in reviews and dto.purchase_det_state == 2 %}
 				<button type="button" class="btn btn-warning mt-4 text-white" onclick="location.href='reviewWrite?sell_id={{dto.sell_id}}'"><i class="icon-cart-add mr-2"></i>리뷰 작성</button>
+				{% elif dto.sell_id not in reviews and dto.purchase_det_state != 2 %}
+				<h5>수령 코드 승인 후 리뷰를 작성할 수 있습니다</h5>
 				{%else%}
 				<h5>리뷰 작성 완료</h5>
 				{%endif%}

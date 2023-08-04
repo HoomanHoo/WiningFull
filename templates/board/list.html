@@ -5,15 +5,17 @@
 
 
 {% block title %}
-  <h2 class="board-title">&nbsp;&nbsp;&nbsp;<b>자유게시판</b></h2>
+  <h2 class="board-title">&nbsp;&nbsp;<b>자유게시판</b></h2>
 {% endblock %}
   
 
 {% block content %}
 
+<!--  
 <head>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+-->
 
 <button class="btn btn-primary scroll-button top-button" onclick="scrollToTop()"><i class="fas fa-arrow-up"></i> </button>
 <button class="btn btn-primary scroll-button bottom-button" onclick="scrollToBottom()"><i class="fas fa-arrow-down"></i></button>
@@ -26,7 +28,7 @@
 	    <div class="col-lg-6 mb-3">
 	      <form class="d-flex" method="get" action="{% url 'board:list' %}">
 	        <input class="form-control me-2" type="search" name="q" placeholder="검색어를 입력해 주세요" style="width:900px;">
-	        <button class="btn btn-outline-primary" type="submit" style="width:150px;">검색</button>
+	        <button class="btn btn-outline-primary" type="submit" style="width:150px;">SEARCH</button>
 	      </form>
 	    </div>
 	    
@@ -35,7 +37,7 @@
 				
 	    	{% if request.session.memid  %}
 			    <div class="col-lg-6 mb-3 text-end">
-			      <a href="{% url 'board:write' %}" class="btn btn-outline-primary">글쓰기</a>
+			      <a href="{% url 'board:write' %}" class="btn btn-outline-primary">+ 글쓰기</a>
 			    </div>
 	  		{% endif %}
 	  </div>
@@ -77,9 +79,16 @@
                 	{{ number|sub:forloop.counter0|abs }}</td>
                 <td>
                   {% if dto.board_read_count != -1 %}
-                    <a href="content?num={{ dto.board_id }}&pagenum={{ pagenum }}&number={{ number|sub:forloop.counter0|abs }}" >
-                      {{ dto.board_title }}
-                      <span class="comment-count" style="color:blue;"> ({{ dto.comment_count }})</span>
+                    <a href="content?num={{ dto.board_id }}&pagenum={{ pagenum }}&number={{ number|sub:forloop.counter0|abs }}" class="title-link" >
+                      	<span style="color: black;">{{ dto.board_title }}</span>
+				          
+                          {% if dto.winboardimg_set.exists %}
+                              <img src="{{ dto.winboardimg_set.first.board_image.url }}" alt="대표 이미지" class="rounded-image">
+                          {% else %}
+                              <span style="color: red;"></span>
+                          {% endif %}
+				          
+                      <span class="comment-count" style="color:red;"> [{{ dto.comment_count }}]</span>
                     </a>
                   {% else %}
                     삭제된 글입니다.
@@ -138,7 +147,25 @@
     </div><br><br>
     
     
+    
+    
+    
+    
+    
 	<script>
+	
+	
+    // 기본 이미지의 URL을 설정합니다.
+    const defaultImageUrl = "{% static 'images/picturehere.PNG' %}";
+
+    // 각각의 이미지를 가져와서 기본 이미지로 변경합니다.
+    const images = document.querySelectorAll(".rounded-image");
+    images.forEach(image => {
+      image.src = defaultImageUrl;
+    });
+    
+    
+	
 		function scrollToTop() {
 		  window.scrollTo(0, 0);
 		}
@@ -146,6 +173,44 @@
 		function scrollToBottom() {
 		  window.scrollTo(0, document.body.scrollHeight);
 		}
+		
+		
+		
+	    // 서버로 AJAX 요청을 보내고 최근 수정된 게시물의 ID 목록을 받아옵니다.
+	    function getRecentModifiedPosts() {
+	        fetch('/recent_modified_posts/')
+	        .then(response => response.json())
+	        .then(data => {
+	            const modifiedPosts = data.modified_posts;
+
+	            // 모든 게시물의 제목을 선택합니다.
+	            const postTitles = document.querySelectorAll('.post-title');
+
+	            // 각 게시물의 제목에 (수정)을 표시하도록 처리합니다.
+	            postTitles.forEach(title => {
+	                const postId = title.dataset.postid;
+
+	                // postId가 최근 수정된 게시물의 목록에 포함되어 있는 경우 (수정)을 추가합니다.
+	                if (modifiedPosts.includes(parseInt(postId))) {
+	                    const modifiedLabel = document.createElement('span');
+	                    modifiedLabel.textContent = '(수정)';
+	                    modifiedLabel.style.color = 'green';
+	                    title.appendChild(modifiedLabel);
+	                }
+	            });
+	        })
+	        .catch(error => {
+	            console.error('Error:', error);
+	        });
+	    }
+
+		// 페이지가 로드되면 최근 수정된 댓글들의 정보를 가져옴
+		document.addEventListener('DOMContentLoaded', () => {
+			getRecentModifiedPosts();
+		});
+		
+		
+		
 	</script>
 
   <style>
@@ -174,7 +239,7 @@
   .scroll-button {
     position: fixed;
     padding: 5px;
-    font-size: 18px;
+    font-size: 21px;
     border: none;
     background-color: transparent;
     cursor: pointer;
@@ -220,9 +285,38 @@
     }
 
     .pagination .current-page {
-      background-color: #007bff;
+      background-color: #800020;;
       color: #fff;
-      border-color: #007bff;
+      border-color: #800020;;
     }
+    
+    .rounded-image {
+        border-radius: 50%;
+        width: 14px;
+        height: 14px;
+        object-fit: cover;
+        object-position: center top;
+    }
+    
+    
+    
+    
+      .title-link {
+	    color: black;
+	    text-decoration: none;
+	  }
+  	 .title-link:hover {
+	    text-decoration: underline;
+	  }
+    
+    
+    
+    
+    
   </style>
+  
+  
+
+  
+  
 {% endblock %}

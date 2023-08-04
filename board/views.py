@@ -3,7 +3,7 @@ from django.template import loader
 from django.views.generic.base import View
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.http import JsonResponse
-from board.models import WinBoard, WinBoardImg, WinComment
+from board.models import WinBoard, WinBoardImg, WinComment, WinBoardLike
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.dateformat import DateFormat
@@ -219,7 +219,7 @@ class UpdateCommentView(View):
         # 댓글 내용 업데이트
         comment.comment_content = comment_content
         comment.save()
-        
+
         # 수정된 댓글 내용을 응답으로 보내기
         return JsonResponse({
             "success": True,
@@ -228,6 +228,14 @@ class UpdateCommentView(View):
             "comment_reg_time": comment.comment_reg_time.strftime("%Y-%m-%d %H:%M:%S"),
             "user_id": comment.user_id,
         })
+        
+        
+        
+        
+        
+        
+        
+        
 
 class DeleteCommentView(View):
     def delete(self, request, comment_id=None):
@@ -254,6 +262,7 @@ import json
 
 
 class ContentView(View):
+    
     def get(self, request):
         template = loader.get_template("board/content.html")
         num = request.GET.get("num")
@@ -286,6 +295,8 @@ class ContentView(View):
 
         comment_count = WinComment.objects.filter(board_id=num).count()
 
+        
+
         context = {
             "dto": dto,
             "dtcs": dtcs,
@@ -294,6 +305,7 @@ class ContentView(View):
             "number": number,
             "image_url": image_url,
             "comment_count": comment_count,
+    
         }
         return HttpResponse(template.render(context, request))
 
@@ -361,6 +373,10 @@ class DeleteView(View):
         return redirect(url)
 
 
+import os
+from django.core.files.storage import default_storage
+
+
 class UpdateView(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -400,10 +416,34 @@ class UpdateView(View):
                 dti.board = dto
             dti.board_image = request.FILES["img"]
             dti.save()
+            
+        
+        # 이미지 삭제 처리
+        delete_image_id = request.POST.get("delete_image_id")
+        if delete_image_id:
+            try:
+                # 이미지 파일을 삭제하기 위해 파일 경로를 구합니다.
+                dti = WinBoardImg.objects.get(pk=delete_image_id)
+                image_path = dti.board_image.path if dti and dti.board_image else None
+
+                if image_path:
+                    # 이미지 파일이 존재하면 파일을 삭제합니다.
+                    if os.path.exists(image_path):
+                        os.remove(image_path)
+                    dti.delete()  # 해당 이미지 객체도 삭제합니다.
+
+            except Exception as e:
+                print(f"Error deleting image: {e}")
 
         dto.save()
         return redirect("board:list")
 
+
+
+
+
+
+import string
 
 class UpdateProView(View):
     @method_decorator(csrf_exempt)
@@ -415,8 +455,10 @@ class UpdateProView(View):
         dti = WinBoardImg.objects.filter(board=dto).first()
         image_name = dti.board_image.name if dti and dti.board_image else ""
         
-        context = {"dto": dto, "dti": dti, "image_name":image_name}
+        # 캐시 무효화를 위해 랜덤한 문자열을 생성하여 cache_buster로 전달합니다.
+        cache_buster = ''.join(random.choice(string.ascii_lowercase) for _ in range(10))
         
+        context = {"dto": dto, "dti": dti, "image_name":image_name, "cache_buster":cache_buster, } 
         return render(request, "updatepro.html", context)
 
     def post(self, request):
@@ -426,16 +468,101 @@ class UpdateProView(View):
         dto.board_content = request.POST["content"]
 
         # 이미지 업로드 처리
-        dti = WinBoardImg.objects.filter(board=dto).first()
         if "img" in request.FILES:
+            dti = WinBoardImg.objects.filter(board=dto).first()
             if not dti:
                 dti = WinBoardImg()
                 dti.board = dto
             dti.board_image = request.FILES["img"]
             dti.save()
+            
+            
+        
+        # 이미지 삭제 처리
+        delete_image_id = request.POST.get("delete_image_id")
+        if delete_image_id:
+            try:
+                # 이미지 파일을 삭제하기 위해 파일 경로를 구합니다.
+                delete_image_path = os.path.join(settings.MEDIA_ROOT, delete_image_id)
+                # 이미지 파일이 존재하면 파일을 삭제합니다.
+                if os.path.exists(delete_image_path):
+                    os.remove(delete_image_path)
+                else:
+                    print(f"Image not found: {delete_image_path}")
+            except Exception as e:
+                print(f"Error deleting image: {e}")
 
+            # 해당 게시글에 연결된 이미지를 삭제합니다.
+            WinBoardImg.objects.filter(board=dto, board_image=delete_image_id).delete()
+            print("첨부된 이미지가 삭제되었습니다.")
+        else:
+            print("이미지가 수정되지 않아서, 게시글만 수정됩니다.")
+            
+        request.session['modified_post_id'] = dto.board_id
         dto.save()
         return redirect("board:list")
+    
+    
+
+
+class RecentModifiedPostsView(View):
+    def get(self, request):
+        # 최근 수정된 댓글 정보를 가져옵니다.
+        recent_posts = WinBoard.objects.filter(modified=True)
+        data = [post.id for post in recent_posts]
+        return JsonResponse({"modified_posts": data})
+
+
+
+
+
+
+
+
+class DeleteImageView(View):
+    def post(self, request):
+        image_id = request.POST.get("delete_image_id")
+
+        if not image_id:
+            return JsonResponse({"success": False, "message": "이미지 ID가 필요합니다."}, status=400)
+
+        try:
+            # 이미지 파일을 삭제하기 위해 파일 경로를 구합니다.
+            dti = WinBoardImg.objects.get(pk=image_id)
+            image_path = dti.board_image.path if dti and dti.board_image else None
+
+            if not image_path:
+                return JsonResponse({"success": False, "message": "삭제할 이미지를 찾을 수 없습니다."}, status=404)
+
+            # 이미지 파일이 존재하면 파일을 삭제합니다.
+            if os.path.exists(image_path):
+                os.remove(image_path)
+                dti.delete()  # 해당 이미지 객체도 삭제합니다.
+            else:
+                return JsonResponse({"success": False, "message": "삭제할 이미지를 찾을 수 없습니다."}, status=404)
+
+            return JsonResponse({"success": True, "message": "이미지가 성공적으로 삭제되었습니다."})
+        except Exception as e:
+            print(f"Error deleting image: {e}")
+            return JsonResponse({"success": False, "message": "이미지 삭제 중 오류가 발생했습니다."}, status=500)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 import time

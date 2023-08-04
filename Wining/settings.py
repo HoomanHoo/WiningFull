@@ -10,10 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-import mimetypes
 from pathlib import Path
 from django.conf.global_settings import STATICFILES_DIRS
 from django.test.signals import static_finders_changed
+import mimetypes
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -84,7 +85,7 @@ SECRET_KEY = "django-insecure-t+x=)475)9=g3d_s84v!pps^irv8f$)6wfz@094&^ujxh10beg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1" ]
 
 
 # Application definition
@@ -233,3 +234,4 @@ LOGOUT_REDIRECT_URI1 = "http://localhost:8000/user/locallogout"
 
 
 mimetypes.add_type("application/javascript", ".js", True)
+

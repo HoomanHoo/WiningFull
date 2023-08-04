@@ -29,20 +29,7 @@ from django.db.models.aggregates import Count, Avg
 import random
 import numpy as np
 from numpy.f2py.crackfortran import get_sorted_names
-
-
-# Create your views here.
-
-
-# class SearchMainView( View ):
-#     @method_decorator( csrf_exempt )
-#     def dispatch(self, request, *args, **kwargs):
-#         return View.dispatch(self, request, *args, **kwargs)
-#     def get(self, request ):
-#         template = loader.get_template( "search/main.html" )
-#         context = {}
-#         return HttpResponse( template.render( context, request ) )
-#
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
 class SearchByNameView(View):
@@ -71,6 +58,7 @@ class SearchByNameView(View):
             start_results_count = start_results.count()                # SEARCH_QUERY_02 (select한 queryset의 row 개수)
             
             include_results = WinWine.objects.filter(
+                ~Q(wine_name__startswith=search_word),
                 wine_name__contains=search_word
             )                                                         # SEARCH_QUERY_03 (와인 이름에 검색어가 포함된 것 select)
             include_results_count = include_results.count()               # SEARCH_QUERY_04 (select한 queryset의 row 개수)
@@ -83,6 +71,7 @@ class SearchByNameView(View):
             start_results_count = start_results.count()                # SEARCH_QUERY_06 (select한 queryset의 row 개수)
              
             include_results = WinWine.objects.filter(
+                ~Q(wine_name_eng__istartswith=search_word),
                 wine_name_eng__icontains=search_word
             )                                                         # SEARCH_QUERY_07 (와인 이름에 검색어가 포함된 것 select (대소문자 구분하지 않는다))
             include_results_count = include_results.count()              # SEARCH_QUERY_08 (select한 queryset의 row 개수)
@@ -108,6 +97,32 @@ class SearchByNameView(View):
                 search_n_time=DateFormat(datetime.now()).format("Y-m-d h:i:s"),
             )
             search_n_rec.save()                                                 # SEARCH_QUERY_10 (비회원의 검색입력 정보 수집)
+
+    
+        
+        start_paginator = Paginator(start_results, 10)
+        page = request.GET.get('page')
+        
+        try:
+            page_obj = start_paginator.page(page)
+        except PageNotAnInteger:
+            page = 1
+            page_obj = start_paginator.page(page)
+        except EmptyPage:
+            page = start_paginator.num_pages
+            page_obj = start_paginator.page(page)
+            
+        left_index = (int(page) - 2)
+        if left_index < 1:
+            left_index = 1
+            
+        right_index = (int(page) + 2)
+        
+        if right_index > start_paginator.num_pages:
+            right_index = start_paginator.num_pages
+            
+        custom_range = range(left_index, right_index+1) 
+
 
         
         
@@ -137,7 +152,9 @@ class SearchByNameView(View):
             "start_results" : start_results,
             "include_results" : include_results,
             "results_count" : results_count,
-            
+            "page_obj" : page_obj,
+            "start_paginator" : start_paginator,
+            "custom_range" : custom_range
         }
 
         return HttpResponse(template.render(context, request))
@@ -235,7 +252,7 @@ class SearchByCategoryView(View):
             wine_tannin__in=list_tannin,
             wine_food__in=list_food,
             wine_region__in=list_region,
-            wine_capacity__lt=0 
+            wine_capacity__gt=0 
         ).select_related('wine_region')
             print("0")
         
@@ -466,6 +483,7 @@ class SearchByUserView(View):
         #sorted_wine_id_100 = sorted_wine_id[0:99]
         sorted_id = []                                              # 유사도 내림차순으로 정렬된 와인 id 빈 리스트                                            
         sorted_name = []                                            # 유사도 내림차순으로 정렬한 와인 이름 빈 리스트 
+        sorted_name_eng = []     
         sorted_image = []                                           # 유사도 내림차순으로 정렬한 와인 이미지 빈 리스트 
         # for idx in sorted_wine_id:
         #     list_for_user.append(wine_dtos[idx])
@@ -487,16 +505,18 @@ class SearchByUserView(View):
         for idx in sorted_wine_id : 
             sorted_id.append(wine_dtos[int(idx)].wine_id)
             sorted_name.append(wine_dtos[int(idx)].wine_name)
+            sorted_name_eng.append(wine_dtos[int(idx)].wine_name_eng)
             sorted_image.append(wine_dtos[int(idx)].wine_image)
         
         # Template 에서 반복문을 쓰기 위해 zip으로 묶는다
-        list_for_user = zip(sorted_id, sorted_name, sorted_image)
+        list_for_user = zip(sorted_id, sorted_name, sorted_name_eng, sorted_image)
         
         print(sorted_id)
         print(sorted_name)
         print(sorted_image)
         print(len(sorted_id))
         print(len(sorted_name))
+        print(len(sorted_name_eng))
         print(len(sorted_image))
         print(results_count)
         
@@ -504,7 +524,8 @@ class SearchByUserView(View):
         template = loader.get_template("search/searchByUserList.html")
         context = {"results_count": results_count, 
                    "sorted_id" : sorted_id,
-                   "list_for_user" : list_for_user,}
+                   "list_for_user" : list_for_user,
+                   "user_id" : user_id}
         return HttpResponse(template.render(context, request))
 
 
@@ -529,6 +550,7 @@ class SearchByRankView(View):
         #      list_by_rank = WinWine.objects.filter(wine_name__contains="0")
         
          # 구매수
+
         if rank_category == "purchaseqnty" :
             purchaseqnty_joined = (WinPurchaseDetail.objects.
             select_related("sell").

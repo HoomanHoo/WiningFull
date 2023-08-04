@@ -15,11 +15,11 @@
 {% endblock %}
 
 {% block content %}
-
+<!--
 <head>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-
+  -->
 
 
 <button class="btn btn-primary scroll-button top-button" onclick="scrollToTop()"><i class="fas fa-arrow-up"></i> </button>
@@ -38,10 +38,10 @@
 	    </div>
 	    <div class="col-lg-6 text-right">
 	        {% if request.session.memid == dto.user_id %}
-	            <div class="d-flex justify-content-end">
-	                <input class="btn btn-lg btn-transparent btn-hover-primary ml-2" type="button" value="글수정" onclick="location='update?num={{ dto.board_id }}&pagenum={{ pagenum }}'">
-	                <input class="btn btn-lg btn-transparent btn-hover-primary ml-2" type="button" value="글삭제" onclick="confirmDelete('{{dto.board_id}}', '{{pagenum}}')">
-	            </div>	    	
+	            
+	                <input class="btn btn-primary ml-2" type="button" value="글수정" onclick="location='update?num={{ dto.board_id }}&pagenum={{ pagenum }}'">
+	                <input class="btn btn-primary ml-2" type="button" value="글삭제" onclick="confirmDelete('{{dto.board_id}}', '{{pagenum}}')">
+	            	    	
             {% endif %}
 	    </div>
 	</div>				
@@ -93,6 +93,7 @@
 								<th>댓글</th>
 								<td>{{ comment_count }}</td>
 							</tr>
+							
 						</tbody>						
 					</table>
 				</div>
@@ -115,10 +116,6 @@
 	            </div>
 	        </div>
 	    </div>
-	</div>
-	
-	<div class="row mt-3">
-		<input class="btn btn-primary ml-2" type="button" value="뒤로가기" onclick="location='list?pagenum={{ pagenum }}'">
 	</div>
 	
 	<br><br><br><br>
@@ -190,7 +187,7 @@
 				</tr>
 				{% empty %}
 				<tr>
-					<td colspan="4" align="center">댓글이 하나토 없습니다.</td>
+					<td colspan="4" align="center">등록된 댓글이 없습니다.</td>
 				</tr>
 				{% endfor %}
 			</tbody>
@@ -327,95 +324,6 @@
 	
 
 
-	
-	function saveEditedComment(commentId) {
-	    // 수정된 부분 1: 해당 commentId를 가진 수정 폼 찾기
-	    const commentForm = document.querySelector(`[data-commentid="${commentId}"] .edit-comment-form`);
-	    if (!commentForm) {
-	        console.error(`Comment form with commentId ${commentId} not found.`);
-	        return;
-	    }
-	    
-	    // 수정된 부분 2: textarea 요소 찾기
-	    const textarea = commentForm.querySelector('textarea');
-	   
-
-	    // 수정된 부분 3: 댓글 내용 가져오기
-	    const commentContent = textarea.value.trim();
-	    
-	    if (!commentContent) {
-	        alert('댓글 내용을 입력해주세요.');
-	        return;
-	    }
-
-	    // 수정된 부분 4: CSRF 토큰 가져오기
-	    const csrfToken = getCookie('csrftoken');
-
-	    // 수정된 부분 5: 서버로 수정된 댓글 내용 전송
-	    fetch('/updatecomment/', {
-	        method: 'POST',
-	        headers: {
-	            'Content-Type': 'application/json',
-	            'X-CSRFToken': csrfToken,
-	        },
-	        body: JSON.stringify({
-	            comment_id: commentId,
-	            comment_content: commentContent,
-	        }),
-	    })
-	    .then(response => response.json())
-	    .then(data => {
-	        if (data.success) {
-	            // 수정된 댓글 내용으로 업데이트
-	            const commentContentDiv = document.querySelector(`[data-commentid="${commentId}"] .comment-content`);
-	            commentContentDiv.textContent = commentContent;
-
-	            // 폼 토글
-	            toggleEditCommentForm(commentId);
-	        } else {
-	            alert(data.message);
-	        }
-	    })
-	    .catch(error => {
-	        console.error('Error:', error);
-	    });
-	}
-	
-
-	
-	
-
-	
-	// 수정된 부분 6: "저장" 버튼에 이벤트 리스너 추가
-    document.querySelectorAll('.save-button').forEach(button => {
-        button.addEventListener('click', () => {
-            const commentId = button.parentElement.dataset.commentid;
-            saveEditedComment(commentId);
-        });
-    });
-
-    // 수정된 부분 7: 폼 토글 함수
-    function toggleEditCommentForm(commentId) {
-        const commentContentDiv = document.querySelector(`[data-commentid="${commentId}"] .comment-content`);
-        const editCommentForm = document.querySelector(`[data-commentid="${commentId}"] .edit-comment-form`);
-
-        if (commentContentDiv && editCommentForm) {
-            commentContentDiv.classList.toggle('d-none');
-            editCommentForm.classList.toggle('d-none');
-        } else {
-            console.error(`Comment element with commentId ${commentId} not found.`);
-        }
-    }
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
 
 
 
@@ -453,6 +361,8 @@
 							var newCell2 = newRow.insertCell();
 							newCell1.textContent = response.dtc.user_id;
 							newCell2.innerHTML = response.dtc.comment_content.replace(/\n/g, "<br>");
+							
+							alert("댓글이 작성되었습니다.");
 						} else {
 							alert("댓글 작성에 실패했습니다.");
 						}
@@ -474,41 +384,10 @@
 	
 	
 	
-    // "등록" 버튼에 이벤트 리스너 추가
-    document.querySelector('.btn-primary').addEventListener('click', function() {
-        var form = new FormData(document.getElementById('comment-form'));
-        var csrfToken = getCookie('csrftoken');
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '{% url "board:writecomment" %}', true);
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-                if (xhr.status === 200) {
-                    try {
-                        var response = JSON.parse(xhr.responseText);
-                        if (response.success) {
-                            var commentTableBody = document.getElementById('comment-table-body');
-                            var newRow = commentTableBody.insertRow();
-                            var newCell1 = newRow.insertCell();
-                            var newCell2 = newRow.insertCell();
-                            newCell1.textContent = response.dtc.user_id;
-                            newCell2.innerHTML = response.dtc.comment_content.replace(/\n/g, '<br>');
-                        } else {
-                            alert('댓글 작성에 실패했습니다.');
-                        }
-                    } catch (error) {
-                        console.error('Error : ', error);
-                        location.reload();
-                    }
-                } else {
-                    alert('댓글 작성에 실패했습니다.');
-                }
-            }
-        };
-        xhr.setRequestHeader('X-CSRFToken', csrfToken);
-        xhr.send(form);
-    });
+
+
 	
-	
+	// 수정버튼 클릭하면 기존 댓글에다가 수정가능하도록 하는 부분
 	document.querySelectorAll('.edit-button').forEach(button => {
 		button.addEventListener('click', () => {
 			const commentId = button.parentElement.parentElement.querySelector('.comment-content').dataset.commentid;
@@ -526,52 +405,29 @@
 				//saveEditedComment(commentId);
 			} else {
 				console.error(`Comment element with commentId ${commentId} not found.`);
+				alert("댓글 수정에 실패하였습니다...");
 			}
 		});
 	});
 	
 	
 	
-	
-	
-	document.querySelectorAll('.cancel-button').forEach(button => {
-		button.addEventListener('click', () => {
-			const commentId = button.parentElement.dataset.commentid;
-			const commentContentDiv = button.parentElement.parentElement.querySelector('.comment-content');
-			const editCommentForm = button.parentElement;
-
-			if (commentContentDiv && editCommentForm) {
-				commentContentDiv.classList.remove('d-none');
-				editCommentForm.classList.add('d-none');
-			} else {
-				console.error(`Comment element with commentId ${commentId} not found.`);
-			}
-		});
-	});
-	
-	
-	
-
-	
-	
-	
-	
-	
+	// 위에서 수정한 댓글을 저장하는 부분
 	function saveEditedComment(commentId) {
 	    // 수정된 부분 1: 해당 commentId를 가진 수정 폼 찾기
 	    const commentForm = document.querySelector(`[data-commentid="${commentId}"] .edit-comment-form`);
+
 	    if (!commentForm) {
 	        console.error(`Comment form with commentId ${commentId} not found.`);
+	        alert("댓글 수정에 실패하였습니다...");
 	        return;
 	    }
-	    
+
 	    // 수정된 부분 2: textarea 요소 찾기
 	    const textarea = commentForm.querySelector('textarea');
-	   
 
 	    // 수정된 부분 3: 댓글 내용 가져오기
 	    const commentContent = textarea.value.trim();
-	    
 	    if (!commentContent) {
 	        alert('댓글 내용을 입력해주세요.');
 	        return;
@@ -581,7 +437,7 @@
 	    const csrfToken = getCookie('csrftoken');
 
 	    // 수정된 부분 5: 서버로 수정된 댓글 내용 전송
-	    fetch('/updatecomment/', {
+	    fetch('updatecomment/', {
 	        method: 'POST',
 	        headers: {
 	            'Content-Type': 'application/json',
@@ -609,6 +465,52 @@
 	        console.error('Error:', error);
 	    });
 	}
+
+	// 수정된 부분 6: "저장" 버튼에 이벤트 리스너 추가
+	document.querySelectorAll('.save-button').forEach(button => {
+	    button.addEventListener('click', () => {
+	        const commentId = button.parentElement.dataset.commentid;
+	        saveEditedComment(commentId);
+	    });
+	});
+
+    // 수정된 부분 7: 폼 토글 함수
+    function toggleEditCommentForm(commentId) {
+        const commentContentDiv = document.querySelector(`[data-commentid="${commentId}"] .comment-content`);
+        const editCommentForm = document.querySelector(`[data-commentid="${commentId}"] .edit-comment-form`);
+
+        if (commentContentDiv && editCommentForm) {
+            commentContentDiv.classList.toggle('d-none');
+            editCommentForm.classList.toggle('d-none');
+        } else {
+            console.error(`Comment element with commentId ${commentId} not found.`);
+        }
+    }
+	
+	
+	
+	
+	document.querySelectorAll('.cancel-button').forEach(button => {
+		button.addEventListener('click', () => {
+			const commentId = button.parentElement.dataset.commentid;
+			const commentContentDiv = button.parentElement.parentElement.querySelector('.comment-content');
+			const editCommentForm = button.parentElement;
+
+			if (commentContentDiv && editCommentForm) {
+				commentContentDiv.classList.remove('d-none');
+				editCommentForm.classList.add('d-none');
+			} else {
+				console.error(`Comment element with commentId ${commentId} not found.`);
+			}
+		});
+	});
+	
+	
+	
+
+	
+	
+	
 	
 	
 	
@@ -769,7 +671,7 @@
   .scroll-button {
     position: fixed;
     padding: 5px;
-    font-size: 18px;
+    font-size: 21px;
     border: none;
     background-color: transparent;
     cursor: pointer;
@@ -805,7 +707,7 @@
   
 	
 	.btn-transparent {
-	color: grey;
+	color: white;
 	}
 
 
@@ -815,7 +717,7 @@
 	  background-color: transparent;
 	  border: none;
 	  cursor: pointer;
-	  transition: color 0.3s; /* 색 변화에 대한 트랜지션 설정 */
+
 	}
 
 	.edit-button:hover,
@@ -853,7 +755,7 @@
 	}
 
 	textarea[name="content"] {
-		height: 150px;
+		height: 100px;
 	}
 
 	.btn-primary {

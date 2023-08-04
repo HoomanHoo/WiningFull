@@ -53,8 +53,12 @@
 					<h6>{{dto.comment_reg_time}}</h6>
 					<span class="dots"></span>
 				</div>
+				<div class="d-flex flex-row align-items-center">
+					<h6>{{dto.board.board_title}}</h6>
+					<span class="dots"></span>
+				</div>
 					<h4><span class="days-ago"> 내용 : 
-					<a href="../board/content?num={{dto.comment_id}}">
+				  	<a href="../board/content?num={{dto.board.board_id}}">  
 						{{dto.comment_content}}
 					</a>
 					</span></h4>

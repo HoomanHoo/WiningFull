@@ -93,9 +93,14 @@ class KakaoLogoutView(View):
 
 class LogoutView(View):
     def get(self, request):
-        del request.session["access_Token"]
-        del request.session["memid"]
-        return redirect("login")
+        ACCESS_TOKEN = request.session.get("access_Token", None)
+        if ACCESS_TOKEN is None:
+            del request.session["memid"]
+            return redirect("login")
+        else:
+            del request.session["access_Token"]
+            del request.session["memid"]
+            return redirect("login")
 
 
 # return redirect("user/login.html")
@@ -181,6 +186,7 @@ class InputUserView(View):
 
             else:
                 template = loader.get_template("user/inputUser.html")
+                request.session["access_Token"] = result["access_token"]
                 context = {
                     "user_email": user_email,
                 }
@@ -318,21 +324,23 @@ class DeleteView(View):
                 "access_Token", None
             )  # access token = none이면 login으로 리다이렉트 하거나 refresh 토큰으로 업데이트해야함
             print("access_Token", request.session.get("access_Token", None))
+            if ACCESS_TOKEN is not None:
+                request_header = {
+                    "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
+                    "Authorization": f"Bearer {ACCESS_TOKEN}",
+                }
 
-            request_header = {
-                "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
-                "Authorization": f"Bearer {ACCESS_TOKEN}",
-            }
+                logout_url = "https://kapi.kakao.com/v1/user/unlink"
 
-            logout_url = "https://kapi.kakao.com/v1/user/unlink"
+                requests.post(logout_url, headers=request_header)
 
-            requests.post(logout_url, headers=request_header)
+                del request.session["access_Token"]
+                del request.session["memid"]
 
-            del request.session["access_Token"]
-            del request.session["memid"]
-
-            return redirect("login")
-
+                return redirect("login")
+            else:
+                del request.session["memid"]
+                return redirect("login")
         else:
             template = loader.get_template("user/delete.html")
             message = "입력하신 비밀번호가 다릅니다"
@@ -515,6 +523,9 @@ class PurchaseDetailView(View):
                 purchase_number = purchase_detail.purchase_det_number
                 purchase_time = purchase_detail.purchase.purchase_time
                 sell_id = purchase_detail.sell.sell_id
+                purchase_det_state = purchase_detail.purchase_det_state
+
+                print(purchase_det_state)
 
                 dtos.append(
                     {
@@ -525,6 +536,7 @@ class PurchaseDetailView(View):
                         "purchase_number": purchase_number,
                         "purchase_time": purchase_time,
                         "sell_id": sell_id,
+                        "purchase_det_state": purchase_det_state,
                     }
                 )
 
@@ -574,7 +586,14 @@ class MyCommentView(View):
     def get(self, request):
         template = loader.get_template("user/myComment.html")
         user_id = request.session.get("memid")
-        dtos = WinComment.objects.filter(user_id=user_id).order_by("-comment_reg_time")
+        dtos = (
+            WinComment.objects.select_related("board")
+            .filter(user_id=user_id)
+            .order_by("-comment_reg_time")
+        )
+
+        for dto in dtos:
+            print(dto.board.board_title)
 
         context = {"dtos": dtos}
 

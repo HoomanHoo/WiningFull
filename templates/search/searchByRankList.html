@@ -30,7 +30,7 @@
 
 					<br>
 					<div> 
-						<input type="number" max="100" name="rank_qnty" placeholder="개수 입력">
+						<input type="number" max="100" name="rank_qnty" placeholder="개수 입력" value="10">
 					</div>
 					<br>
 					
@@ -41,30 +41,114 @@
 		
 	<br><br>
 	{% block list %}
-	전체 결과 수 : {{ count }}										<!-- 전체 결과 수 출력 -->
+									<!-- 전체 결과 수 출력 -->
 <br><br>
 
 		{% if count == 0 %}										<!-- 검색 결과 유무에 따라 나눈다 -->
 				검색 결과가 없습니다
 		{% else %}
-			{% for wine_by_rank in list_by_rank %}								<!-- 검색 결과가 있다면 반복문으로 나타낸다 -->
+											<!-- 검색 결과가 있다면 반복문으로 나타낸다 -->
+				
 				{% if rank_category == "sellregist" %}
-					<a href="../detail/winedetail?wine_id={{ wine_by_rank.wine__wine_id }}">
-						<div align="center" style="width:60%; height: 100px; border: 5px solid red; border-radius: 2em;">													<!-- 리스트 요소는 <div> 태그로 나타내고 <div> 영역 안에 image, 이름이 있다 -->
-				 			<div align="left" ><img src="../{{wine_by_rank.sell__wine__wine_image}}" width="60" height="80" alt="Image"> </div>
-							<div style="text-align:left"> {{wine_by_rank.wine__wine_name}} </div>
+					<h4> 판매 등록 수 검색 결과 수 : {{ count }}개 </h4>	<br><br>
+					{% for wine_by_rank in list_by_rank %}
+					
+					<div class="list_outline_start" style=" width:60%; height: 240px; border: 5px solid rgb(170, 0, 4); 
+					border-radius: 1em; padding: 3px 3px 3px 3px; margin: 0 auto;">	    	
+				 	<a href="../detail/winedetail?wine_id={{ wine_by_rank.wine__wine_id }}">
+				 		<div class="list_image" style="float: left;">
+				 			<img src="../{{wine_by_rank.wine__wine_image}}" width="150" height="200"> 
+				 		</div>
+							<div class="list_name" id="{wine_by_rank.sell__wine__wine_id}}" style="font-size: x-large; font-color:black;">
+								{{wine_by_rank.wine__wine_name}}
+							</div>
+							<div class="list_name_eng" style="font-size: large; padding: 5px 5px 5px 5px; font-color:black;"> 
+								{{wine_by_rank.wine__wine_name_eng}} 
+							</div>
+						</a>
+						<div>
+							판매 등록 수 : {{wine_by_rank.max_count}}
 						</div>
-					</a>
-				{% else %}
-				<a href="../detail/winedetail?wine_id={{ wine_by_rank.sell__wine__wine_id }}">
-					<div align="center" style="width:60%; height: 100px; border: 5px solid red; border-radius: 2em;">													<!-- 리스트 요소는 <div> 태그로 나타내고 <div> 영역 안에 image, 이름이 있다 -->
-				 		<div align="left" ><img src="../{{wine_by_rank.sell__wine__wine_image}}" width="60" height="80" alt="Image"> </div>
-						<div style="text-align:left"> {{wine_by_rank.sell__wine__wine_name}} </div>
 					</div>
-				</a>
+					<br><br>
+					{% endfor %}
+
+					
+				{% elif rank_category == "purchaseqnty" %}
+					<h4> 구매 수 검색 결과 : {{ count }}개 </h4>	<br><br>
+					{% for wine_by_rank in list_by_rank %}
+					
+					<div class="list_outline_start" style=" width:60%; height: 240px; border: 5px solid rgb(170, 0, 4); 
+					border-radius: 1em; padding: 3px 3px 3px 3px; margin: 0 auto;">	    	
+				 	<a href="../detail/winedetail?wine_id={{ wine_by_rank.sell__wine__wine_id }}">
+				 		<div class="list_image" style="float: left;">
+				 			<img src="../{{wine_by_rank.sell__wine__wine_image}}" width="150" height="200"> 
+				 		</div>
+							<div class="list_name" id="{wine_by_rank.sell__wine__wine_id}}" style="font-size: x-large; font-color:black;">
+								{{wine_by_rank.sell__wine__wine_name}}
+							</div>
+							<div class="list_name_eng" style="font-size: large; padding: 5px 5px 5px 5px; font-color:black;"> 
+								{{wine_by_rank.sell__wine__wine_name_eng}} 
+							</div>
+						</a>
+						<div>
+							구매수 : {{wine_by_rank.max_count}}
+					</div>
+					</div>
+					<br><br>
+					{% endfor %}
+					
+				{% elif rank_category == "reviewqnty" %}
+					<h4> 리뷰 개수 검색 결과 : {{ count }}개 </h4>	<br><br>
+					{% for wine_by_rank in list_by_rank %}
+					
+					<div class="list_outline_start" style=" width:60%; height: 240px; border: 5px solid rgb(170, 0, 4); 
+					border-radius: 1em; padding: 3px 3px 3px 3px; margin: 0 auto;">	    	
+				 	<a href="../detail/winedetail?wine_id={{ wine_by_rank.sell__wine__wine_id }}">
+				 		<div class="list_image" style="float: left;">
+				 			<img src="../{{wine_by_rank.sell__wine__wine_image}}" width="150" height="200"> 
+				 		</div>
+							<div class="list_name" id="{wine_by_rank.sell__wine__wine_id}}" style="font-size: x-large; font-color:black;">
+								{{wine_by_rank.sell__wine__wine_name}}
+							</div>
+							<div class="list_name_eng" style="font-size: large; padding: 5px 5px 5px 5px; font-color:black;"> 
+								{{wine_by_rank.sell__wine__wine_name_eng}} 
+							</div>
+						</a>
+						<div>
+							리뷰 개수 : {{wine_by_rank.max_count}}
+						</div>
+					</div>
+					<br><br>
+					{% endfor %}
+					
+				{% elif rank_category == "reviewavg" %}
+					<h4> 리뷰 평점 검색 결과 : {{ count }}개 </h4>	<br><br>
+					{% for wine_by_rank in list_by_rank %}
+					
+					<div class="list_outline_start" style=" width:60%; height: 240px; border: 5px solid rgb(170, 0, 4); 
+					border-radius: 1em; padding: 3px 3px 3px 3px; margin: 0 auto;">	    	
+				 	<a href="../detail/winedetail?wine_id={{ wine_by_rank.sell__wine__wine_id }}">
+				 		<div class="list_image" style="float: left;">
+				 			<img src="../{{wine_by_rank.sell__wine__wine_image}}" width="150" height="200"> 
+				 		</div>
+							<div class="list_name" id="{wine_by_rank.sell__wine__wine_id}}" style="font-size: x-large; font-color:black;">
+								{{wine_by_rank.sell__wine__wine_name}}
+							</div>
+							<div class="list_name_eng" style="font-size: large; padding: 5px 5px 5px 5px; font-color:black;"> 
+								{{wine_by_rank.sell__wine__wine_name_eng}} 
+							</div>
+						</a>
+						<div>
+							리뷰 평점 : {{wine_by_rank.avg}}
+						</div>
+					</div>		
+					<br><br>
+					{% endfor %}
+				
 				{% endif %}
 				<br><br>
-			{% endfor %}
+			
 		{% endif %}
 	
 	{% endblock %}

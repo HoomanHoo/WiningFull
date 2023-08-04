@@ -40,19 +40,39 @@
             </div>
         </div>
         
+        
+        
+        <!--  -->
         <div class="row justify-content-center">
             <div class="col-lg-6">
                 <div class="form-group">
                     <label for="img">이미지</label>
-                    <input class="form-control" type="file" name="img" id="img" accept="image/*">
+                    <input class="form-control" type="file" name="img" id="img" accept="image/*" value="{{image_name}}">
 					    {% if image_name %}
-					        <p class="red-text">이전에 첨부했던 사진은 {{ image_name }}입니다.</p>
+					        <p class="blue-text">이전에 첨부했던 사진은 {{ image_name }}입니다.</p>
+			                <div class="image-container">
+			                    <!-- cache_buster를 이미지 URL에 추가합니다 -->
+			                    <img src="{{ image_url }}?{{ cache_buster }}" alt="기존 이미지">
+			                    <button class="delete-image-btn" id="deleteImageBtn">이미지삭제</button>
+			                    <input type="hidden" name="delete_image_id" value="{{ image_name }}">
+			                </div>
 					    {% else %}
-					        <p class="red-text">이전에 첨부한 사진이 없습니다.</p>
+					        <p class="blue-text">이전에 첨부한 사진이 없습니다.</p>
 					    {% endif %}
                 </div>
             </div>
         </div>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         <br><br>
         <div class="row justify-content-center">
@@ -76,19 +96,91 @@
 
 <style>
     /* 이전에 첨부했던 사진이 있는 경우에 적용할 스타일 */
-    .red-text {
+    .blue-text {
         color: red;
     }
+    
+        /* 이미지 컨테이너 스타일 */
+    .image-container {
+        position: relative;
+        display: inline-block;
+    }
 
-    /* 이전에 첨부한 사진이 없는 경우에 적용할 스타일 */
-    .red-text {
-        color: red;
+    /* 이미지 삭제 버튼 스타일 */
+    .delete-image-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background-color: #f44336;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        font-size: 16px;
+        cursor: pointer;
     }
 </style>
 
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteButton = document.getElementById('deleteImageBtn');
+    deleteButton.addEventListener('click', deleteImage);
+
+    function deleteImage() {
+        if (confirm('이미지를 삭제하시겠습니까?')) {
+            // 이미지 삭제 요청을 보낼 URL을 설정합니다. 실제 서버의 URL로 변경해야 합니다.
+            const deleteUrl = '/delete_image'; // 예시 URL, 실제 URL로 변경해야 합니다.
+
+            // 이미지 ID를 데이터로 포함하여 Ajax 요청을 보냅니다.
+            const data = { delete_image_id: '{{ image_id }}' };
+
+            // Ajax를 이용하여 서버에 이미지 삭제 요청을 보냅니다.
+            fetch(deleteUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+                .then(response => response.json())
+                .then(result => {
+                    // 서버에서 응답을 받았을 때 처리할 로직을 작성합니다.
+                    if (result.success) {
+                        // 이미지 삭제가 성공한 경우 화면에서 업데이트합니다.
+                        const imageElement = document.getElementById('img');
+                        imageElement.value = ''; // 이미지 파일 선택을 초기화합니다.
+                        const imageInfoElement = document.querySelector('.red-text');
+                        imageInfoElement.innerHTML = '이전에 첨부한 사진이 없습니다.';
+                        deleteButton.style.display = 'none'; // 이미지 삭제 버튼을 감춥니다.
+                        alert('이미지가 성공적으로 삭제되었습니다.'); // 이미지가 성공적으로 삭제되었음을 사용자에게 알립니다.
+                    } else {
+                        // 이미지 삭제가 실패한 경우 처리할 로직을 작성합니다.
+                        alert('이미지 삭제에 실패했습니다.'); // 이미지 삭제가 실패했음을 사용자에게 알립니다.
+                    }
+                })
+                .catch(error => {
+                    // 에러 처리 로직을 작성합니다.
+                    console.error('이미지 삭제 중 오류 발생:', error);
+                    alert('이미지 삭제 중 오류가 발생했습니다.'); // 이미지 삭제 중 오류가 발생했음을 사용자에게 알립니다.
+                });
+        }
+    }
+
+    // '확인' 버튼 클릭 시 기존 이미지를 유지하고 게시글만 수정하도록 합니다.
+    const confirmButton = document.getElementById('confirmButton');
+    confirmButton.addEventListener('click', function(event) {
+        // 기본 form 제출 동작을 막습니다.
+        event.preventDefault();
+        // form element를 찾아서 제출합니다.
+        const form = document.querySelector('form[name="updateform"]');
+        // 이미지 삭제 버튼을 감춥니다. (기존 이미지를 유지하기 위함)
+        deleteButton.style.display = 'none';
+        form.submit();
+    });
+});
 
 
-
-
+</script>
 

@@ -134,3 +134,7 @@ def sort(a, b):
 def random_generate(list, cnt):
     return random.sample(list, cnt)
     
+
+
+
+

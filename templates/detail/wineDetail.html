@@ -48,6 +48,13 @@
 <div class="row" style="text-align:center">
 	<h5>{{ wine_info.wine_name_eng }} </h5>
 </div>
+<div class="row" style="text-align:center">
+	<h5>{{ wine_info.wine_capacity }} mL 
+	{% if wine_info.wine_capacity == 750 %}
+		(표준 용량)
+	{% endif %}
+</h5>
+</div>
 <br>
 <br>
 
@@ -68,20 +75,14 @@
   <br><br>
   <div class="row" style="text-align:center">
    <div class="col-sm-4">
-     <div class="fakeimg"> <span class="info"> 도수 : {{ wine_info.wine_alc }} </span> </div>
+     <div class="fakeimg"> <span class="info"> 도수 : {{ wine_info.wine_alc }}% </span> </div>
    </div>
-   <div class="col-sm-8">
-     <div class="fakeimg">
-		당도 : {{ wine_info.wine_dangdo }}
-		산도 : {{ wine_info.wine_sando }}
-		탄닌 : {{ wine_info.wine_tannin }}
-		
-		
+   <div class="col-sm-8" style="text-align:center">
+     <div class="fakeimg" style="text-align:center">
+     	<div style="text-align:center">
 		<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
-		<canvas id="myChart" width="100" height="100"></canvas>
-		<script>
-		
+		<canvas id="chartTaste" width="800" height="200"></canvas>
+		<script>		
 		let taste_spec = [];
 		taste_spec.push("{{ wine_info.wine_dangdo }}");
 		taste_spec.push("{{ wine_info.wine_sando }}");
@@ -90,15 +91,15 @@
 		let taste_spec_name = ["당도", "산도", "탄닌"];
 		
 		const ctxTaste = document.getElementById('chartTaste').getContext('2d');
-		const chartTaste = new Chart(chartTaste, {
+		const chartTaste = new Chart(ctxTaste, {
 		    type: 'bar',
 		    data: {
 		        labels: taste_spec_name,
 		        datasets: [{
-		            label: '# of Votes',
+		            label: 'wine_taste',
 		            data: taste_spec,
 		            backgroundColor: [
-		                'rgba(255, 99, 132, 0.2)'
+		                'rgba(255, 99, 132, 0.5)'
 		            ],
 		            borderColor: [
 		                'rgba(255, 99, 132, 1)'
@@ -110,34 +111,48 @@
 		    	responsive: false,
 		        scales: {
 		            y: {
-		                beginAtZero: true
-		            }
+						ticks: {
+							min: 0,
+							max: 5,
+							fontSize : 20
+						}
+					}
 		        }
 		    }
 		});
-</script>
+		</script>
+		</div>
+		<div>
+			
+		</div>
+		</div>
 		
 		
-	 </div>
+		
+		
+	 
    </div>
   	</div>
   </div>  
  <br><br>
   <div class="row">
- 	<div class="col">
+ 	<div class="col_" style="float: left;">
   		{% if request.session.memid %}
-		    <input class="inputbutton" type="button" value="매장 리스트업"
+		    <input class="inputbutton" type="button" value="매장 리스트업" style="padding: 10px 30px;"
 		    	onclick="location='../purchasing/wine/{{ wine_info.wine_id }}/stores'">    
 		    	<!-- onclick="location='../purchasing/store-list?wine_id={{ wine_info.wine_id }}'"> -->	    	
 		{% else %}   	
-		    <input class="inputbutton" type="button" value="매장 리스트업"
+		    <input class="inputbutton" type="button" value="매장 리스트업" style="padding: 10px 30px;"
 		    	value="구매하려면 로그인을 해야합니다." disabled="disabled">
-		</div>
+		
 		{% endif %}
-	<div class="col">
-		    	<input class="inputbutton" type="button" value="뒤로 가기"
+		</div>
+	<div class="col_" style="float: left;"> 
+			<br>
+		    	<input class="inputbutton" type="button" value="뒤로 가기" style="padding: 10px 30px;"
 		    	onclick="history.back()">
   	</div>	
+  	
   </div>
 		
 	{% endblock %}	
@@ -162,7 +177,7 @@
 <style>
 .fakeimg {
             height: 200px;
-            background-color: #F5A9A9;
+            background-color: #F8E0E6;
         }
 
 .info 	{
