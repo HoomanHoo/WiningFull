@@ -33,10 +33,9 @@ from store.db_access.query_set import (
     get_store_revenue,
     search_product_list,
     search_receive_code,
+    update_purchase_det_state,
 )
-from purchasing.models import WinPurchaseDetail
 from purchasing.usecase.receive_code_create_enc_module import EncModule
-from store.models import WinStore
 from store.usecase.pagination import db_preprocessing, pagenation
 
 # Create your views here.
@@ -165,10 +164,9 @@ class ProductAdditionView(View):
         db_data = paging_result["db_data"]
         state = paging_result["pages_count"]
         product_list = get_product_list_by_seller(user_id=user_id)
-        store_id = WinStore.objects.filter(user_id=user_id).values_list(
-            "store_id", flat=True
-        )[0]
+        store_id = get_store_info(user_id=user_id)["store_id"]
 
+        # 이미 등록된 상품 리스트들도 페이징 처리 할 것
         template = loader.get_template("store/productAddition.html")
         context = {
             "wines": db_data,
@@ -308,9 +306,8 @@ class SearchReceiveCodeView(View):
         purchase_detail_id = request.POST.get("purchaseDetailId", None)
         template = loader.get_template("store/searchReceiveCode.html")
         user_id = request.session.get("memid")
-        WinPurchaseDetail.objects.filter(
-            purchase_detail_id=purchase_detail_id,
-        ).update(purchase_det_state=2)
+        update_purchase_det_state(purchase_detail_id=purchase_detail_id)
+
         logger.info(
             f"{user_id}: purchase_detail_id: {purchase_detail_id} SearchReceiveCodeView"
         )

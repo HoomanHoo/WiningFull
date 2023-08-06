@@ -1,4 +1,7 @@
 import base64
+import json
+import logging
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.generic.base import View
 from django.template import loader
@@ -30,6 +33,8 @@ from django.db.models import F
 from django.core.files.storage import default_storage
 from purchasing.usecase.decrypt_receive_code import DecModule
 from django.db.models import Q
+
+logger = logging.getLogger("user")
 
 
 class LoginView(View):
@@ -334,8 +339,8 @@ class DeleteView(View):
                 return redirect("login")
             else:
                 request_header = {
-                "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
-                "Authorization": f"Bearer {ACCESS_TOKEN}",
+                    "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
+                    "Authorization": f"Bearer {ACCESS_TOKEN}",
                 }
     
                 logout_url = "https://kapi.kakao.com/v1/user/unlink"
@@ -709,3 +714,44 @@ class MyReceiveCodeView(View):
 
         context = {"pdtos": list_dtos, "pages_count": pages_count, "state": state}
         return HttpResponse(template.render(context, request))
+
+
+class TempLoginView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return View.dispatch(self, request, *args, **kwargs)
+
+    def get(self, request):
+        template = loader.get_template("purchasing/tempLogin.html")
+        logger.info("temp login")
+        context = {}
+        return HttpResponse(template.render(context, request))
+
+    def post(self, request):
+        req_data = json.loads(request.body)
+
+        user_id = req_data.get("id", None)
+        user_passwd = req_data.get("passwd", None)
+
+        try:
+            dto = WinUser.objects.get(user_id=user_id)
+            user_grade = dto.user_grade.user_grade
+
+            if user_passwd == dto.user_passwd:
+                if user_grade != -1:
+                    request.session["memid"] = user_id
+                    message = 1
+
+                else:
+                    message = -1
+
+            else:
+                message = -2
+        except ObjectDoesNotExist as ex:
+            logger.error(ex)
+            message = -2
+
+        logger.info(f"{user_id} temp login")
+        context = {"message": message}
+
+        return JsonResponse(context, status=200)

@@ -10,7 +10,6 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.dateformat import DateFormat
 from django.utils.datetime_safe import datetime
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import DatabaseError
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -20,11 +19,11 @@ from purchasing.usecase.receive_code_create_enc_module import (
     EncModule,
     create_receive_code,
 )
-
 from purchasing.usecase.purchase_usecase import calc, formating
 from purchasing.db_access.query_set import (
     ReviewSerializer,
     StoreListSerializer,
+    delete_detail_cart_info,
     get_cart_state,
     get_product_info,
     get_info_of_buy_one,
@@ -39,10 +38,7 @@ from purchasing.db_access.query_set import (
     get_detail_info,
 )
 
-
 from store.usecase.pagination import db_preprocessing
-from purchasing.models import WinCartDetail, WinReceiveCode
-from user.models import WinUser
 
 
 logger = logging.getLogger("purchasing")
@@ -62,6 +58,7 @@ class StoreListView(View):
         list_info = db_preprocessing(db_data=store_list, end_page=end, start_page=start)
 
         context = {"store_list": list_info[1]}
+
         logger.info(f"{request.session['memid']}: wine_id : {wine_id} StoreListView")
         return HttpResponse(template.render(context, request))
 
@@ -82,6 +79,7 @@ class LoadAdditionalStoreListAPI(APIView):
         serializer = StoreListSerializer(db_data, many=True)
 
         json_result = JSONRenderer().render(serializer.data)
+
         logger.info(
             f"{request.session['memid']}: wine_id : {wine_id} page_num: {page_num} LoadAdditionalStoreListAPI"
         )
@@ -100,15 +98,14 @@ class DetailProductInfoView(View):
         template = loader.get_template("purchasing/detailProductInfo.html")
 
         product_info = get_product_info(sell_id=sell_id)
-        print(product_info)
 
         if product_info:
             if product_info[0]["store__storeUrl__store_map_url"] == "":
                 url_value = 0
-                print(url_value)
+
             else:
                 url_value = 1
-                print(url_value)
+
             product_info = product_info[0]
         else:
             url_value = None  # 에러 페이지로 리다이렉트 시킬 것
@@ -117,8 +114,8 @@ class DetailProductInfoView(View):
             "product_info": product_info,
             "url_value": url_value,
             "user_id": user_id,
-            # "rdtos": rdtos,
         }
+
         logger.info(f"{user_id}: sell_id: {sell_id} DetailProductInfoView")
         return HttpResponse(template.render(context, request))
 
@@ -199,6 +196,7 @@ class BuyListView(View):
 
         context["dtos"] = dtos
         context["all_price"] = all_price
+
         logger.info(f"{user_id}: sell_id: {sell_id} cart_id: {cart_id} BuyListView")
         return HttpResponse(template.render(context, request))
 
@@ -224,7 +222,6 @@ class AddPickListView(View):
         sell_id = request.POST.get("sellId", None)
         quantity = int(request.POST.get("qnty", None))
         current_time = DateFormat(datetime.now()).format("Y-m-d H:i:s")
-        print(sell_id)
         try:
             cart_id = add_cart_info(
                 user_id=user_id,
@@ -232,10 +229,12 @@ class AddPickListView(View):
                 quantity=quantity,
                 current_time=current_time,
             )
+
             logger.info(f"{user_id} sell_id: {sell_id}")
             return redirect("purchasing:cartList", cart_id=cart_id)
-        except DatabaseError as db_error:
-            logger.error(db_error)
+
+        except DatabaseError as ex:
+            logger.error(ex)
             return redirect("errorhandling:purchaseError")
 
 
@@ -243,7 +242,6 @@ class PickListView(View):
     def get(self, request, **kwargs):
         user_id = request.session.get("memid")
         cart_id = kwargs.get("cart_id", None)
-
         page_infos = []
         all_price = 0
 
@@ -251,7 +249,6 @@ class PickListView(View):
             logger.error("NO user_id")
             redirect("purchaseError")
         else:
-            print(cart_id)
             if cart_id == 0:
                 cart_id = get_cart_id(user_id=user_id)
 
@@ -273,27 +270,26 @@ class PickListView(View):
                 "all_price": all_price,
                 "cart_id": cart_id,
             }
+
             logger.info(f"{user_id}: cart_id: {cart_id} PickListView")
             return HttpResponse(template.render(context, request))
 
-    def post(self, request, **kwargs):
-        request_body = json.loads(request.body)
-        cart_detail_id = request_body.get("cartDetailId", None)
+    # def post(self, request, **kwargs):
+    #     request_body = json.loads(request.body)
+    #     cart_detail_id = request_body.get("cartDetailId", None)
 
-        print(cart_detail_id)
-        if cart_detail_id is not None:
-            detail_cart = WinCartDetail.objects.get(cart_det_id=cart_detail_id)
-            detail_cart.delete()
-            logger.info(
-                f"{request.session['memid']} cart_detail_id: {cart_detail_id} PickListView_DELETE"
-            )
-            return JsonResponse({"result": "삭제되었습니다"}, status=200)
+    #     if cart_detail_id is not None:
+    #         result = delete_detail_cart_info(cart_det_id=cart_detail_id)
+    #         logger.info(
+    #             f"{request.session['memid']} cart_detail_id: {result} PickListView_DELETE"
+    #         )
+    #         return JsonResponse({"result": "삭제되었습니다"}, status=200)
 
-        else:
-            logger.error(
-                f"{request.session['memid']} no cart_detail_id or another error PickListView_DELETE"
-            )
-            return JsonResponse({"result": "문제가 발생했습니다 잠시 후 다시 시도해주세요"}, status=500)
+    #     else:
+    #         logger.error(
+    #             f"{request.session['memid']} no cart_detail_id or another error PickListView_DELETE"
+    #         )
+    #         return JsonResponse({"result": "문제가 발생했습니다 잠시 후 다시 시도해주세요"}, status=500)
 
 
 class RemoveBuyList(View):
@@ -302,10 +298,9 @@ class RemoveBuyList(View):
         request_body = json.loads(request.body)
         cart_detail_id = request_body.get("cartDetailId", None)
         if cart_detail_id is not None:
-            detail_cart = WinCartDetail.objects.get(cart_det_id=cart_detail_id)
-            detail_cart.delete()
+            result = delete_detail_cart_info(cart_det_id=cart_detail_id)
             logger.info(
-                f"{request.session['memid']} cart_detail_id: {cart_detail_id} RemoveBuyList"
+                f"{request.session['memid']} cart_detail_id: {result} RemoveBuyList"
             )
             return JsonResponse({"result": "삭제되었습니다"}, status=200)
 
@@ -370,14 +365,12 @@ class OrderPageView(View):
                     enc_receive_code = EncModule().encrypt_receive_code(
                         receive_code=receive_code
                     )
-                    queryset = WinReceiveCode(
-                        purchase_detail_id=purchase_detail_id[0],
-                        receive_code=enc_receive_code,
-                    )
-                    print(purchase_detail_id)
-                    print(purchase_detail_id[0])
-                    enc_receive_codes.append(queryset)
-                insert_enc_receive_codes(enc_receive_codes)
+                    enc_receive_codes.append(enc_receive_code)
+
+                insert_enc_receive_codes(
+                    enc_receive_codes=enc_receive_codes,
+                    purchase_detail_ids=purchase_detail_ids,
+                )
 
                 detail_infos = get_detail_info(purchase_id)
 
@@ -386,55 +379,13 @@ class OrderPageView(View):
                         detail_info.get("receive_code")
                     ).decode("utf-8")
                     detail_info["receive_code"] = receive_code
+
                 logger.info(
                     f"{user_id}: purchase_id: {purchase_id} current_time: {current_time} OrderPageView"
                 )
             except DatabaseError as db_error:
                 logger.error(db_error)
                 return redirect("errorhandling:purchaseError")
+
             context = {"detail_infos": detail_infos}
             return HttpResponse(template.render(context, request))
-
-
-class TempLoginView(View):
-    @method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-        return View.dispatch(self, request, *args, **kwargs)
-
-    def get(self, request):
-        template = loader.get_template("purchasing/tempLogin.html")
-        logger.info("temp login")
-        context = {}
-        return HttpResponse(template.render(context, request))
-
-    def post(self, request):
-        req_data = json.loads(request.body)
-
-        user_id = req_data.get("id", None)
-        user_passwd = req_data.get("passwd", None)
-
-        try:
-            dto = WinUser.objects.get(user_id=user_id)
-            user_grade = dto.user_grade.user_grade
-
-            if user_passwd == dto.user_passwd:
-                if user_grade != -1:
-                    print(1)
-                    request.session["memid"] = user_id
-                    message = 1
-
-                else:
-                    print(-1)
-                    message = -1
-
-            else:
-                print(-2)
-                message = -2
-        except ObjectDoesNotExist as ex:
-            logger.error(ex)
-            message = -2
-
-        logger.info(f"{user_id} temp login")
-        context = {"message": message}
-
-        return JsonResponse(context, status=200)

@@ -28,5 +28,4 @@ urlpatterns = [
     path("cart/<int:cart_id>", views.PickListView.as_view(), name="cartList"),
     path("order", views.OrderPageView.as_view(), name="orderPage"),
     path("remove-buy-list", views.RemoveBuyList.as_view(), name="removeBuyList"),
-    path("templogin", views.TempLoginView.as_view(), name="tempLogin"),
 ]

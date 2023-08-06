@@ -22,4 +22,5 @@ urlpatterns = [  # init_url == "http://localhost:8000/user/login"
     path("kakaologin", views.KaKaoLogin.as_view(), name="kakaoLogin"),
     path("kakaologin/<str:act>", views.KaKaoLogin.as_view(), name="kakaoLoginRefresh"),
     path("inputUser", views.KakaoRedirectURI.as_view(), name="inputUser"),
+    path("templogin", views.TempLoginView.as_view(), name="tempLogin"),
 ]

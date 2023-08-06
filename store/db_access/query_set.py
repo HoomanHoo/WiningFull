@@ -136,6 +136,12 @@ def drop_store_info(user_id: str) -> None:
     WinSell.objects.filter(store__user_id=user_id).update(sell_state=-1)
 
 
+def update_purchase_det_state(purchase_detail_id: str) -> None:
+    WinPurchaseDetail.objects.filter(
+        purchase_detail_id=purchase_detail_id,
+    ).update(purchase_det_state=2)
+
+
 def check_store_product_info(user_id: str) -> dict or None:
     info = (
         WinSell.objects.select_related("store")

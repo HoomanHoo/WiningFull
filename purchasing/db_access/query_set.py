@@ -1,7 +1,6 @@
 from django.db import transaction
 from django.db.models.query import QuerySet
 from django.db.models import F, Q
-from django.db.models.fields import CharField
 from django.db.models import CharField, Value as V
 from django.db.models.functions import (
     ExtractYear,
@@ -115,6 +114,7 @@ def add_cart_info(user_id: str, sell_id: str, quantity: int, current_time: str) 
         )
         cart_detail_info.cart_det_qnty += quantity
         cart_detail_info.save()
+
     except ObjectDoesNotExist as ex:
         print(ex)
         cart_detail_info = WinCartDetail(
@@ -125,8 +125,24 @@ def add_cart_info(user_id: str, sell_id: str, quantity: int, current_time: str) 
     return cart_id
 
 
-def insert_enc_receive_codes(enc_receive_codes: list) -> None:
-    WinReceiveCode.objects.bulk_create(enc_receive_codes)
+def insert_enc_receive_codes(
+    enc_receive_codes: list, purchase_detail_ids: list
+) -> None:
+    db_data = []
+
+    for idx, purchase_detail_id in enumerate(purchase_detail_ids):
+        queryset = WinReceiveCode(
+            purchase_detail_id=purchase_detail_id[0],
+            receive_code=enc_receive_codes[idx],
+        )
+        db_data.append(queryset)
+    WinReceiveCode.objects.bulk_create(db_data)
+
+
+def delete_detail_cart_info(cart_det_id: str) -> tuple:
+    detail_cart = WinCartDetail.objects.get(cart_det_id=cart_det_id)
+    result = detail_cart.delete()
+    return result
 
 
 def get_cart_id(user_id: str) -> str or None:
@@ -206,7 +222,6 @@ def get_store_lists(wine_id: str) -> QuerySet:
     ON (`win_sell`.`store_id` = `win_store`.`store_id`)
     WHERE `win_sell`.`wine_id` = wine_id
     """
-
 
     store_lists = (
         WinSell.objects.filter(wine_id=wine_id, sell_state=1)
@@ -380,11 +395,11 @@ def get_product_reviews(sell_id: int, select_code: int) -> QuerySet:
         .values("user_id", "review_content", "review_time", "review_score")
         .order_by(order)
     )
-    print(review_list)
+
     list_length = review_list.count()
     if list_length > 5:
         print("list is longer then 6")
-        return print(review_list[:6])
+        return review_list[:6]
 
     elif list_length <= 5 and list_length > 1:
         print("list is short")
@@ -396,5 +411,3 @@ class ReviewSerializer(serializers.Serializer):
     review_content = serializers.CharField()
     review_time = serializers.CharField()
     review_score = serializers.IntegerField()
-
-
