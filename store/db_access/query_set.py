@@ -1,12 +1,7 @@
 import time
-from detail.models import WinWine
-from purchasing.models import WinPurchase, WinPurchaseDetail, WinReceiveCode
-from store.models import WinStore, WinStoreUrl, WinSell, WinRevenue
 from django.db import transaction
-from store.usecase.pagination import db_preprocessing
-from user.models import WinReview, WinUser, WinUserGrade
-from django.db.models.query import QuerySet
 from django.db.models import F
+from django.db.models.query import QuerySet
 from django.db.models.aggregates import Sum
 from django.db.models.fields import CharField
 from django.db.models.functions.datetime import (
@@ -16,8 +11,13 @@ from django.db.models.functions.datetime import (
     TruncYear,
 )
 from django.db.models.functions.comparison import Cast
-from rest_framework import serializers
 from django.core.exceptions import ObjectDoesNotExist
+from rest_framework import serializers
+
+from detail.models import WinWine
+from purchasing.models import WinPurchase, WinPurchaseDetail, WinReceiveCode
+from store.models import WinStore, WinStoreUrl, WinSell
+from user.models import WinReview, WinUser, WinUserGrade
 
 
 @transaction.atomic
@@ -335,7 +335,6 @@ class PurchaseDetailSerializer(serializers.ModelSerializer):
             "user_name",
             "wine_name",
         ]
-
 
 
 def get_reviews_by_seller(sell_id: str):

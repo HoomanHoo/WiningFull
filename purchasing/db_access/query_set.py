@@ -1,6 +1,21 @@
 from django.db import transaction
-from django.db.models.query import QuerySet, Prefetch
+from django.db.models.query import QuerySet
 from django.db.models import F, Q
+from django.db.models.fields import CharField
+from django.db.models import CharField, Value as V
+from django.db.models.functions import (
+    ExtractYear,
+    ExtractMonth,
+    ExtractDay,
+    ExtractHour,
+    ExtractMinute,
+    Concat,
+)
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework import serializers
+
+from store.models import WinSell, WinRevenue
+from user.models import WinReview, WinUser
 from purchasing.models import (
     WinPurchase,
     WinPurchaseDetail,
@@ -8,10 +23,6 @@ from purchasing.models import (
     WinCartDetail,
     WinReceiveCode,
 )
-from django.core.exceptions import ObjectDoesNotExist
-from store.models import WinSell, WinRevenue
-from user.models import WinReview, WinUser
-from rest_framework import serializers
 
 
 @transaction.atomic(durable=True)
@@ -196,17 +207,6 @@ def get_store_lists(wine_id: str) -> QuerySet:
     WHERE `win_sell`.`wine_id` = wine_id
     """
 
-    # store_lists = (
-    #     WinSell.objects.filter(wine_id=wine_id, sell_state=0)
-    #     .select_related("wine", "store")
-    #     .values(
-    #         "sell_id",
-    #         "wine__wine_name",
-    #         "sell_price",
-    #         "store__store_name",
-    #         "store__store_address",
-    #     )
-    # )
 
     store_lists = (
         WinSell.objects.filter(wine_id=wine_id, sell_state=1)
@@ -348,38 +348,6 @@ def get_detail_info(purchase_id):
     return detail_infos
 
 
-from django.db.models.functions.comparison import Cast
-from django.db.models.functions.datetime import TruncDate, TruncHour
-from django.db.models.fields import CharField
-from django.db.models import CharField, Value as V
-from django.db.models.functions import (
-    ExtractYear,
-    ExtractMonth,
-    ExtractDay,
-    ExtractHour,
-    ExtractMinute,
-    Concat,
-)
-
-#  year=ExtractYear("review_reg_time"),
-#             month=ExtractMonth("review_reg_time"),
-#             day=ExtractDay("review_reg_time"),
-#             hour=ExtractHour("review_reg_time"),
-#             minute=ExtractMinute("review_reg_time"),
-#             review_time=Concat(
-#                 "year",
-#                 V("-"),
-#                 "month",
-#                 V("-"),
-#                 "day",
-#                 V(" "),
-#                 "hour",
-#                 V(":") + "minute",
-#                 output_field=CharField(),
-#             ),
-# review_time=(Cast(TruncHour("review_reg_time"), CharField()))
-
-
 def get_product_reviews(sell_id: int, select_code: int) -> QuerySet:
     if select_code == 1:
         order = "-review_reg_time"
@@ -430,10 +398,3 @@ class ReviewSerializer(serializers.Serializer):
     review_score = serializers.IntegerField()
 
 
-# class WinReview(models.Model):
-#     review_id = models.AutoField(primary_key=True)
-#     user = models.ForeignKey("WinUser", models.CASCADE)  #
-#     sell = models.ForeignKey("store.WinSell", models.CASCADE)  #
-#     review_content = models.CharField(max_length=500)
-#     review_score = models.DecimalField(max_digits=2, decimal_places=1)
-#     review_reg_time = models.DateTimeField()

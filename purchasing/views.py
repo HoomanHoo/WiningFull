@@ -1,19 +1,27 @@
+import logging
+import json
+import base64
+
 from django.shortcuts import render, redirect
 from django.views.generic.base import View
 from django.template import loader
 from django.http.response import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from purchasing.usecase.purchase_usecase import calc
+from django.utils.dateformat import DateFormat
+from django.utils.datetime_safe import datetime
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import DatabaseError
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
+
 from purchasing.usecase.receive_code_create_enc_module import (
     EncModule,
     create_receive_code,
 )
 
-
-from django.utils.dateformat import DateFormat
-from django.utils.datetime_safe import datetime
+from purchasing.usecase.purchase_usecase import calc, formating
 from purchasing.db_access.query_set import (
     ReviewSerializer,
     StoreListSerializer,
@@ -31,16 +39,13 @@ from purchasing.db_access.query_set import (
     get_detail_info,
 )
 
-from purchasing.usecase.purchase_usecase import formating
-from django.db import DatabaseError
-import json
-from purchasing.models import WinCartDetail, WinReceiveCode, WinPurchaseDetail
-import base64
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.renderers import JSONRenderer
-from store.usecase.pagination import db_preprocessing, pagenation
+
+from store.usecase.pagination import db_preprocessing
+from purchasing.models import WinCartDetail, WinReceiveCode
 from user.models import WinUser
+
+
+logger = logging.getLogger("purchasing")
 
 
 # Create your views here.
@@ -57,7 +62,7 @@ class StoreListView(View):
         list_info = db_preprocessing(db_data=store_list, end_page=end, start_page=start)
 
         context = {"store_list": list_info[1]}
-
+        logger.info(f"{request.session['memid']}: wine_id : {wine_id} StoreListView")
         return HttpResponse(template.render(context, request))
 
 
@@ -65,25 +70,21 @@ class LoadAdditionalStoreListAPI(APIView):
     def get(self, request, **kwargs):
         wine_id = kwargs.get("wine_id", None)
         page_num = kwargs.get("page_num", 1)
-        print(page_num)
+
         show_length = 30
         end = int(show_length) * int(page_num)
         start = end - int(show_length)
         store_list = get_store_lists(wine_id=wine_id)
 
         list_info = db_preprocessing(db_data=store_list, end_page=end, start_page=start)
-        # paging_result = pagenation(
-        #     show_length=show_length,
-        #     page_num=page_num,
-        #     end_page=end,
-        #     start_page=start,
-        #     datas=list_info,
-        # )
+
         db_data = list_info[1]
-        # print(type(db_data), db_data)
         serializer = StoreListSerializer(db_data, many=True)
-        print(serializer.data)
+
         json_result = JSONRenderer().render(serializer.data)
+        logger.info(
+            f"{request.session['memid']}: wine_id : {wine_id} page_num: {page_num} LoadAdditionalStoreListAPI"
+        )
         return Response(json_result)
 
 
@@ -118,7 +119,7 @@ class DetailProductInfoView(View):
             "user_id": user_id,
             # "rdtos": rdtos,
         }
-
+        logger.info(f"{user_id}: sell_id: {sell_id} DetailProductInfoView")
         return HttpResponse(template.render(context, request))
 
 
@@ -128,9 +129,13 @@ class ReviewLoadAPI(APIView):
         select_code = int(request.GET.get("selectcode", 1))
 
         rdtos = get_product_reviews(sell_id=sell_id, select_code=select_code)
-        print(rdtos)
+
         serialzered = ReviewSerializer(rdtos, many=True)
         json_result = JSONRenderer().render(serialzered.data)
+
+        logger.info(
+            f"{request.session['memid']} : sell_id: {sell_id} select_code: {select_code} ReviewLoadAPI"
+        )
         return Response(json_result)
 
 
@@ -151,6 +156,7 @@ class BuyListView(View):
         all_price = 0
 
         if user_id is None:
+            logger.error("no user_id")
             redirect("purchaseError")
 
         if sell_id is not None:
@@ -188,11 +194,12 @@ class BuyListView(View):
             context["cart_id"] = cart_id
 
         else:
+            logger.error("sell_id cart_id is None")
             return redirect("errorhandling:purchaseError")
 
         context["dtos"] = dtos
         context["all_price"] = all_price
-
+        logger.info(f"{user_id}: sell_id: {sell_id} cart_id: {cart_id} BuyListView")
         return HttpResponse(template.render(context, request))
 
 
@@ -204,10 +211,12 @@ class AddPickListView(View):
     def get(self, request):
         user_id = request.session.get("memid")
         if user_id is None:
+            logger.info("error")
             return redirect("purchaseError")
 
         else:
             cart_id = get_cart_id(user_id=user_id)
+            logger.info(f"{user_id} cart_id: {cart_id} AddPickListView")
             return redirect("purchasing:cartList", cart_id=cart_id)
 
     def post(self, request):
@@ -223,9 +232,10 @@ class AddPickListView(View):
                 quantity=quantity,
                 current_time=current_time,
             )
+            logger.info(f"{user_id} sell_id: {sell_id}")
             return redirect("purchasing:cartList", cart_id=cart_id)
         except DatabaseError as db_error:
-            print(db_error)
+            logger.error(db_error)
             return redirect("errorhandling:purchaseError")
 
 
@@ -238,6 +248,7 @@ class PickListView(View):
         all_price = 0
 
         if user_id is None:
+            logger.error("NO user_id")
             redirect("purchaseError")
         else:
             print(cart_id)
@@ -248,6 +259,7 @@ class PickListView(View):
                 cart_state = get_cart_state(cart_id=cart_id)
 
                 if cart_state == -1:
+                    logger.error("invaild cart")
                     return redirect("purchaseError")
 
             page_infos = get_cart_list_page_info(cart_id=cart_id)
@@ -261,7 +273,7 @@ class PickListView(View):
                 "all_price": all_price,
                 "cart_id": cart_id,
             }
-
+            logger.info(f"{user_id}: cart_id: {cart_id} PickListView")
             return HttpResponse(template.render(context, request))
 
     def post(self, request, **kwargs):
@@ -272,11 +284,16 @@ class PickListView(View):
         if cart_detail_id is not None:
             detail_cart = WinCartDetail.objects.get(cart_det_id=cart_detail_id)
             detail_cart.delete()
-
+            logger.info(
+                f"{request.session['memid']} cart_detail_id: {cart_detail_id} PickListView_DELETE"
+            )
             return JsonResponse({"result": "삭제되었습니다"}, status=200)
 
         else:
-            return JsonResponse({"result": "문제가 발생했습니다 잠시 후 다시 시도해주세요"}, status=200)
+            logger.error(
+                f"{request.session['memid']} no cart_detail_id or another error PickListView_DELETE"
+            )
+            return JsonResponse({"result": "문제가 발생했습니다 잠시 후 다시 시도해주세요"}, status=500)
 
 
 class RemoveBuyList(View):
@@ -287,11 +304,16 @@ class RemoveBuyList(View):
         if cart_detail_id is not None:
             detail_cart = WinCartDetail.objects.get(cart_det_id=cart_detail_id)
             detail_cart.delete()
-
+            logger.info(
+                f"{request.session['memid']} cart_detail_id: {cart_detail_id} RemoveBuyList"
+            )
             return JsonResponse({"result": "삭제되었습니다"}, status=200)
 
         else:
-            return JsonResponse({"result": "문제가 발생했습니다 잠시 후 다시 시도해주세요"}, status=200)
+            logger.error(
+                f"{request.session['memid']} no cart_detail_id or another error RemoveBuyList"
+            )
+            return JsonResponse({"result": "문제가 발생했습니다 잠시 후 다시 시도해주세요"}, status=500)
 
 
 class OrderPageView(View):
@@ -303,6 +325,7 @@ class OrderPageView(View):
         user_id = request.session.get("memid")
         template = loader.get_template("purchasing/orderPage.html")
         context = {}
+        logger.info(f"{user_id} : OrderPageView")
         return HttpResponse(template.render(context, request))
 
     def post(self, request):
@@ -329,6 +352,7 @@ class OrderPageView(View):
         )
         # result = sequence.calc()
         if result is None:
+            logger.error("No buy list")
             return redirect("purchasing:buyList")
         else:
             try:
@@ -337,7 +361,7 @@ class OrderPageView(View):
                 purchase_infos = insert_purchase(result)
                 purchase_id = purchase_infos[0]
                 purchase_detail_ids = purchase_infos[1]
-                print("purchase_detail_ids: ", purchase_detail_ids)
+
                 for purchase_detail_id in purchase_detail_ids:
                     receive_code = create_receive_code(
                         purchase_num=purchase_detail_id[0]
@@ -356,15 +380,17 @@ class OrderPageView(View):
                 insert_enc_receive_codes(enc_receive_codes)
 
                 detail_infos = get_detail_info(purchase_id)
-                print(detail_infos)
+
                 for detail_info in detail_infos:
                     receive_code = base64.b64decode(
                         detail_info.get("receive_code")
                     ).decode("utf-8")
                     detail_info["receive_code"] = receive_code
-
+                logger.info(
+                    f"{user_id}: purchase_id: {purchase_id} current_time: {current_time} OrderPageView"
+                )
             except DatabaseError as db_error:
-                print(db_error)
+                logger.error(db_error)
                 return redirect("errorhandling:purchaseError")
             context = {"detail_infos": detail_infos}
             return HttpResponse(template.render(context, request))
@@ -377,17 +403,15 @@ class TempLoginView(View):
 
     def get(self, request):
         template = loader.get_template("purchasing/tempLogin.html")
+        logger.info("temp login")
         context = {}
         return HttpResponse(template.render(context, request))
 
     def post(self, request):
         req_data = json.loads(request.body)
-        print(req_data)
+
         user_id = req_data.get("id", None)
         user_passwd = req_data.get("passwd", None)
-
-        print(user_id)
-        print(user_passwd)
 
         try:
             dto = WinUser.objects.get(user_id=user_id)
@@ -406,10 +430,11 @@ class TempLoginView(View):
             else:
                 print(-2)
                 message = -2
-        except ObjectDoesNotExist:
-            print(-2)
+        except ObjectDoesNotExist as ex:
+            logger.error(ex)
             message = -2
 
+        logger.info(f"{user_id} temp login")
         context = {"message": message}
 
         return JsonResponse(context, status=200)
