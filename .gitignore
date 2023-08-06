@@ -5,8 +5,10 @@
 /errorhandling/migrations
 /detail/migrations
 /board/migrations
+/log
+__pycache__
 *.pyc
 *.project
 *.pydevproject
 *.prefs
-/log
+
