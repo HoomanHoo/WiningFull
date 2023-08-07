@@ -4,263 +4,92 @@
 
 {%block content%}
 <head>
-	<meta charset="UTF-8">
+  <meta charset="utf-8">
   	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  	
   	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
-  	<script src="{%static 'js/jquery-3.6.4.js'%}"></script>
-  	<script src="{%static 'js/bootstrap.min.js' %}"></script>	
+  	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  	<script src="{%static 'js/bootstrap.min.js' %}"></script>
 </head>
 
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="myPage">마이페이지</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#myNavbar" aria-expanded="false" aria-controls="myNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="modifyUser">회원정보수정</a></li>
+                <li class="nav-item"><a class="nav-link" href="reviewList">리뷰 관리</a></li>
+                <li class="nav-item"><a class="nav-link" href="purchaseDetail">구매 내역</a></li>
+                <li class="nav-item"><a class="nav-link" href="../purchasing/cart">장바구니</a></li>
+                <li class="nav-item"><a class="nav-link" href="myBoard">게시글 관리</a></li>
+                <li class="nav-item"><a class="nav-link" href="myComment">댓글 관리</a></li>
+                <li class="nav-item"><a class="nav-link" href="delete">회원 탈퇴</a></li>
+                {% if dto.user_grade_id == 1 %}
+                <li class="nav-item"><a class="nav-link" href="myReceiveCode">수령 코드 확인</a></li>
+                {% endif %}
+                {% if dto.user_grade_id == 2 %}
+                <li class="nav-item"><a class="nav-link" href="../store/mypage">점주 페이지</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
 
-    <body class="sb-nav-fixed">   
-		<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-		
-	 <div class="border-start border-end bg-white" id="sidebar-wrapper" style="width:300px;">
-         <div class="sidebar-heading border-bottom bg-light" align="center"><b>MyPage</b></div>
-               <div class="list-group list-group-flush">
-                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="modifyUser">회원정보수정</a>
-                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="delete">회원탈퇴</a>
-                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myBoard">게시글관리</a>
-                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myComment">댓글관리</a>
-                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="reviewList">리뷰관리</a>
-                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="purchaseDetail">구매내역</a>
+<div class="container-fluid">
+  <div class="row content">
+    <div class="col-xl-9">
+      <div class="well">
+        <!-- <h4>홍길동(aaa)님 안녕하세요</h4> -->
+        <h4>{{dto.user_name}}({{memid}})님 안녕하세요</h4>
+      </div>
+      <div class="row">
+        <div class="col-xl-3">
+          <div class="well">
+            <h4 align="center"><a href="addPointHis">포인트</a></h4>
+            <p align="center">{{dto.user_point}}</p>
+            <p align="center"><a href="addPoint">충전하기</a></p> 
+          </div>
+        </div>
+        <div class="col-xl-3">
+          <div class="well">
+            <h4 align="center">주문내역</h4>
+            <p align="center">{{purchase_c}}</p> 
+          </div>
+        </div>
+        <div class="col-xl-3">
+          <div class="well">
+            <h4 align="center">나의 리뷰</h4>
+            <p align="center">{{review_c}}</p> 
+          </div>
+        </div>
+        <div class="col-xl-3">
+          <div class="well">
+            <h4 align="center">장바구니</h4>
+            <p align="center">{{cart_c}}</p> 
+          </div>
+        </div>
+      </div>
+      <div class="row">
+      	<div class="col-xl-12">
+      		<div class="well">
+      		<h4>최근 본 상품</h4> 
+  			{%for wine_image in wine_images%}
+  			<a href="../detail/winedetail?wine_id={{wine_image.1}}">
+  				<img src="{{wine_image.0}}" width=150 height=150>  
+  			</a>
+  		
+  			{%endfor%}
+      		</div>
+      	</div>
+      </div>
 
-	                {% if dto.user_grade_id == 1 %}
-	                <a class="nav-link" href="myReceiveCode">수령 코드 확인</a>
-	                {% endif %}
-	                {% if dto.user_grade_id == 2 %}
-	                <a class="nav-link" href="../store/mypage">점주 페이지</a>
-	                {% endif %}
-               </div>
-         </div>
-         
-            
-     
-            
-            
-            
-            
-		 <div id="layoutSidenav_content">
-                <main>
-                    <div class="container-fluid px-4">
-                       
-                        <ol class="breadcrumb mb-4">
-                            <h7>{{dto.user_name}}({{memid}})님 안녕하세요</h7>
-                        </ol>
-                        <div class="row">
-                            <div class="col-xl-3 col-md-6">
-                                <div class="card bg-primary text-white mb-4">
-                                    <div class="card-body">{{dto.user_point}} Point</div>
-                                    <div class="card-footer d-flex align-items-center justify-content-between">
-                                    	<a class="small text-white" href="#" id="showChargeForm">충전하기</a>
-                                        <a class="small text-white" href="addPointHis">더보기 > </a>
-                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-							
-                            <div id="chargeForm" style="display:none;">
-								<form method="post" action="addPoint" name="addpoint">
-									<div class="container">
-										<div class="wrapper"> 
-											<div class="outer-card"> 
-												<div class="forms">
-													<input class="inputbutton" type="button" value="X" onclick="location='myPage'">
+    </div>
+  </div>
+</div>
 
-													<div class="input-items"> 
-														<input id="chargePoint" name="point" type="number" placeholder="충전금액을 입력해주세요" size="19"> 
-													</div>
-													<div class="input-items"> 
-														<span id="currentPoint">보유 포인트 :<b> {{dto.user_point}}</b></span>
-													</div>
-												</div> 
-												<div class="input-buttons"> 
-													<input type="submit" id="charge" value="충전하기">
-												</div> 
-											</div> 
-										</div> 
-									</div>
-								</form>
-                            </div>
-                            
-                            
-                            
-                            <div class="col-xl-3 col-md-6">
-                                <div class="card bg-warning text-white mb-4">
-                                    <div class="card-body">주문내역 {{purchase_c}}</div>
-                                    <div class="card-footer d-flex align-items-center justify-content-between">
-                                        <a class="small text-white stretched-link" href="purchaseDetail">더보기 > </a>
-                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xl-3 col-md-6">
-                                <div class="card bg-success text-white mb-4">
-                                    <div class="card-body">나의 리뷰 {{review_c}}</div>
-                                    <div class="card-footer d-flex align-items-center justify-content-between">
-                                        <a class="small text-white stretched-link" href="#">더보기 > </a>
-                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xl-3 col-md-6">
-                                <div class="card bg-danger text-white mb-4">
-                                    <div class="card-body">장바구니 {{cart_c}}</div>
-                                    <div class="card-footer d-flex align-items-center justify-content-between">
-                                        <a class="small text-white stretched-link" href="../purchasing/cart">더보기 > </a>
-                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xl-6">
-                                <div class="card mb-4">
-                                    <div class="card-header">
-                                        <i class="fas fa-chart-area me-1"></i>
-                                        <b>Recent Searched.</b>
-                                        <span><b></b></span>
-                                    </div>
-	                                
-							      	<div class="col-xl-12">
-							      		<div class="well">
-							      		<h4></h4> 
-							  			{%for wine_image in wine_images%}
-							  			<a href="../detail/winedetail?wine_id={{wine_image.1}}">
-							  				<img src="{{wine_image.0}}" width=90 height=150>  
-							  			</a>
-							  		
-							  			{%endfor%}
-							      		</div>
-							      	</div>
-							     
-									      
-                                    <div class="card-body"><canvas id="myAreaChart" width="100%" height="40"></canvas></div>
-                                </div>
-                            </div>
-                            
-                            <!--  -->
-                            <div class="col-xl-6">
-                                <div class="card mb-4">
-                                    <div class="card-header">
-                                        <i class="fas fa-chart-bar me-1"></i>
-                                        <b>여기다가 넣을만한 게 뭐가 있니?</b>
-                                    </div>
-                                    <div class="card-body"><canvas id="myBarChart" width="100%" height="40"></canvas></div>
-                                </div>
-                            </div>
-                            
-                        </div>
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <i class="fas fa-table me-1"></i>
-                                기타 등등
-                            </div>
-                            <div>
-                            	etc<br>
-                            	etc<br>
-                            </div>
-
-                        </div>
-                    </div>
-                </main>
-
-            </div>
-		</nav>
-
-        <script src="js/scripts.js"></script>
-        <script src="assets/demo/chart-area-demo.js"></script>
-        <script src="assets/demo/chart-bar-demo.js"></script>
-        <script src="js/datatables-simple-demo.js"></script>
-        
-        
-        <!--page 넘어가지 않고  myPage내부에서 충전 바로 되도록 설정 -->
-        <script>
-			document.addEventListener("DOMContentLoaded", function() {
-			    var showChargeFormButton = document.getElementById("showChargeForm");
-			    var chargeForm = document.getElementById("chargeForm");
-			
-			    showChargeFormButton.addEventListener("click", function() {
-			        chargeForm.style.display = "block";
-			    });
-			});
-		</script>
-		
-    </body>
+</body>
 </html>
-
-<style>
-	#sidebar-wrapper {
-		position:fixed;
-	    left: 50;
-	    top:250px;
-	    width: 300px; /* 원하는 너비 값으로 조정 */
-	    background-color: #ffffff; /* 배경색 설정 */
-	    border-right: 1px solid #dee2e6; /* 우측 경계선 설정 */
-	    overflow-y: auto; /* 내용이 넘칠 경우 스크롤바 추가 */
-	    z-index: 1000; /* 다른 요소 위에 표시하기 위한 z-index 값 설정 */
-
-	}
-
-	#layoutSidenav_content {
-   		margin-left: 350px; /* 사이드바의 너비 + 여유 여백 만큼 설정 */
-	}
-	
-	
-	
-    /* 충전하기 폼 스타일 */
-    #chargeForm {
-        display: none;
-    }
-
-    .container {
-        display: flex;
-        height: 25vh;
-    }
-
-    .wrapper {
-        background-color: #f8f9fa;
-        width: 100%;
-        max-width: 300px;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
-    }
-
-    .input-items {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 20px;
-    }
-
-    #chargePoint {
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-
-    .input-buttons {
-        text-align: center;
-    }
-
-    #charge {
-        padding: 10px 20px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-	
-	  .inputbutton {
-	    background-color: transparent;
-	    border: none;
-	    cursor: pointer;
-	    float:right;
-	  }
-	  
-</style>
-
 {%endblock%}
