@@ -46,7 +46,16 @@ logger = logging.getLogger("purchasing")
 
 # Create your views here.
 class StoreListView(View):
+    """
+    "wine/<int:wine_id>/stores"
+    """
+
     def get(self, request, **kwargs):
+        """
+        사용자가 선택한 와인을 어떤 매장에서 판매하고 있는지를 보여주기 위한 View Class 입니다
+        사용자가 선택한 와인의 wine_id를 input값으로 하여 get_store_lists 함수 호출 후
+        리턴된 QuerySet을 슬라이싱 해서 front로 리턴함
+        """
         wine_id = kwargs.get("wine_id", None)
         page_num = 1
         template = loader.get_template("purchasing/storeList.html")
@@ -64,7 +73,17 @@ class StoreListView(View):
 
 
 class LoadAdditionalStoreListAPI(APIView):
+    """
+    "wine/<int:wine_id>/stores/<int:page_num>"
+    """
+
     def get(self, request, **kwargs):
+        """
+        사용자가 선택한 와인을 어떤 매장에서 판매하고 있는지를 보여주기 위한 View Class 입니다
+        사용자가 선택한 와인의 wine_id를 input값으로 하여 get_store_lists 함수 호출 후
+        리턴된 QuerySet을 슬라이싱 해서 front로 리턴함
+        StoreListView 함수와 동일하기 때문에 차후 하나의 코드로 통합할 예정
+        """
         wine_id = kwargs.get("wine_id", None)
         page_num = kwargs.get("page_num", 1)
 
@@ -87,11 +106,23 @@ class LoadAdditionalStoreListAPI(APIView):
 
 
 class DetailProductInfoView(View):
+    """
+    "sell/<int:sell_id>"
+    """
+
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
+        """
+        csrf token 처리를 위해서 dispatch 함수 overriding
+        """
         return View.dispatch(self, request, *args, **kwargs)
 
     def get(self, request, **kwargs):
+        """
+        사용자가 선택한 매장에서 해당 와인을 얼마에 파는지,
+        매장의 상세한 정보는 어떻게 되는지 등을 나타냄
+        """
+
         sell_id = kwargs.get("sell_id", 0)
         user_id = request.session.get("memid")
 
@@ -100,7 +131,9 @@ class DetailProductInfoView(View):
         product_info = get_product_info(sell_id=sell_id)
 
         if product_info:
-            if product_info[0]["store__storeUrl__store_map_url"] == "":
+            if (
+                product_info[0]["store__storeUrl__store_map_url"] == ""
+            ):  # store_map_url은 존재하지 않을 수도 있음
                 url_value = 0
 
             else:
@@ -121,7 +154,16 @@ class DetailProductInfoView(View):
 
 
 class ReviewLoadAPI(APIView):
+    """
+    "sell/<int:sell_id>/reviews"
+    """
+
     def get(self, request, **kwargs):
+        """
+        해당 상품에 대한 리뷰를 json 형태로 return 함
+        select_code는 인자로 넘겨서 정렬 기준을 컨트롤 함
+        """
+
         sell_id = kwargs.get("sell_id", 0)
         select_code = int(request.GET.get("selectcode", 1))
 
@@ -137,11 +179,21 @@ class ReviewLoadAPI(APIView):
 
 
 class BuyListView(View):
+    """
+    "payment"
+    """
+
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return View.dispatch(self, request, *args, **kwargs)
 
     def get(self, request):
+        """
+        상품 상세 정보 페이지 - DetailProductInfoView 와
+        장바구니 페이지 - PickListView 두 곳에서 넘어오는 경우를 상정하고 if문 분기를 시킴
+        PickListView에서 넘어오는 경우 cart_id를 인자로 하여 detail cart list 를 front로 return함
+        """
+
         user_id = request.session.get("memid")
         sell_id = request.GET.get("sellid", None)
         cart_id = request.GET.get("cartid", None)
@@ -202,11 +254,19 @@ class BuyListView(View):
 
 
 class AddPickListView(View):
+    """
+    "cart"
+    """
+
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return View.dispatch(self, request, *args, **kwargs)
 
     def get(self, request):
+        """
+        user/myPage에서 넘어오는 경우 cart_id를 알 수가 없기 때문에 PickListView 앞에서
+        현재 사용중인 cart_id를 구하는 역할을 함
+        """
         user_id = request.session.get("memid")
         if user_id is None:
             logger.info("error")
@@ -218,6 +278,10 @@ class AddPickListView(View):
             return redirect("purchasing:cartList", cart_id=cart_id)
 
     def post(self, request):
+        """
+        DetailProductInfoView에서 장바구니에 추가하고자 하는 상품과 그 갯수를 db에 저장하고
+        cart_id를 반환하여 PickListView로 이동시킴
+        """
         user_id = request.POST.get("userId")
         sell_id = request.POST.get("sellId", None)
         quantity = int(request.POST.get("qnty", None))
@@ -239,7 +303,14 @@ class AddPickListView(View):
 
 
 class PickListView(View):
+    """
+    "cart/<int:cart_id>"
+    """
+
     def get(self, request, **kwargs):
+        """
+        키워드 인수로 전달받은 cart_id를 통해 현재 존재하는 장바구니 정보를 front로 return함
+        """
         user_id = request.session.get("memid")
         cart_id = kwargs.get("cart_id", None)
         page_infos = []
@@ -274,27 +345,21 @@ class PickListView(View):
             logger.info(f"{user_id}: cart_id: {cart_id} PickListView")
             return HttpResponse(template.render(context, request))
 
-    # def post(self, request, **kwargs):
-    #     request_body = json.loads(request.body)
-    #     cart_detail_id = request_body.get("cartDetailId", None)
-
-    #     if cart_detail_id is not None:
-    #         result = delete_detail_cart_info(cart_det_id=cart_detail_id)
-    #         logger.info(
-    #             f"{request.session['memid']} cart_detail_id: {result} PickListView_DELETE"
-    #         )
-    #         return JsonResponse({"result": "삭제되었습니다"}, status=200)
-
-    #     else:
-    #         logger.error(
-    #             f"{request.session['memid']} no cart_detail_id or another error PickListView_DELETE"
-    #         )
-    #         return JsonResponse({"result": "문제가 발생했습니다 잠시 후 다시 시도해주세요"}, status=500)
-
 
 class RemoveBuyList(View):
+    """
+    "remove-buy-list"
+    """
+
     @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
     def post(self, request):
+        """
+        json으로 전달받은 cart_detail_id를 통해 해당하는 상품을 장바구니 목록에서 삭제함
+        자후 delete 함수로 바꾸고 serializer 적용 예정
+        """
         request_body = json.loads(request.body)
         cart_detail_id = request_body.get("cartDetailId", None)
         if cart_detail_id is not None:
@@ -312,11 +377,20 @@ class RemoveBuyList(View):
 
 
 class OrderPageView(View):
+    """
+    "order"
+    """
+
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return View.dispatch(self, request, *args, **kwargs)
 
     def get(self, request):
+        """
+        해당 함수 실사용 환경에서 호출되는지 확인 못함
+        추후 확인 후 호출되지 않으면 삭제 예정
+        """
+
         user_id = request.session.get("memid")
         template = loader.get_template("purchasing/orderPage.html")
         context = {}
@@ -324,6 +398,11 @@ class OrderPageView(View):
         return HttpResponse(template.render(context, request))
 
     def post(self, request):
+        """
+        장바구니 목록 결제와 상품 상세 페이지에서 바로 결제하는 경우 두 가지 전부 대응할 수 있도록 calc 함수 정의 후 사용
+        수령코드 생성 후 base64로 인코딩 해서 db에 저장, 인코딩 하지 않은 데이터는 front로 리턴
+        """
+
         template = loader.get_template("purchasing/orderPage.html")
 
         user_id = request.session.get("memid")
