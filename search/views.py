@@ -4,6 +4,10 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.template import loader
 from django.http.response import HttpResponse
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
+from rest_framework import serializers
 from detail.models import WinWine, WinWineRegion, WinDetailView, WinDetailViewN
 from django.db.models import Q
 import difflib
@@ -23,7 +27,11 @@ from search.functions.functions import (
     win_reco_food,
     win_reco_taste,
     win_corr_alc_inverse,
-    sort, list_corr_5, list_corr_6, list_corr_2d, random_generate,
+    sort,
+    list_corr_5,
+    list_corr_6,
+    list_corr_2d,
+    random_generate,
 )
 from django.db.models.aggregates import Count, Avg
 import random
@@ -158,6 +166,35 @@ class SearchByNameView(View):
         }
 
         return HttpResponse(template.render(context, request))
+
+
+class ShowRelateKeyword(APIView):
+    def get(self, request):
+        search_word = request.GET.get("searchword", None)
+        name_language = request.GET.get("namelanguage", None)
+        result = {}
+        if name_language == "winenamekor":
+            result = (
+                WinWine.objects.annotate(result=F("wine_name"))
+                .filter(wine_name__icontains=search_word, wine_name__range=("가", "힣"))
+                .values("result")[:8]
+            )
+            serialize = SearchResultSerializer(result, many=True)
+
+        elif name_language == "winenameeng":
+            result = (
+                WinWine.objects.annotate(result=F("wine_name_eng"))
+                .filter(wine_name_eng__icontains=search_word)
+                .values("result")[:8]
+            )
+            serialize = SearchResultSerializer(result, many=True)
+
+        json_result = JSONRenderer().render(serialize.data)
+        return Response(json_result)
+
+
+class SearchResultSerializer(serializers.Serializer):
+    result = serializers.CharField()
 
 
 class SearchByCategoryView(View):

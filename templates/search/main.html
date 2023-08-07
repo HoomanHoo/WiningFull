@@ -27,6 +27,7 @@
 		</style>
 		<script src="/static/js/jquery-3.6.4.js"></script>
 		<script src="/static/js/script_search.js"></script>
+		
 	</head>
 	
 	<body> 
@@ -41,24 +42,28 @@
 		<br><br>
 		{% block input %}								<!-- 검색 입력 창 -->
 		<!-- 검색어 입력하고 submit 하면 "http://localhost:8000/search/searchbynamelist" -->
-		<div class="center-container">		
-			<div class="search-form-container">
+		<div  class="center-container">		
+			<div id="rootDiv" class="search-form-container">
 				<img src="{% static 'logo1.png' %}" alt="logo1" class="wining-image">
-				<div class="search-form">
+				<div class="search-form" style="text-align: center">
 					{% csrf_token %}
 		        	<form method="post" action="searchbynamelist" name="searchbyname">
 		            	{% csrf_token %}
 						
-						<select name="namelanguage">
-						<option value="winenamekor"> 한국어 </option> 
-						<option value="winenameeng"> 영문이름 </option>
+						<select id="nameLanguage" name="namelanguage">
+							<option value="winenamekor"> 한국어 </option> 
+							<option value="winenameeng"> 영문이름 </option>
 						</select>
-		            	<input class="search-input" type="text" name="searchname" maxlength="100" placeholder="검색어를 입력하세요." autofocus>
+		            	<input @keyup="searchRelateKeyword" id="searchInput" class="search-input" type="text" name="searchname" maxlength="100" :value="[[selectedValue]]" placeholder="검색어를 입력하세요." :style="unhover" autofocus>
 		            	<input class="search-button" type="submit" value="GO">
+						<div  v-for="wineName in result" id="resultArea">
+							<input @click="clickWineName" v-show="show" type="text" name="result" :value=[[wineName.result]] :style="hover" readonly>
+						</div>
 		        	</form>
 		        </div>
 		   </div>
 		</div>
+		<script type="module" src="/static/js/searchKeyInputScript.js" defer></script>
 		{% endblock %}
 
 		{% block list %}

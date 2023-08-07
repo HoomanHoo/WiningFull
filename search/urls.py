@@ -27,5 +27,5 @@ urlpatterns = [  # init_url == "http://localhost:8000/search/main"
         views.SearchByRankView.as_view(),
         name="searchbycategorylist",
     ),
-
+    path("relatekeyword", views.ShowRelateKeyword.as_view(), name="showRelateKeyword"),
 ]
