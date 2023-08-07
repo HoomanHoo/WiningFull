@@ -33,6 +33,10 @@ from django.db.models import F
 from django.core.files.storage import default_storage
 from purchasing.usecase.decrypt_receive_code import DecModule
 from django.db.models import Q
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
+from rest_framework import serializers
 
 logger = logging.getLogger("user")
 
@@ -85,7 +89,7 @@ class LoginView(View):
 class KakaoLogoutView(View):
     def get(self, request):
         REST_API_KEY = getattr(settings, "KAKAO_REST_API_KEY")
-        LOGOUT_REDIRECT_URI = getattr(settings, "LOGOUT_REDIRECT_URI1")
+        LOGOUT_REDIRECT_URI = getattr(settings, "LOGOUT_REDIRECT_URI")
         print("access_Token", request.session.get("access_Token", None))
         logout_url = (
             "https://kauth.kakao.com/oauth/logout?client_id="
@@ -644,6 +648,56 @@ class AddPointView(View):
         pdto.save()
 
         return redirect("myPage")
+
+
+class SearchUserAccountAPI(APIView):
+    def get(self, request):
+        user_id = request.session.get("memid")
+        # user_id = "test9090"
+        user_account_info = WinUserAccount.objects.filter(user_id=user_id).values()[0]
+
+        account_default_setting = user_account_info["user_account_default"]
+
+        if account_default_setting == 1:
+            user_account = {"user_account": user_account_info["user_account1"]}
+
+        elif account_default_setting == 2:
+            user_account = {"user_account": user_account_info["user_account2"]}
+
+        elif account_default_setting == 3:
+            user_account = {"user_account": user_account_info["user_account3"]}
+
+        elif account_default_setting == "" or account_default_setting is None:
+            user_account = {"user_account": "결제 수단이 등록되지 않았습니다"}
+
+        serialized = SelectAccountSerializer(user_account)
+        json_result = JSONRenderer().render(serialized.data)
+
+        return Response(json_result)
+
+
+class SelectAccountSerializer(serializers.Serializer):
+    user_account = serializers.CharField()
+
+
+class UpdateUserDefaultAccountAPI(APIView):
+    def get(self, request):
+        user_id = request.session.get("memid")
+        # user_id = "test9090"
+        user_account_info = WinUserAccount.objects.filter(user_id=user_id).values(
+            "user_account1", "user_account2", "user_account3"
+        )[0]
+
+        serialized = AccountSerializer(user_account_info)
+        json_result = JSONRenderer().render(serialized.data)
+
+        return Response(json_result)
+
+
+class AccountSerializer(serializers.Serializer):
+    user_account1 = serializers.CharField()
+    user_account2 = serializers.CharField()
+    user_account3 = serializers.CharField()
 
 
 class AddPointHisView(View):

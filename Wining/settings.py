@@ -85,7 +85,7 @@ SECRET_KEY = "django-insecure-t+x=)475)9=g3d_s84v!pps^irv8f$)6wfz@094&^ujxh10beg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.0.13" ]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.0.13"]
 
 
 # Application definition
@@ -230,8 +230,7 @@ KAKAO_REDIRECT_URI1 = "http://localhost:8000/user/inputUser"
 KAKAO_REDIRECT_URI2 = "http://localhost:8000/user/inputUserInfo"
 KAKAO_REDIRECT_URI3 = "http://localhost:8000/user/inputStore"
 
-LOGOUT_REDIRECT_URI1 = "http://localhost:8000/user/locallogout"
+LOGOUT_REDIRECT_URI = "http://localhost:8000/user/locallogout"
 
 
 mimetypes.add_type("application/javascript", ".js", True)
-

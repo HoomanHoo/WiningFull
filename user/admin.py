@@ -1,5 +1,12 @@
 from django.contrib import admin
-from user.models import WinUser, WinUserFavorite, WinUserGrade, WinPointHis, WinReview
+from user.models import (
+    WinUser,
+    WinUserAccount,
+    WinUserFavorite,
+    WinUserGrade,
+    WinPointHis,
+    WinReview,
+)
 
 
 class WinUserAdmin(admin.ModelAdmin):
@@ -12,10 +19,25 @@ class WinUserAdmin(admin.ModelAdmin):
         "user_tel",
         "user_reg_date",
         "user_point",
+        "user_profile_img",
     )
 
 
 admin.site.register(WinUser, WinUserAdmin)
+
+
+class WinUserAccountAdmin(admin.ModelAdmin):
+    list_display = (
+        "user_account_id",
+        "user_id",
+        "user_account_default",
+        "user_account1",
+        "user_account2",
+        "user_account3",
+    )
+
+
+admin.site.register(WinUserAccount, WinUserAccountAdmin)
 
 
 class WinUserFavoriteAdmin(admin.ModelAdmin):

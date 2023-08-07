@@ -4,7 +4,7 @@ from django.db import models
 class WinUser(models.Model):
     user_id = models.CharField(primary_key=True, max_length=30)
     user_grade = models.ForeignKey(
-        "WinUserGrade", models.CASCADE, db_column="user_grade"
+        "WinUserGrade", models.CASCADE, db_column="user_grade", default=1
     )
     user_passwd = models.CharField(max_length=30)
     user_name = models.CharField(max_length=20)
@@ -12,10 +12,24 @@ class WinUser(models.Model):
     user_tel = models.CharField(max_length=20)
     user_reg_date = models.DateTimeField()
     user_point = models.PositiveIntegerField()
+    user_profile_img = models.ImageField(default="")
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_user"
+
+
+class WinUserAccount(models.Model):
+    user_account_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey("WinUser", models.CASCADE, db_column="user_id", default="")
+    user_account_default = models.IntegerField(default=1)
+    user_account1 = models.CharField(default="", max_length=80)
+    user_account2 = models.CharField(default="", max_length=80)
+    user_account3 = models.CharField(default="", max_length=80)
+
+    class Meta:
+        db_table = "win_user_account"
+        managed = True
 
 
 class WinUserFavorite(models.Model):
