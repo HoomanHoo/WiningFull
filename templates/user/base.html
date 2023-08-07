@@ -1,40 +1,453 @@
-{%load static%}
-<!DOCTYPE html>
+{% load static %}
+
 <html>
 	<head>
-		<meta charset="UTF-8">
-		<title> 회원관리 </title>
-		<link rel="stylesheet" type="text/css" href="{%static 'css/bootstrap.css'%}">
-		<script src="{%static 'js/jquery-3.6.4.js'%}"></script>
-		<script src="{%static 'js/script_user.js'%}"></script>
-	</head>
-	<body>
-		{%block menu%}
-			{% if request.session.memid  %}
-			<div class="right-align">
-  				<a href="/user/logout" class="btn btn-primary"> 로그아웃 </a> &nbsp;&nbsp;&nbsp;
-  				<a href="/user/myPage" class="btn btn-primary"> 마이페이지 </a> &nbsp;&nbsp;&nbsp;
-				<a href="/board/list" class="btn btn-primary"> 게시판 </a> &nbsp;&nbsp;&nbsp;&nbsp;
-				<a href="/search/main" class="btn btn-primary"> 메인/검색 </a> &nbsp;&nbsp;&nbsp;&nbsp;
-			</div>
-			{% else %}
-			<div class="right-align">
-  				<a href="/user/login" class="btn btn-primary"> 로그인 </a> &nbsp;&nbsp;&nbsp;
-				<a href="/board/list" class="btn btn-primary"> 게시판 </a> &nbsp;&nbsp;&nbsp;&nbsp;
-				<a href="/search/main" class="btn btn-primary"> 메인/검색 </a> &nbsp;&nbsp;&nbsp;&nbsp;
-			</div>
-			{% endif %}
+	<link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
+	<meta charset="UTF-8">
+		<title> 게시판 </title>
+		<link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">	
+		<script src="{% static 'js/jquery-3.6.4.js'%}"></script>
+		<script src="{% static 'js/script_board.js'%}"></script>
 		
-		{%endblock%}
 
+
+
+<style>
+
+
+	    
+	.row.content {height: 550px}
+    
+    /* Set gray background color and 100% height */
+    .sidenav {
+      background-color: #f1f1f1;
+      height: 100%;
+    }
+        
+    /* On small screens, set height to 'auto' for the grid */
+    @media screen and (max-width: 767px) {
+      .row.content {height: auto;} 
+    }
+    
+    
+    
+	    
+	        body {
+	            font-family: 'Noto Sans', Arial, sans-serif;
+	            background-color: #f5f5f5;
+	            margin: 0;
+	        }
+	
+	        .header {
+	            background-color:  #800020; /* 와인색으로 변경 */
+	            color: #ffffff;
+	            padding: 10px;
+	            text-align: center;
+	        }
+	        
+	        
+	        .header-image {
+		        width: 80px; /* 이미지의 너비 조절 */
+		        height: 80px; /* 이미지의 높이 조절 */
+		        position: absolute; /* 절대 위치로 설정하여 메뉴바 오른쪽 상단에 고정 */
+		        top: 80px; /* 원하는 Y 축 위치로 조정 */
+		        left: 30px; /* 원하는 X 축 위치로 조정 */
+		        
+		    }
+	        
+	       .logout-image {
+		        width: 30px; /* 이미지의 너비 조절 */
+		        height: 30px; /* 이미지의 높이 조절 */
+		        position: absolute; /* 절대 위치로 설정하여 메뉴바 오른쪽 상단에 고정 */
+		        top: 14px; /* 원하는 Y 축 위치로 조정 */
+		        right: 100px; /* 원하는 X 축 위치로 조정 */
+		        
+		    }
+	        
+	
+	        .right-align {
+	            text-align: right;
+	            margin-right: 10px;
+	        }
+	        
+	        .right-margin {
+            	margin-right: 10px;
+       		}
+	
+	        .btn {
+	            display: inline-block;
+	            background-color: #800020; /* 와인색으로 변경 */
+	            color: #ffffff;
+	            padding: 8px 16px;
+	            border: none;
+	            text-decoration: none;
+	            border-radius: 20px;
+	            margin-right: 10px;
+	            font-weight: bold;
+	            cursor: pointer;
+	            transition: background-color 0.3s;
+	        }
+	
+	        .btn:hover {
+	            background-color: #4b0014; /* 와인색으로 변경 (hover 시) */
+	        }
+	
+	        .btn-primary {
+	            background-color: #800020; /* 와인색으로 변경 */
+	        }
+	
+	        .center-text {
+	            justify-content: center;
+	        }
+	
+	        .left-align {
+	            text-align: left;
+	            margin-left: 130px;
+	        }
+	
+	        .left-margin {
+	            margin-left: 10px;
+	        }
+
+	        footer {
+	            text-align: center;
+	            padding: 3px;
+	            background-color: #b0c4de;
+	            color: #ffffff;
+	        }
+	
+	        footer p {
+	            font-size: 90%;
+	            margin: 4px;
+	        }
+	
+	        .red-text {
+	            color:	#FFFF00;
+	            font-weight: bold;
+	        }
+	
+	        .all-browsers {
+	            margin: 0;
+	            padding: 5px;
+	            background-color: lightgray;
+	        }
+	
+	        .all-browsers > h1, .browser {
+	            margin: 10px;
+	            padding: 5px;
+	        }
+	
+	        .browser {
+	            background: white;
+	        }
+	
+	        .browser > h2, p {
+	            margin: 4px;
+	            font-size: 90%;
+	        }
+	
+	        footer {
+	            text-align: center;
+	            padding: 3px;
+	            background-color: black;
+	            color: white;
+	        }
+	        
+   
+	       	        
+	        .center-container {
+	            display: flex;
+	            justify-content: center;
+	            align-items: center;
+	            height: 10vh;
+	        }
+	         
+	        
+	                /* 검색창 스타일 */
+	        .search-form-container {
+	            text-align: center;
+	            margin: 30px auto;
+	        }
+	        
+	        
+	     	.search-input {
+	            width: 400px;
+	            height: 40px;
+	            border: 2px solid #800020; /* 와인색으로 변경 */
+	            border-radius: 20px;
+	            padding: 5px 15px;
+	            font-size: 16px;
+	            outline: none;
+	        }
+	
+	        .search-button {
+	            background-color: #800020; /* 와인색으로 변경 */
+	            color: #ffffff;
+	            border: none;
+	            border-radius: 20px;
+	            padding: 8px 20px;
+	            font-size: 16px;
+	            margin-left: 10px;
+	            cursor: pointer;
+	            transition: background-color 0.3s;
+	        }
+	
+	        .search-button:hover {
+	            background-color: #4b0014; /* 와인색으로 변경 (hover 시) */
+	        }
+	        
+	        
+	        
+	    </style>
+	</head>
+	
+<body>
+
+
+		<nav class="navbar navbar-dark bg-dark">
+			<div class="container-fluid">
+			    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+			      <span class="navbar-toggler-icon"></span>
+			    </button>
+
+			</div>
+		</nav>
+
+
+
+
+    <div class="header">
+        {% if request.session.memid %}
+            <div class="right-align right-margin">
+                <i class="fas fa-user"></i>
+                <span class='red-text'>{{ request.session.memid }}</span>님이 로그인하였습니다.
+                &nbsp;
+                <a href="#" class="logout-button btn">로그아웃</a>
+                <a href="#">
+                	<img src="{% static 'images/logout.png' %}" alt="logout" class="logout-image">
+                </a>
+            </div>
+        {% else %}
+            <div class="right-align right-margin">
+                <span class='red-text'>로그인되지 않은 상태입니다.</span>
+            </div>
+        {% endif %}
+        {% if request.session.memid %}
+	      
+        <div class="center-container">
+            <div class="d-flex">
+                <a href="/search/main" class="btn">MAIN</a>
+                <a href="/search/searchbycategory" class="btn">Category.</a>
+                <a href="/search/searchbyuser" class="btn">Recommend.</a>
+                <a href="/search/searchbyrank" class="btn">MostPop.</a>
+                <div class="ml-auto">
+                    <a href="/board/list" class="btn">Board</a>
+                    <a href="/user/myPage" class="btn">MyPage</a>
+                </div>
+            </div>
+        </div>
+	      
+            
+        {% else %}
+	        <div class="center-container">
+	            <div class="d-flex">
+	                <a href="/search/main" class="btn">MAIN</a>
+	                <a href="/board/list" class="btn">Category.</a>
+	                <a href="/search/searchbyrank" class="btn">MostPop.</a>
+	                <div class="ml-auto">
+	                    <a href="/board/list" class="btn">Board</a>
+	                    <a href="/user/login" class="btn">Login</a>
+	                </div>
+	            </div>
+	        </div>
+        {% endif %}
+        
+        
+        <!-- 이미지 삽입 -->
+        <a href="/search/main">
+    		<img src="{% static 'images/wineglass.png' %}" alt="wineglass" class="header-image">
+       </a>
+        
+    </div>
+    
+    
+
+<div class="collapse" id="navbarToggleExternalContent">
+	{% if request.session.memid %} 
+	  <div class="bg-dark p-4">
+	
+		    	<a href="/search/searchbycategory" class="text-white h4">카테고리검색</a>
+		    	&nbsp;&nbsp;&nbsp;
+		    	<span class="text-muted">원하는 카테고리별로 와인을 볼 수 있습니다.</span>
+		    	<br><br>
+		    	
+		    	<a href="/search/searchbyuser" class="text-white h4">추천검색</a>
+		    	&nbsp;&nbsp;&nbsp;
+		    	<span class="text-muted">사용자의 취향에 맞춰 추천된 와인을 볼 수 있습니다.</span>
+		    	<br><br>
+	
+		    	<a href="/search/searchbyrank" class="text-white h4">순위별검색</a>
+		    	&nbsp;&nbsp;&nbsp;
+		    	<span class="text-muted">사람들이 많이 찾는 인기있는 와인을 볼 수 있습니다.</span>
+		    	<br><br>
+		    	
+	{% else %}
+		    	<a href="/search/searchbycategory" class="text-white h4">카테고리검색</a>
+		    	&nbsp;&nbsp;&nbsp;
+		    	<span class="text-muted">원하는 카테고리별로 와인을 볼 수 있습니다.</span>
+		    	<br><br>
+	
+		    	<a href="/search/searchbyrank" class="text-white h4">순위별검색</a>
+		    	&nbsp;&nbsp;&nbsp;
+		    	<span class="text-muted">사람들이 많이 찾는 가장 인기있는 와인을 볼 수 있습니다.</span>
+		    	<br><br>
+	
+	{% endif %}
+
+
+
+    
+  </div>
+</div>
+	
+	<script src="{% static 'js/jquery-3.6.4.js' %}"></script>
+	
 		<br><br>
-		{%block title%} <h2> 회원관리 </h2> {%endblock%}
-		<br><br>
-		{%block content%}
+		<div class="left-align left-margin">
+			{% block title %} <h2> 자유게시판 </h2> {% endblock %}
+		</div>
 		
-		{%endblock%}
+		{% block content %}
+		
+		
+		
+		{% endblock %}
+		
+		<!--  
+	    <head>
+	        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	    </head>
+		-->
+    		<!-- 하단 내용 작성 -->
+   		<footer>
+   			<br>
+   			<p>&copy; 2023 WINING website. All rights reserved.</p>
+   			<br>
+  			
+		
+				
+				<br>
+				
+		</footer>
+		
+	</body>		
+		
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.17/dist/sweetalert2.all.min.js"></script>
+
+<script>
+// 확인 창을 띄우는 함수
+function confirmLogout() {
+    Swal.fire({
+        title: '로그아웃 하겠습니까?',
+        icon: 'success',
+        showCancelButton: true,
+        
+        confirmButtonText: '로그아웃',
+        cancelButtonText: '취소',
+        reverseButtons: true,
+        customClass: {
+            container: 'custom-modal-container', // 사용자 정의 컨테이너 클래스
+            title: 'custom-modal-title', // 사용자 정의 타이틀 클래스
+            confirmButton: 'custom-modal-confirm-button', // 사용자 정의 확인 버튼 클래스
+            cancelButton: 'custom-modal-cancel-button', // 사용자 정의 취소 버튼 클래스
+        },
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // 확인을 누르면 로그아웃 URL로 이동
+            window.location.href = '/user/logout';
+        } else {
+            // 취소를 누르면 아무 동작도 하지 않음
+            return false;
+        }
+    });
+}
+
+// 로그아웃 버튼에 onclick 이벤트 추가
+document.querySelector(".logout-button").addEventListener("click", confirmLogout);
+</script>
+
+			<style>
+				/* 사용자 정의 모달 스타일 */
+				.custom-modal-container {
+				    border: 2px solid #555;
+				    border-radius: 8px;
+				    background-color: #f8f8f8;
+				}
+				
+				.custom-modal-title {
+				    color: #555;
+				}
+				
+				.custom-modal-confirm-button, .custom-modal-cancel-button {
+				    background-color: #03c75a;
+				    color: #ffffff;
+				    padding: 8px 16px;
+				    border: none;
+				    text-decoration: none;
+				    border-radius: 20px;
+				    margin-right: 10px;
+				    font-weight: bold;
+				    cursor: pointer;
+				    transition: background-color 0.3s;
+				}
+				
+				.custom-modal-confirm-button:hover, .custom-modal-cancel-button:hover {
+				    background-color: #00af4a;
+				}
+				
+				
+			.logout-image {
+		        width: 30px; /* 이미지의 너비 조절 */
+		        height: 30px; /* 이미지의 높이 조절 */
+		        position: absolute; /* 절대 위치로 설정하여 메뉴바 오른쪽 상단에 고정 */
+		        top: 71px; /* 원하는 Y 축 위치로 조정 */
+		        right: 10px; /* 원하는 X 축 위치로 조정 */
+		        
+		    }
+			
+			
+			.btn {
+		        font-size: 20px; /* 원하는 글꼴 크기로 조정하세요 */
+		    }
+	        
+	       .logout-button {
+       			font-size: 16px; /* 작은 크기로 설정 */
+    		}
+				
+				
+			</style>
+		
+	    <!-- Bootstrap JS -->
+		<script src="{% static 'bootstrap.min.js' %}"></script>
+	  
+		
 	</body>
 </html>
 
 
-										
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

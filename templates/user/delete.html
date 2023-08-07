@@ -1,11 +1,42 @@
 {%extends "user/base.html"%}
-{%block title%} <h2> </h2> {%endblock%}
 {%load static%}
-<link rel="stylesheet" type="text/css" href="{%static 'css/inputUser.css'%}">
-{%block content%}
-{%csrf_token%}
+{%block title%} <h2> </h2> {%endblock%}
 
-<div class="card signup_v4 mb-30">
+{%block content%}
+<head>
+	<meta charset="UTF-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  	
+  	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+  	<script src="{%static 'js/jquery-3.6.4.js'%}"></script>
+  	<script src="{%static 'js/bootstrap.min.js' %}"></script>	
+</head>
+
+<body class="sb-nav-fixed" >   
+	<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+	
+		 <div class="border-start border-end bg-white" id="sidebar-wrapper" style="width:300px;">
+	         <div class="sidebar-heading border-bottom bg-light" align="center"><b>MyPage</b></div>
+	               <div class="list-group list-group-flush">
+	                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="modifyUser">회원정보수정</a>
+	                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="delete">회원탈퇴</a>
+	                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myBoard">게시글관리</a>
+	                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myComment">댓글관리</a>
+	                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="reviewList">리뷰관리</a>
+	                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="purchaseDetail">구매내역</a>
+	
+		                {% if dto.user_grade_id == 1 %}
+		                <a class="nav-link" href="myReceiveCode">수령 코드 확인</a>
+		                {% endif %}
+		                {% if dto.user_grade_id == 2 %}
+		                <a class="nav-link" href="../store/mypage">점주 페이지</a>
+		                {% endif %}
+	               </div>
+	    </div>
+   </nav>
+
+
+<div class="card signup_v4 mb-30" id="layoutSidenav_content">
      <div class="card-body">
          <ul class="nav nav-tabs" id="myTab" role="tablist">
              <li class="nav-item" role="presentation">
@@ -32,10 +63,34 @@
          </div>
      </div>
  </div>
+ 
 <script>
 	var message = "{{message}}";
 	if(message) {
 		alert(message);
 	}
 </script>
+
+
+
+
+
+<style>
+
+	/*왼쪽에 MyPage 내용 고정시키는 코드 */
+	#sidebar-wrapper {
+		position:fixed;
+	    left: 50;
+	    top:250px;
+	    width: 300px; /* 원하는 너비 값으로 조정 */
+	    background-color: #ffffff; /* 배경색 설정 */
+	    border-right: 1px solid #dee2e6; /* 우측 경계선 설정 */
+	    overflow-y: auto; /* 내용이 넘칠 경우 스크롤바 추가 */
+	    z-index: 1000; /* 다른 요소 위에 표시하기 위한 z-index 값 설정 */
+	}
+	#layoutSidenav_content {
+			margin-left: 400px; /* 사이드바의 너비 + 여유 여백 만큼 설정 */
+	}
+	
+</style>
 {%endblock%}
