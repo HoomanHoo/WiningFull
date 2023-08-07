@@ -2,48 +2,54 @@
 {%csrf_token%}
 {%load static%}
 <link rel="stylesheet" type="text/css" href="{%static 'css/reviewList.css'%}">
+
 {%block title%} <h2>  </h2> {%endblock%}
 
 {%block content%}
 <head>
-  <meta charset="utf-8">
+	<meta charset="UTF-8">
   	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  	
   	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
-  	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-  	<script src="{%static 'js/bootstrap.min.js' %}"></script>
+  	<script src="{%static 'js/jquery-3.6.4.js'%}"></script>
+  	<script src="{%static 'js/bootstrap.min.js' %}"></script>	
 </head>
 
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="reviewList">리뷰 관리</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#myNavbar" aria-expanded="false" aria-controls="myNavbar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="myNavbar">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link" href="modifyUser">회원정보수정</a></li>
-                <li class="nav-item"><a class="nav-link" href="reviewList">리뷰 관리</a></li>
-                <li class="nav-item"><a class="nav-link" href="purchaseDetail">구매 내역</a></li>
-                <li class="nav-item"><a class="nav-link" href="../purchasing/cart">장바구니</a></li>
-                <li class="nav-item"><a class="nav-link" href="myBoard">게시글 관리</a></li>
-                <li class="nav-item"><a class="nav-link" href="myComment">댓글 관리</a></li>
-                <li class="nav-item"><a class="nav-link" href="delete">회원 탈퇴</a></li>
-                {% if user_grade == "2" %}
-                <li class="nav-item"><a class="nav-link" href="../store/storeMyPage">점주 페이지</a></li>
-                {% endif %}
-            </ul>
-        </div>
-    </div>
-</nav>
 
-<div class="container mt-5 mb-5">
+    <body class="sb-nav-fixed">   
+		<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+		
+	    <div class="border-start border-end bg-white" id="sidebar-wrapper" style="width:300px;">
+               <div class="sidebar-heading border-bottom bg-light" align="center"><b>MyPage</b></div>
+               <div class="list-group list-group-flush">
+                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="modifyUser">회원정보수정</a>
+                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="delete">회원탈퇴</a>
+                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myBoard">게시글관리</a>
+                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myComment">댓글관리</a>
+                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="reviewList">리뷰관리</a>
+                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="purchaseDetail">구매내역</a>
+                
+                {% if dto.user_grade_id == 1 %}
+                <a class="nav-link" href="myReceiveCode">수령 코드 확인</a>
+                {% endif %}
+                {% if dto.user_grade_id == 2 %}
+                <a class="nav-link" href="../store/storeMyPage">점주 페이지</a>
+                {% endif %}
+               </div>
+         </div>
+    	</nav>
+
+
+
+
+
+<div id="layoutSidenav-content" class="container d-flex justify-content-center mt-50 mb-50">
     <div class="d-flex justify-content-center row">
         <div class="col-md-10">
         	{%for dto in dtos%}
             <div class="row p-2 bg-white border rounded">
                 <div class="col-md-3 mt-1">
-                	<!-- <img src="{{dto.sell.wine.wine_image}}" class="img-fluid img-responsive rounded product-image"> -->
                 	<img src="{{dto.sell.wine.wine_image}}" width=200 height=200>
                 </div>
                 <div class="col-md-6 mt-1">
@@ -63,6 +69,31 @@
 </div>
 
 </body>
+
+
+
+
+
+<style>
+
+	/*왼쪽에 MyPage 내용 고정시키는 코드 */
+	#sidebar-wrapper {
+		position:fixed;
+	    left: 50;
+	    top:250px;
+	    width: 300px; /* 원하는 너비 값으로 조정 */
+	    background-color: #ffffff; /* 배경색 설정 */
+	    border-right: 1px solid #dee2e6; /* 우측 경계선 설정 */
+	    overflow-y: auto; /* 내용이 넘칠 경우 스크롤바 추가 */
+	    z-index: 1000; /* 다른 요소 위에 표시하기 위한 z-index 값 설정 */
+	}
+	#layoutSidenav_content {
+			margin-left: 400px; /* 사이드바의 너비 + 여유 여백 만큼 설정 */
+	}
+	
+</style>
+
+
 
 {%endblock%}
 
