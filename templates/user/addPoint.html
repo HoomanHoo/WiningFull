@@ -33,21 +33,39 @@
 					<div class="input-buttons"> 
 						<input type="submit" id="charge" value="충전하기">
 					</div> 
-					<div class="outer-card" :style="hover" v-show="show" >
-						<div class="forms">
-							<div class="input-items">
-								<input @click="invisible" type="button" value="x">
+					<div class="outer-card" :style="hover" v-show="show">
+					
+						<div v-if="userAccountId != -1" class="forms">
+							<div class="input-items" style="text-align:right">
+								<input  @click="invisible" type="button" value="x  " style="width:40px">
 							</div>
-							<div class="input-items">
-								<input @click="changeDefaultAccount" type="button" :value="[[accountList.user_account1]]">
+							<div v-if="accountList.user_account1" class="input-items">
+								<input id="1" @click="changeDefaultAccount" type="button" :value="[[accountList.user_account1]]">
 							</div>
-							<div class="input-items">
-								<input @click="changeDefaultAccount" type="button" :value="[[accountList.user_account2]]">
+							<div v-if="accountList.user_account2" class="input-items">
+								<input id="2" @click="changeDefaultAccount" type="button" :value="[[accountList.user_account2]]">
 							</div>
-							<div class="input-items">
-								<input @click="changeDefaultAccount" type="button" :value="[[accountList.user_account3]]">
+							<div v-if="! accountList.user_account2" class="input-items">
+								<input id="2" @click="addPaymentMethod" type="button" value="not -1 결제수단 등록하기">
+							</div>
+							<div v-if="accountList.user_account3" class="input-items">
+								<input id="3" @click="changeDefaultAccount" type="button" :value="[[accountList.user_account3]]">
+							</div>
+							<div v-if="! accountList.user_account3" class="input-items">
+								<input id="3" @click="addPaymentMethod" type="button" value="not -1 결제수단 등록하기">
 							</div>
 						</div>
+				
+						
+						<div v-if="userAccountId == -1" class="forms">
+							<div class="input-items" style="text-align:right">
+								<input  @click="invisible" type="button" value="x  " style="width:40px">
+							</div>
+							<div class="input-items">
+								<input id="1" @click="addPaymentMethod" type="button" value="is -1 결제수단 등록하기">
+							</div>
+						</div>
+					
 					</div>
 				</div>
 			</div> 

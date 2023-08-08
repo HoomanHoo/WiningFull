@@ -7,6 +7,7 @@ const addPoint = Vue.createApp({
         const pointAdd = Vue.ref("");
         const selectedAccount = Vue.ref("");
         const accountList = Vue.ref("");
+        const userAccountId = Vue.ref("");
         const hover = Vue.ref({ "z-index": 2, "position": "absolute", "left": "0px", "top": "0px" });
         const unHover = Vue.ref({ "z-index": 1, "position": "relative" });
         const show = Vue.ref(false);
@@ -31,27 +32,66 @@ const addPoint = Vue.createApp({
 
         const selectAccount = (event) => {
 
-            const url = "updatedefaultaccount"
-            fetch(url).then((response) => response.json()).then((data) => {
-                const responseData = JSON.parse(data);
-                accountList.value = responseData;
+            if (userAccountId.value != -1) {
+                const url = "account/" + userAccountId.value;
+                fetch(url).then((response) => response.json()).then((data) => {
+                    const responseData = JSON.parse(data);
+                    accountList.value = responseData;
+                    show.value = true;
+                })
+            }
+
+            else if (userAccountId.value == -1) {
+                console.log(userAccountId.value);
                 show.value = true;
-            })
+            }
         }
 
         const invisible = () => {
             show.value = false;
         }
 
-        const changeDefaultAccount = () => {
+        const changeDefaultAccount = (event) => {
+            const thisElement = event.target;
+            const thisValue = thisElement.id;
+            const url = "account/" + userAccountId.value;
+            const init = {
+                method: "PATCH",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "selectedAccount": thisValue
+                })
+            }
+            fetch(url, init).then((response) => {
+                if (response.ok) {
+                    return response.json();
 
+                }
+                else {
+                    const responseData = "없뎃";
+                }
+            }).then((data) => {
+                const responseData = JSON.parse(data)
+                selectedAccount.value = responseData["user_account"];
+                userAccountId.value = responseData["user_account_id"];
+                show.value = false;
+            });;
         }
+
+        const addPaymentMethod = () => {
+            location.href = "payment-method";
+        }
+
 
         Vue.onMounted(() => {
             const url = "account"
             fetch(url).then((response) => response.json()).then((data) => {
                 const responseData = JSON.parse(data);
                 selectedAccount.value = responseData["user_account"];
+                userAccountId.value = responseData["user_account_id"];
             })
         })
 
@@ -60,9 +100,31 @@ const addPoint = Vue.createApp({
 
 
 
-        return { decidedValues, pointAdd, selectedAccount, hover, unHover, show, accountList, invisible, selectAccount, clickDecidedValue }
+        return {
+            decidedValues,
+            pointAdd,
+            selectedAccount,
+            hover,
+            unHover,
+            show,
+            accountList,
+            userAccountId,
+            invisible,
+            selectAccount,
+            clickDecidedValue,
+            changeDefaultAccount,
+            addPaymentMethod
+        }
     },
 
 
 })
 addPoint.mount("#rootDiv");
+
+function getCookie(name) {
+    let matches = document.cookie.match(new RegExp(
+        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+    ));
+
+    return matches ? decodeURIComponent(matches[1]) : undefined;
+}
