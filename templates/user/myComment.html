@@ -48,21 +48,35 @@
         <div class="col-md-8">
 	        <div class="mt-2">
 		       	<div class="d-flex flex-row mt-3">
-		        	<img src="https://pbs.twimg.com/media/FX3zgNgaIAcSxrE.jpg" width="50" height="60" class="rounded-circle">
+	                      {% if dto.winboardimg_set.exists %} 
+			              <div class="position-relative snipimage">
+			                프로필이미지 보여질 예정
+			              </div>
+                          {% else %} <!-- 프로필이미지가 없는 경우에 공백이미지 -->
+                          <div class="position-relative snipimage">
+                          	<img src="{% static 'img/emptyimage.PNG' %}" class="rounded img-fluid w-100 img-responsive" style="max-width: 300px; max-height: 300px;">
+                          </div>
+                          {% endif %}
 				<div class="ms-2 d-flex flex-column">
-				<div class="d-flex flex-row align-items-center">
-					<h6>{{dto.comment_reg_time}}</h6>
-					<span class="dots"></span>
-				</div>
-				<div class="d-flex flex-row align-items-center">
-					<h6>{{dto.board.board_title}}</h6>
-					<span class="dots"></span>
-				</div>
-					<h4><span class="days-ago"> 내용 : 
-				  	<a href="../board/content?num={{dto.board.board_id}}">  
-						{{dto.comment_content}}
-					</a>
-					</span></h4>
+				
+					<div class="d-flex flex-row align-items-center">
+						<h6>{{dto.comment_reg_time}}</h6>
+						<span class="dots"></span>
+					</div>
+				
+					<div class="d-flex flex-row align-items-center">
+						<h6>{{dto.board.board_title}}</h6>
+						<span class="dots"></span>
+					</div>
+				
+					<h4>
+					<span class="days-ago"> 내용 : 
+				  		<a href="../board/content?num={{dto.board.board_id}}">  
+							{{dto.comment_content}}
+						</a>
+					</span>
+					</h4>
+					
 				</div>
 		       	</div>
 	        </div>

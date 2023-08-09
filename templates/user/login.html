@@ -2,9 +2,10 @@
 {% block title %}<h2></h2>{% endblock %}
 {% load static %}
 
+<!--  
 <link rel="stylesheet" type="text/css" href="{% static 'css/inputUser.css' %}">
 
-
+-->
 
 {% block content %}
 {% csrf_token %}
@@ -13,7 +14,7 @@
     <div class="card-body">
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <a class="nav-link active" id="login-tab" data-toggle="tab" href="#login" role="tab" aria-controls="login" aria-selected="true">Login</a>
+                <a class="nav-link active" id="login-tab" data-toggle="tab" href="#login" role="tab" aria-controls="login" aria-selected="true">. . . </a>
             </li>
         </ul>
         <div class="tab-content" id="myTabContent">
@@ -29,19 +30,21 @@
                 {% endif %}
                 <form method="post" action="login" name="loginform">
                     {% csrf_token %}
-                    <div class="form-row">
-                        <div class="form-group col-md-3"> <!-- 컬럼 너비 조정 -->
+					<div class="form-row">
+                        <div class="form-group col-md-6">
                             <label for="inputName">Your ID</label>
                             <input type="text" class="form-control" id="inputEmail4" placeholder="Enter your ID" name="user_id">
                         </div>
-                        <div class="form-group col-md-3"> <!-- 컬럼 너비 조정 -->
+                        <div class="form-group col-md-6">
                             <label for="inputName">Your Password</label>
                             <input type="password" class="form-control" id="inputPassword4" placeholder="Enter your password" name="user_passwd">
                         </div>
-                    </div>
-                    <div class="mt-2 mb-3">
-                        <button class="btn btn-primary full-width" type="submit">Login</button>
-                        <input type="button" value="카카오 로그인" onclick="location='kakaologin?act=login'">
+                    </div><br>
+                   <div class="mt-2 mb-3 text-center">
+                        <button class="btn btn-primary btn-block" type="submit">Login</button><br>
+                        <button class="btn btn-secondary btn-block smaller-button" onclick="location='kakaologin?act=login'">
+                        	<span class="button-text">KAKAO Login</span>
+                        </button>
                     </div>
                     <div>
                         <p>Not a member? <a href="kakaologin?act=regist">Register with Kakao</a></p>
@@ -58,5 +61,89 @@
         alert(message);
     }
 </script>
+
+
+<style>
+
+
+/* 특정 버튼에 대한 스타일 지정 */
+.smaller-button {
+    font-size: 15px !important; /* 원하는 글씨 크기로 조절 */
+    padding: 6px 12px !important; /* 원하는 패딩 값으로 조절 */
+    border-radius: 50px !important; /* 원하는 값으로 동그랗게 설정 */
+}
+
+
+
+
+.text-center {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+
+.signup_v4 {
+    max-width: 400px;
+    margin: 0 auto;
+    margin-bottom: 100px;
+    padding: 17px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 로그인 폼 스타일 */
+.form-group label {
+    font-weight: bold;
+}
+
+/* 버튼 스타일 */
+.btn-primary, .btn-secondary {
+    font-size: 6px;
+}
+
+/* 중앙 정렬 */
+.text-center {
+    text-align: center;
+}
+
+/* 네비게이션 탭 스타일 */
+.nav-tabs .nav-item {
+    margin-bottom: 0;
+}
+
+/* 활성 탭 스타일 */
+.nav-tabs .nav-link.active {
+    background-color: #f8f9fa;
+    border-color: transparent;
+}
+
+/* 입력 필드 너비 조정 */
+.form-group input {
+    width: 200%;
+    padding: 12px; /* 크기 증가 */
+    font-size: 14px; /* 폰트 크기 증가 */
+}
+/* 카카오 로그인 버튼 스타일 */
+.btn-secondary {
+    background-color: #f7e600;
+    border-color: #f7e600;
+    color: #000;
+    font-weight: bold;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+
+.btn-secondary:hover {
+    background-color: #f0d400;
+    border-color: #f0d400;
+    color: #000;
+}
+
+
+</style>
+
+
 
 {% endblock %}

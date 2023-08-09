@@ -26,7 +26,7 @@ class WinPurchaseDetail(models.Model):
     purchase_det_state = models.IntegerField()
 
     class Meta:
-        #      managed = False
+        # managed = False
         db_table = "win_purchase_detail"
 
 
@@ -37,7 +37,7 @@ class WinCart(models.Model):
     cart_state = models.IntegerField()
 
     class Meta:
-        #       managed = False
+        # managed = False
         db_table = "win_cart"
 
 
@@ -48,7 +48,7 @@ class WinCartDetail(models.Model):
     cart_det_qnty = models.IntegerField()
 
     class Meta:
-        #     managed = False
+        # managed = False
         db_table = "win_cart_detail"
 
 
@@ -58,5 +58,5 @@ class WinReceiveCode(models.Model):
     receive_code = models.BinaryField(max_length=500)
 
     class Meta:
-        #     managed = False
+        # managed = False
         db_table = "win_receive_code"

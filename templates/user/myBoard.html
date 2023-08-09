@@ -25,20 +25,20 @@
 	
 		 <div class="border-start border-end bg-white" id="sidebar-wrapper" style="width:300px;">
 	         <div class="sidebar-heading border-bottom bg-light" align="center"><b>MyPage</b></div>
-	               <div class="list-group list-group-flush">
-	                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="modifyUser">회원정보수정</a>
-	                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="delete">회원탈퇴</a>
-	                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myBoard">게시글관리</a>
-	                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myComment">댓글관리</a>
-	                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="reviewList">리뷰관리</a>
-	                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="purchaseDetail">구매내역</a>
-	
-		                {% if dto.user_grade_id == 1 %}
-		                <a class="nav-link" href="myReceiveCode">수령 코드 확인</a>
-		                {% endif %}
-		                {% if dto.user_grade_id == 2 %}
-		                <a class="nav-link" href="../store/mypage">점주 페이지</a>
-		                {% endif %}
+             <div class="list-group list-group-flush">
+                 <a class="list-group-item list-group-item-action list-group-item-light p-3" href="modifyUser">회원정보수정</a>
+                 <a class="list-group-item list-group-item-action list-group-item-light p-3" href="delete">회원탈퇴</a>
+                 <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myBoard">게시글관리</a>
+                 <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myComment">댓글관리</a>
+                 <a class="list-group-item list-group-item-action list-group-item-light p-3" href="reviewList">리뷰관리</a>
+                 <a class="list-group-item list-group-item-action list-group-item-light p-3" href="purchaseDetail">구매내역</a>
+
+	                {% if dto.user_grade_id == 1 %}
+	                <a class="nav-link" href="myReceiveCode">수령 코드 확인</a>
+	                {% endif %}
+	                {% if dto.user_grade_id == 2 %}
+	                <a class="nav-link" href="../store/mypage">점주 페이지</a>
+	                {% endif %}
 	               </div>
 	    </div>
    </nav>
@@ -48,10 +48,16 @@
     <div class="card p-3">
         <div class="row">
             <div class="col-md-4">
-            	
-	                <div class="position-relative snipimage">
-	                	<img src="{{image.url}}" class="rounded img-fluid w-100 img-responsive">
-	                </div>
+	                
+	                      {% if dto.winboardimg_set.exists %} <!-- 이미지가 존재하는 경우에 이미지 보이기 -->
+				              <div class="position-relative snipimage" style="max-width: 300px;">
+				                <img src="{{image.url}}" class="rounded img-fluid w-100 img-responsive" style="max-width: 300px; max-height: 300px;">
+				              </div>
+                          {% else %} <!-- 이미지가 없는 경우에 준비된 공백이미지 보이기 -->
+	                          <div class="position-relative snipimage" style="max-width: 300px;">
+	                          	<img src="{% static 'img/emptyimage.PNG' %}" class="rounded img-fluid w-100 img-responsive" style="max-width: 300px; max-height: 300px;">
+	                          </div>
+                          {% endif %}
             	
             </div>
             <div class="col-md-8">
