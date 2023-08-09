@@ -8,7 +8,7 @@ const addPoint = Vue.createApp({
         const selectedAccount = Vue.ref("");
         const accountList = Vue.ref("");
         const userAccountId = Vue.ref("");
-        const hover = Vue.ref({ "z-index": 2, "position": "absolute", "left": "0px", "top": "0px" });
+        const hover = Vue.ref({ "z-index": 3, "position": "absolute", "left": "0vw", "right": "0vw", "top": "0vh", "bottom": "0vh" });
         const unHover = Vue.ref({ "z-index": 1, "position": "relative" });
         const show = Vue.ref(false);
 
@@ -85,6 +85,10 @@ const addPoint = Vue.createApp({
             location.href = "payment-method";
         }
 
+        const back = () => {
+            location.href = "myPage";
+        }
+
 
         Vue.onMounted(() => {
             const url = "account"
@@ -109,6 +113,7 @@ const addPoint = Vue.createApp({
             show,
             accountList,
             userAccountId,
+            back,
             invisible,
             selectAccount,
             clickDecidedValue,

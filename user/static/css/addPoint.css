@@ -3,19 +3,21 @@
     margin: 0
 }
 
+/* 
 body {
     background-color: #f8f8f8;
     display: flex;
     justify-content: center;
     align-items: center
-}
+} */
 
+/* 
 .container {
     display: flex;
     height: 100vh;
     justify-content: center;
     align-items: center
-}
+} */
 
 .wrapper {
     width: 350px;
@@ -114,4 +116,35 @@ input::-webkit-input-placeholder {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+
+.hover-element {
+    display: flex;
+    height: inherit;
+    background-color: rgba(255, 255, 255, 0.685);
+    align-items: center;
+    justify-content: center;
+    right: 0px;
+    left: 0px;
+}
+
+.hover-inner-element {
+    /* div hover 안에서 중앙정렬해야함 */
+    width: inherit;
+    height: inherit;
+
+}
+
+
+.text-col {
+    align-items: center;
+    display: flex;
+}
+
+.hover-col {
+    display: flex;
+    margin-bottom: 0vh;
+    align-items: center;
+    justify-content: center;
 }
