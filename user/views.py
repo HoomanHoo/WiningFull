@@ -488,7 +488,7 @@ class ReviewListView(View):
         template = loader.get_template("user/reviewList.html")
         user_id = request.session.get("memid")
         dtos = WinReview.objects.filter(user_id=user_id).order_by("-review_reg_time")
-
+        print(dtos)
         context = {"dtos": dtos}
 
         return HttpResponse(template.render(context, request))
@@ -539,6 +539,7 @@ class PurchaseDetailView(View):
             purchase_details = WinPurchaseDetail.objects.filter(purchase_id=purchase)
 
             for purchase_detail in purchase_details:
+                wine_id = purchase_detail.sell.wine.wine_id
                 wine_name = purchase_detail.sell.wine.wine_name
                 wine_name_eng = purchase_detail.sell.wine.wine_name_eng
                 wine_image = purchase_detail.sell.wine.wine_image
@@ -552,6 +553,7 @@ class PurchaseDetailView(View):
 
                 dtos.append(
                     {
+                        "wine_id": wine_id,
                         "wine_name": wine_name,
                         "wine_name_eng": wine_name_eng,
                         "wine_image": wine_image,
@@ -563,6 +565,9 @@ class PurchaseDetailView(View):
                     }
                 )
 
+        for dto in dtos:
+            print(dto['wine_id'])        
+                
         context = {"dtos": dtos, "reviews": reviews}
 
         return HttpResponse(template.render(context, request))

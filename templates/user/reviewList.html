@@ -52,29 +52,32 @@
                 <thead>
                     <tr>
                         <th scope="col" style="width:7%">Product.</th>
-                        <th scope="col" style="width:37%">Info.</th>
+                        <th scope="col" style="width:47%">Info.</th>
                         <th scope="col" style="width:10%">Price.</th>
-                        <th scope="col" style="width:33%">Review.</th>
+                        <th scope="col" style="width:23%">Review.</th>
                         <th scope="col">Rate.</th> 
                     </tr>
                 </thead>
                 <tbody>
                     {% for dto in dtos %}
                     <tr>
-                        <td>
-                        	<img src="{{ dto.sell.wine.wine_image }}" width="77" height="100" alt="Wine Image">
+                        <td>	
+							<a href="../detail/winedetail?wine_id={{dto.sell.wine.wine_id}}">
+                        		<img src="{{ dto.sell.wine.wine_image }}" width="77" height="100" alt="Wine Image">
+                        	</a>
+                        	
                         </td>
-			            <td>
-			               <a href="/detail/winedetail?wine_id={{wine_image.wine.wine_id}}">{{dto.sell.wine.wine_name}}<br>
+			            <td class="align-middle">
+			               <a href="/detail/winedetail?wine_id={{dto.sell.wine.wine_id}}">{{dto.sell.wine.wine_name}}<br>
 			               {{dto.sell.wine.wine_name_eng}}</a>
 			            </td>
-                        <td>
+                        <td class="align-middle">
                          	<p>{{ dto.sell.sell_price }}원</p>
                         </td>
                         
-                        <td>{{ dto.review_content }}<br><br>{{ dto.review_reg_time }}</td>
+                        <td class="align-middle">{{ dto.review_content }}<br><br>{{ dto.review_reg_time }}</td>
                         
-                        <td>{{ dto.review_score }} / 5.0</td>
+                        <td class="align-middle">{{ dto.review_score }} / 5.0</td>
                     </tr>
                     {% endfor %}
                 </tbody>

@@ -1,76 +1,75 @@
+{%extends "user/base.html"%}
 {%load static%}
+{%block title%} <h2> </h2> {%endblock%}
+
 {%csrf_token%}
 <link rel="stylesheet" type="text/css" href="{%static 'css/addPoint.css'%}">
 <script src="{%static 'js/jquery-3.6.4.js'%}"></script>
 <script src="{%static 'js/script_user.js'%}"></script>
 <script type="module" src="{%static 'js/addPointScript.js'%}"></script>
 <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
-{%block title%} <h2>  </h2> {%endblock%}
+
 
 {%block content%}
-<form method="post" action="addPoint" name="addpoint">
-<div class="container">
-	<div id="rootDiv">
-		<div  class="wrapper" :style="unHover">
-			<div class="outer-card" :style="unHover"> 
-				<div class="forms"><br><br>
-					<div class="input-items"> 
-						<input id="chargePoint" name="point" type="number" placeholder="충전금액을 입력해주세요" size="19" :value="[[pointAdd]]"> 
-					</div>
-					<div class="input-items row">
-						<input v-for="value in decidedValues" @click="clickDecidedValue" class="col" type="button" :value="[[value]]">
-					</div>
-					<div class="input-items row">
-						<input @click="selectAccount" type="button" :value="[[selectedAccount]]">
-					</div>
-					<br><br>
-					<div class="input-items"> 
-						<span>보유 포인트</span> 
-						<span id="currentPoint">{{dto.user_point}}</span>
-					</div>
-					<br><br>
-					</div> 
-					<div class="input-buttons"> 
-						<input type="submit" id="charge" value="충전하기">
-					</div> 
-					<div class="outer-card" :style="hover" v-show="show">
-					
-						<div v-if="userAccountId != -1" class="forms">
-							<div class="input-items" style="text-align:right">
-								<input  @click="invisible" type="button" value="x  " style="width:40px">
-							</div>
-							<div v-if="accountList.user_account1" class="input-items">
-								<input id="1" @click="changeDefaultAccount" type="button" :value="[[accountList.user_account1]]">
-							</div>
-							<div v-if="accountList.user_account2" class="input-items">
-								<input id="2" @click="changeDefaultAccount" type="button" :value="[[accountList.user_account2]]">
-							</div>
-							<div v-if="! accountList.user_account2" class="input-items">
-								<input id="2" @click="addPaymentMethod" type="button" value="not -1 결제수단 등록하기">
-							</div>
-							<div v-if="accountList.user_account3" class="input-items">
-								<input id="3" @click="changeDefaultAccount" type="button" :value="[[accountList.user_account3]]">
-							</div>
-							<div v-if="! accountList.user_account3" class="input-items">
-								<input id="3" @click="addPaymentMethod" type="button" value="not -1 결제수단 등록하기">
-							</div>
-						</div>
-				
-						
-						<div v-if="userAccountId == -1" class="forms">
-							<div class="input-items" style="text-align:right">
-								<input  @click="invisible" type="button" value="x  " style="width:40px">
-							</div>
-							<div class="input-items">
-								<input id="1" @click="addPaymentMethod" type="button" value="is -1 결제수단 등록하기">
-							</div>
-						</div>
-					
-					</div>
-				</div>
-			</div> 
-		</div> 
-	</div>
-</div>
-</form>
+
+<head>
+	<meta charset="UTF-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  	
+  	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+  	<script src="{%static 'js/jquery-3.6.4.js'%}"></script>
+  	<script src="{%static 'js/bootstrap.min.js' %}"></script>	
+</head>
+
+
+
+<body>
+    <form method="post" action="addPoint" name="addpoint">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow-lg border-0 rounded-lg mt-5">
+                        <div class="card-header"><h3 class="text-center font-weight-light my-4">충전하기</h3></div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label class="small mb-1" for="chargePoint">충전 금액</label>
+                                <input class="form-control py-4" id="chargePoint" name="point" type="number" placeholder="충전금액을 입력해주세요" :value="[[pointAdd]]">
+                            </div>
+                            <div class="form-group">
+                                <label class="small mb-1">충전 금액 선택</label>
+                                <div class="row">
+                                    <button v-for="value in decidedValues" @click="clickDecidedValue" class="col btn btn-light m-1" type="button">{{ value }}</button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="small mb-1">결제 수단 선택</label>
+                                <button @click="selectAccount" class="btn btn-light" type="button">{{ selectedAccount }}</button>
+                            </div>
+                            <div class="form-group">
+                                <label class="small mb-1">보유 포인트</label>
+                                <span class="form-control py-2">{{ dto.user_point }}</span>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="input-buttons">
+                                <input type="submit" id="charge" class="btn btn-primary btn-block" value="충전하기">
+                            </div>
+                        </div>
+                      
+                      
+                        
+                
+
+                        
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <script src="{% static 'js/jquery-3.6.4.js' %}"></script>
+    <script src="{% static 'js/script_user.js' %}"></script>
+    <script type="module" src="{% static 'js/addPointScript.js' %}"></script>
+</body>
 {%endblock%}

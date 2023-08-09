@@ -1,120 +1,95 @@
-{%extends "user/base.html"%}
-{%csrf_token%}
-{%load static%}
-<link rel="stylesheet" type="text/css" href="{%static 'css/myBoard.css'%}">
+{% extends "user/base.html" %}
+{% csrf_token %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/myBoard.css' %}">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
+{% block title %} <h2>  </h2> {% endblock %}
 
-{%block title%} <h2>  </h2> {%endblock%}
-
-{%block content%}
-
+{% block content %}
 <head>
-	<meta charset="UTF-8">
-  	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  	
-  	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
-  	<script src="{%static 'js/jquery-3.6.4.js'%}"></script>
-  	<script src="{%static 'js/bootstrap.min.js' %}"></script>	
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+    <script src="{% static 'js/jquery-3.6.4.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
 </head>
 
-
 <body class="sb-nav-fixed">   
-	<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-	
-		 <div class="border-start border-end bg-white" id="sidebar-wrapper" style="width:300px;">
-	         <div class="sidebar-heading border-bottom bg-light" align="center"><b>MyPage</b></div>
-             <div class="list-group list-group-flush">
-                 <a class="list-group-item list-group-item-action list-group-item-light p-3" href="modifyUser">회원정보수정</a>
-                 <a class="list-group-item list-group-item-action list-group-item-light p-3" href="delete">회원탈퇴</a>
-                 <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myBoard">게시글관리</a>
-                 <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myComment">댓글관리</a>
-                 <a class="list-group-item list-group-item-action list-group-item-light p-3" href="reviewList">리뷰관리</a>
-                 <a class="list-group-item list-group-item-action list-group-item-light p-3" href="purchaseDetail">구매내역</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+        <div class="border-start border-end bg-white" id="sidebar-wrapper" style="width:300px;">
+            <div class="sidebar-heading border-bottom bg-light" align="center"><b>MyPage</b></div>
+            <div class="list-group list-group-flush">
+                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="modifyUser">회원정보수정</a>
+                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="delete">회원탈퇴</a>
+                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myBoard">게시글관리</a>
+                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myComment">댓글관리</a>
+                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="reviewList">리뷰관리</a>
+                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="purchaseDetail">구매내역</a>
 
-	                {% if dto.user_grade_id == 1 %}
-	                <a class="nav-link" href="myReceiveCode">수령 코드 확인</a>
-	                {% endif %}
-	                {% if dto.user_grade_id == 2 %}
-	                <a class="nav-link" href="../store/mypage">점주 페이지</a>
-	                {% endif %}
-	               </div>
-	    </div>
-   </nav>
-	
-<div class="container mt-4" id="layoutSidenav_content">
-	{% for dto, image in dtos_and_images %}
-    <div class="card p-3">
-        <div class="row">
-            <div class="col-md-4">
-	                
-	                      {% if dto.winboardimg_set.exists %} <!-- 이미지가 존재하는 경우에 이미지 보이기 -->
-				              <div class="position-relative snipimage" style="max-width: 300px;">
-				                <img src="{{image.url}}" class="rounded img-fluid w-100 img-responsive" style="max-width: 300px; max-height: 300px;">
-				              </div>
-                          {% else %} <!-- 이미지가 없는 경우에 준비된 공백이미지 보이기 -->
-	                          <div class="position-relative snipimage" style="max-width: 300px;">
-	                          	<img src="{% static 'img/emptyimage.PNG' %}" class="rounded img-fluid w-100 img-responsive" style="max-width: 300px; max-height: 300px;">
-	                          </div>
-                          {% endif %}
-            	
-            </div>
-            <div class="col-md-8">
-                <div class="mt-2">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <h5><span class="days-ago">{{dto.board_reg_time}}</span></h5>
-                    <span><i class="fa fa-heart text-danger"></i> </span>
-                  </div>
-                  <div class="d-flex justify-content-md-start justify-content-between views-content mt-2">
-                      <div class="d-flex flex-row align-items-center">
-                          <i class="fa fa-eye"></i>
-                          <h6><span class="ms-1 views">조회수 : {{dto.board_read_count}}</span></h6>
-                      </div>
-                  </div>
-                  <div class="d-flex flex-row mt-3">
-                      <div class="ms-2 d-flex flex-column">
-                         <div class="d-flex flex-row align-items-center">
-                         	<a href="/board/content?num={{dto.board_id}}">
-                              <h3 class="mb-1">{{dto.board_title}} </h3>
-                            </a>  
-                         <span class="dots"></span>
-                         </div>
-                         <h4>{{dto.board_content}}</h4>
-                      </div>
-                  </div>
-                </div>
+                {% if dto.user_grade_id == 1 %}
+                <a class="nav-link" href="myReceiveCode">수령 코드 확인</a>
+                {% endif %}
+                {% if dto.user_grade_id == 2 %}
+                <a class="nav-link" href="../store/mypage">점주 페이지</a>
+                {% endif %}
             </div>
         </div>
+    </nav>
+    
+    <div class="container mt-4" id="layoutSidenav_content">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col"style="width:9%">Image.</th>
+                    <th scope="col"style="width:11%">Title.</th>
+                    <th scope="col"style="width:31%">Content.</th>
+                    <th scope="col"style="width:5%">Writer.</th>
+                    <th scope="col"style="width:11%">DATE.</th>
+                    <th scope="col"style="width:4%">Views.</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dto, image in dtos_and_images %}
+                <tr>
+                    <td>
+                        {% if dto.winboardimg_set.exists %}
+                        <a href="/board/content?num={{ dto.board_id }}">
+                            <img src="{{ image.url }}" class="rounded img-fluid" style="max-width: 100px; max-height: 100px;">
+                        </a>
+                        {% else %}
+                            <img src="{% static 'img/emptyimage.PNG' %}" class="rounded img-fluid" style="max-width: 100px; max-height: 100px;">
+                        {% endif %}
+                    </td>
+                    <td class="align-middle"><a href="/board/content?num={{ dto.board_id }}">{{ dto.board_title }}</a></td>
+                    <td class="align-middle"><a href="/board/content?num={{ dto.board_id }}">{{ dto.board_content }}</a></td>
+                    <td class="align-middle">{{ dto.user_id }}</td>
+                    <td class="align-middle">{{ dto.board_reg_time }}</td>
+                    <td class="align-middle">{{ dto.board_read_count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    {%endfor%}
-</div>
-
-
-
-
-
-
-
+</body>
 
 <style>
-
-	/*왼쪽에 MyPage 내용 고정시키는 코드 */
-	#sidebar-wrapper {
-		position:fixed;
-	    left: 50;
-	    top:250px;
-	    width: 300px; /* 원하는 너비 값으로 조정 */
-	    background-color: #ffffff; /* 배경색 설정 */
-	    border-right: 1px solid #dee2e6; /* 우측 경계선 설정 */
-	    overflow-y: auto; /* 내용이 넘칠 경우 스크롤바 추가 */
-	    z-index: 1000; /* 다른 요소 위에 표시하기 위한 z-index 값 설정 */
-	}
-	#layoutSidenav_content {
-			margin-left: 400px; /* 사이드바의 너비 + 여유 여백 만큼 설정 */
-	}
-	
+    /*왼쪽에 MyPage 내용 고정시키는 코드 */
+    #sidebar-wrapper {
+        position: fixed;
+        left: 50;
+        top: 250px;
+        width: 300px; /* 원하는 너비 값으로 조정 */
+        background-color: #ffffff; /* 배경색 설정 */
+        border-right: 1px solid #dee2e6; /* 우측 경계선 설정 */
+        overflow-y: auto; /* 내용이 넘칠 경우 스크롤바 추가 */
+        z-index: 1000; /* 다른 요소 위에 표시하기 위한 z-index 값 설정 */
+    }
+    #layoutSidenav_content {
+        margin-left: 400px; /* 사이드바의 너비 + 여유 여백 만큼 설정 */
+    }
 </style>
-{%endblock%}
 
-
+{% endblock %}

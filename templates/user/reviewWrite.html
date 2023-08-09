@@ -1,39 +1,138 @@
-{%load static%}
-{%csrf_token%}
-<link rel="stylesheet" type="text/css" href="{%static 'css/reviewWrite.css'%}">
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" rel="stylesheet">
-<script src="{%static 'js/jquery-3.6.4.js'%}"></script>
-<script src="{%static 'js/script_user.js'%}"></script>
+{% load static %}
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>리뷰작성</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+  <script src="{% static 'js/jquery-3.6.4.js' %}"></script>
+  <script src="{% static 'js/script_user.js' %}"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+    }
 
-<div class="formthree ptb-100">
-	<div class="container">
-	<div class="row">
-		<div class="col-md-8 col-md-offset-2">
-		<form method="post" action="reviewWrite" name="reviewwrite">
-		<input type="hidden" name="sell_id" value="{{dto.sell_id}}">
-			<div class="row">
-				<div class="col-md-6">
-					<div class="form-group">
-						<img src="{{dto.wine.wine_image}}" class="rounded img-fluid w-100 img-responsive">
-				    </div>
-				    <label><h5>{{dto.wine.wine_name}}({{dto.wine.wine_name_eng}}), {{dto.sell_price}}원</h5></label>
-				</div>
-				<div class="col-md-6">
-				    <div class="form-group">
-				        <label class="sr-only">rating</label>
-				        <input type="number" step="0.1" max="5" min="0.5" class="form-control" name="rating" id="ratingSix" placeholder="rating">
-					</div>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="sr-only">Message</label>
-				<textarea class="form-control" rows="7" placeholder="Write Review" name="content"></textarea>
-			</div>
-			<button type="submit" class="btn btn-primary" id="write">Write</button>
-		</form>
-		</div>
-	</div>
-	</div>
+    .page-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f8f9fa;
+    }
+
+    .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      max-width: 600px;
+    }
+
+    .card-header {
+      background-color: black; 
+      color: white;
+      text-align: right;
+      padding: 10px 20px;
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: white;
+    }
+
+    .card-body {
+      padding: 30px;
+    }
+
+    .card-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .wine-title {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .wine-subtitle {
+      font-size: 16px;
+      color: #6c757d;
+    }
+
+    .wine-image {
+      max-width: 150px;
+      height: 220px;
+    }
+
+    .rating-input {
+      font-size: 18px;
+    }
+
+    .review-textarea {
+      resize: vertical;
+      min-height: 150px;
+      font-size: 16px;
+    }
+
+    .write-button {
+      background-color: #28a745; 
+      color: #ffffff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 18px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .write-button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-container">
+  <div class="card">
+    <div class="card-header">
+      <button type="button" onclick="location='myPage'" class="btn-close">x</button>
+    </div>
+    <div class="card-body">
+      <h2 class="card-title">Write Your Own Review</h2>
+      <form method="post" action="reviewWrite" name="reviewwrite">
+        <input type="hidden" name="sell_id" value="{{dto.sell_id}}">
+        <div class="row">
+          <div class="col-md-6">
+            <h2 class="wine-title">{{dto.wine.wine_name}} ({{dto.wine.wine_name_eng}})</h2>
+            <p class="wine-subtitle">구매가격 : {{dto.sell_price}}원</p>
+            <div class="form-group">
+              <label class="sr-only">Rating</label>
+              <input type="number" step="0.1" max="5" min="0.5" class="form-control rating-input" name="rating" id="ratingSix" placeholder="Rating">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <img src="{{dto.wine.wine_image}}" class="wine-image rounded img-fluid" alt="Wine Image">
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="sr-only">Review</label>
+          <textarea class="form-control review-textarea" rows="7" placeholder="Write your review here" name="content"></textarea>
+        </div>
+        <button type="submit" class="write-button">SUBMIT</button>
+      </form>
+    </div>
+  </div>
 </div>
+
+</body>
+</html>
