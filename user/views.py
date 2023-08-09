@@ -12,12 +12,6 @@ import requests
 from Wining import settings
 from purchasing.usecase import decrypt_receive_code
 from store.usecase.pagination import db_preprocessing, pagenation
-from user.db_access.query_set import (
-    check_id,
-    check_login,
-    get_favorite_info,
-    insert_user_info,
-)
 from user.kakao_token_module import kakao_token
 from user.models import (
     WinUser,
@@ -79,19 +73,22 @@ class LoginView(View):
     def post(self, request):
         user_id = request.POST["user_id"]
         user_passwd = request.POST["user_passwd"]
-        result = check_login(user_id=user_id, is_kakao=False, user_passwd=user_passwd)
 
-        if result == 1:
-            request.session["memid"] = user_id
-            return redirect("myPage")
+        try:
+            dto = WinUser.objects.get(user_id=user_id)
+            user_grade = dto.user_grade.user_grade
 
-        elif result == -1:
-            message = "탈퇴한 회원입니다"
+            if user_passwd == dto.user_passwd:
+                if user_grade != -1:
+                    request.session["memid"] = user_id
+                    return redirect("myPage")
 
-        elif result == -2:
-            message = "입력하신 비밀번호가 다릅니다"
+                else:
+                    message = "탈퇴한 회원입니다"
 
-        elif result == -3:
+            else:
+                message = "입력하신 비밀번호가 다릅니다"
+        except ObjectDoesNotExist:
             message = "입력하신 아이디가 없습니다"
 
         template = loader.get_template("user/login.html")
@@ -106,30 +103,25 @@ class KakaoLogoutView(View):
     def get(self, request):
         REST_API_KEY = getattr(settings, "KAKAO_REST_API_KEY")
         LOGOUT_REDIRECT_URI = getattr(settings, "LOGOUT_REDIRECT_URI")
-
+        print("access_Token", request.session.get("access_Token", None))
         logout_url = (
             "https://kauth.kakao.com/oauth/logout?client_id="
             + REST_API_KEY
             + "&logout_redirect_uri="
             + LOGOUT_REDIRECT_URI
         )
-
         return redirect(logout_url)
 
 
 class LogoutView(View):
     def get(self, request):
         ACCESS_TOKEN = request.session.get("access_Token", None)
-
         if ACCESS_TOKEN is None:
             del request.session["memid"]
-
             return redirect("login")
-
         else:
             del request.session["access_Token"]
             del request.session["memid"]
-
             return redirect("login")
 
 
@@ -139,20 +131,16 @@ class LogoutView(View):
 class KaKaoLogin(View):
     def get(self, request, **kwargs):
         act = request.GET.get("act", None)
-
         if act is None:
             act = kwargs.get("act", None)
         REST_API_KEY = getattr(settings, "KAKAO_REST_API_KEY")
-
         if act == "login":
             KAKAO_REDIRECT_URI = getattr(settings, "KAKAO_REDIRECT_URI1")
-
         elif act == "regist":
             KAKAO_REDIRECT_URI = getattr(settings, "KAKAO_REDIRECT_URI2")
-
         elif act == "regstore":
             KAKAO_REDIRECT_URI = getattr(settings, "KAKAO_REDIRECT_URI3")
-
+        print(KAKAO_REDIRECT_URI)
         uri = (
             "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="
             + REST_API_KEY
@@ -171,29 +159,28 @@ class KakaoRedirectURI(View):
         KAKAO_REDIRECT_URI = getattr(settings, "KAKAO_REDIRECT_URI1")
 
         result = kakao_token(code=code, redirect_uri=KAKAO_REDIRECT_URI, is_store=0)
-
         if result["code"] == -1:
             return redirect("kakaoLoginRefresh", act="login")
-
         else:
             user_email = result["email"]
             min_age = result["min_age"]
-
-            if int(min_age) < 20:  # 미성년자 일 때
+            if int(min_age) < 20:
                 template = loader.get_template("user/return.html")
                 context = {"code": -1}
                 return HttpResponse(template.render(context, request))
 
-            else:  # 회원 정보 있는지 검증
-                check_result = check_login(user_id=user_email, is_kakao=True)
-
-                if check_result == -3 or check_result == -1:  # 회원 정보가 없거나 탈퇴 회원일 때
+            else:
+                login_info = WinUser.objects.filter(
+                    ~Q(user_grade=-1), user_email=user_email
+                ).values("user_id", "user_grade")
+                print(login_info.count())
+                if login_info.count() == 0:
                     template = loader.get_template("user/return.html")
                     context = {"code": -2}
                     return HttpResponse(template.render(context, request))
-
-                else:  # 로그인 성공
-                    request.session["memid"] = user_email
+                else:
+                    print(login_info)
+                    request.session["memid"] = login_info[0]["user_id"]
                     request.session["access_Token"] = result["access_token"]
                     return redirect("myPage")
 
@@ -205,6 +192,7 @@ class InputUserView(View):
 
     def get(self, request):
         code = request.GET.get("code", None)
+        print(code)
         KAKAO_REDIRECT_URI = getattr(settings, "KAKAO_REDIRECT_URI2")
 
         result = kakao_token(code=code, redirect_uri=KAKAO_REDIRECT_URI, is_store=0)
@@ -228,47 +216,39 @@ class InputUserView(View):
     def post(self, request):
         user_point = 0
         # default_grade = 1
-        try:
-            dto = WinUser(
-                user_id=request.POST["user_id"],
-                user_grade=WinUserGrade.objects.get(user_grade=1),
-                user_passwd=request.POST["user_passwd"],
-                user_name=request.POST["user_name"],
-                user_email=request.POST["user_email"],
-                user_tel=request.POST["user_tel"],
-                user_reg_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                user_point=user_point,
-            )
 
-            fdto = WinUserFavorite(
-                user=WinUser.objects.get(user_id=dto.user_id),
-                fav_wine_color=request.POST["color"],
-                fav_alc=request.POST["alc"],
-                fav_numbwith=request.POST["comp_num"],
-                fav_sweet=request.POST["sweet"],
-                fav_bitter=request.POST["bitter"],
-                fav_sour=request.POST["sour"],
-                fav_season=request.POST["season"],
-                fav_food=request.POST["food"],
-                fav_first_priority=request.POST["fav_first"],
-                fav_second_priority=request.POST["fav_second"],
-                fav_third_priority=request.POST["fav_third"],
-            )
+        dto = WinUser(
+            user_id=request.POST["user_id"],
+            user_grade=WinUserGrade.objects.get(user_grade=1),
+            user_passwd=request.POST["user_passwd"],
+            user_name=request.POST["user_name"],
+            user_email=request.POST["user_email"],
+            user_tel=request.POST["user_tel"],
+            user_reg_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            user_point=user_point,
+        )
+        dto.save()
 
-            try:
-                insert_user_info(user_info=dto, user_favorite_info=fdto)
+        fdto = WinUserFavorite(
+            user=WinUser.objects.get(user_id=dto.user_id),
+            fav_wine_color=request.POST["color"],
+            fav_alc=request.POST["alc"],
+            fav_numbwith=request.POST["comp_num"],
+            fav_sweet=request.POST["sweet"],
+            fav_bitter=request.POST["bitter"],
+            fav_sour=request.POST["sour"],
+            fav_season=request.POST["season"],
+            fav_food=request.POST["food"],
+            fav_first_priority=request.POST["fav_first"],
+            fav_second_priority=request.POST["fav_second"],
+            fav_third_priority=request.POST["fav_third"],
+        )
+        fdto.save()
 
-            except Exception as ex:
-                logger.error(ex)
-                return redirect("inputUserInfo")
+        # message = "회원가입에 성공했습니다"
+        # alert_script = f'<script>alert("{message}");</script>'
 
-            # message = "회원가입에 성공했습니다"
-            # alert_script = f'<script>alert("{message}");</script>'
-
-            return redirect("login")
-
-        except Exception:
-            return redirect("inputUserInfo")
+        return redirect("login")
 
 
 class InputStoreView(View):
@@ -301,26 +281,22 @@ class InputStoreView(View):
 
     def post(self, request):
         user_point = 0
-        try:
-            user_id = request.POST["user_id"]
-            # user_input =
-            dto = WinUser(
-                user_id=user_id,
-                user_grade=WinUserGrade.objects.get(user_grade=1),
-                user_passwd=request.POST["user_passwd"],
-                user_name=request.POST["user_name"],
-                user_email=request.POST["user_email"],
-                user_tel=request.POST["user_tel"],
-                user_reg_date=DateFormat(datetime.now()).format("Y-m-d h:i:s"),
-                user_point=user_point,
-            )
-            insert_user_info(user_info=dto, is_store=True)
-            request.session["temp_id"] = user_id
+        user_id = request.POST["user_id"]
+        # user_input =
+        WinUser(
+            user_id=user_id,
+            user_grade=WinUserGrade.objects.get(user_grade=1),
+            user_passwd=request.POST["user_passwd"],
+            user_name=request.POST["user_name"],
+            user_email=request.POST["user_email"],
+            user_tel=request.POST["user_tel"],
+            user_reg_date=DateFormat(datetime.now()).format("Y-m-d h:i:s"),
+            user_point=user_point,
+        ).save()
+        request.session["temp_id"] = user_id
 
-            # return redirect("/store/store-registration")
-            return redirect("storeRegistration")
-        except Exception:
-            return redirect("inputStore")
+        # return redirect("/store/store-registration")
+        return redirect("storeRegistration")
 
         # 로그인도 회원가입도 되지 않았을 때 가입 시 입력 아이디를 세션에 저장한다.
         # redirect로 이동한다. context에 id를 넣어 보내면 주소가 이동하지 않고 redirect 를 쓰면 id를 보낼 수 없다.
@@ -333,8 +309,12 @@ class ConfirmIdView(View):
         user_id = request.GET["user_id"]
         result = 0
 
-        result = check_id(user_id=user_id)
-        context = {"result": result["result"], "user_id": user_id}
+        try:
+            WinUser.objects.get(user_id=user_id)
+            result = 1
+        except ObjectDoesNotExist:
+            result = 0
+        context = {"result": result, "user_id": user_id}
 
         return HttpResponse(template.render(context, request))
 
@@ -355,16 +335,17 @@ class DeleteView(View):
         user_id = request.POST["user_id"]
         user_passwd = request.POST["user_passwd"]
 
-        dto = check_id(user_id=user_id)["user_info"]
+        dto = WinUser.objects.get(user_id=user_id)
 
         if user_passwd == dto.user_passwd:
             w_user_grade = WinUserGrade.objects.get(user_grade=-1)
-            dto.user_grade.user_grade = -1
+            dto.user_grade = w_user_grade
             dto.save()
 
             ACCESS_TOKEN = request.session.get(
                 "access_Token", None
             )  # access token = none이면 login으로 리다이렉트 하거나 refresh 토큰으로 업데이트해야함
+            print("access_Token", request.session.get("access_Token", None))
 
             if ACCESS_TOKEN is None:
                 del request.session["memid"]
@@ -399,20 +380,19 @@ class ModifyUserView(View):
     def get(self, request):
         template = loader.get_template("user/modifyUser.html")
         user_id = request.session.get("memid")
-        dto = check_id(user_id=user_id)["user_info"]
-
+        dto = WinUser.objects.get(user_id=user_id)
+        print(dto.user_grade_id)
         if dto.user_grade_id == 1:
-            fdto = get_favorite_info(user_id=user_id)
-
-            if fdto is None:
-                context = {"user_id": user_id, "dto": dto}
-
-            else:
-                context = {"user_id": user_id, "dto": dto, "fdto": fdto}
+            try:
+                fdto = WinUserFavorite.objects.get(user_id=user_id)
+            except WinUserFavorite.DoesNotExist:
+                fdto = None
+            context = {"user_id": user_id, "dto": dto, "fdto": fdto}
+        else:
+            context = {"user_id": user_id, "dto": dto}
 
         return HttpResponse(template.render(context, request))
 
-    # 여기까지 코드 정리 진행됨 - 집 가서 다시 보기
     def post(self, request):
         user_id = request.session.get("memid")
         dto = WinUser.objects.get(user_id=user_id)
@@ -508,7 +488,7 @@ class ReviewListView(View):
         template = loader.get_template("user/reviewList.html")
         user_id = request.session.get("memid")
         dtos = WinReview.objects.filter(user_id=user_id).order_by("-review_reg_time")
-
+        print(dtos)
         context = {"dtos": dtos}
 
         return HttpResponse(template.render(context, request))
@@ -559,6 +539,7 @@ class PurchaseDetailView(View):
             purchase_details = WinPurchaseDetail.objects.filter(purchase_id=purchase)
 
             for purchase_detail in purchase_details:
+                wine_id = purchase_detail.sell.wine.wine_id
                 wine_name = purchase_detail.sell.wine.wine_name
                 wine_name_eng = purchase_detail.sell.wine.wine_name_eng
                 wine_image = purchase_detail.sell.wine.wine_image
@@ -572,6 +553,7 @@ class PurchaseDetailView(View):
 
                 dtos.append(
                     {
+                        "wine_id": wine_id,
                         "wine_name": wine_name,
                         "wine_name_eng": wine_name_eng,
                         "wine_image": wine_image,
@@ -583,6 +565,9 @@ class PurchaseDetailView(View):
                     }
                 )
 
+        for dto in dtos:
+            print(dto['wine_id'])        
+                
         context = {"dtos": dtos, "reviews": reviews}
 
         return HttpResponse(template.render(context, request))
@@ -679,24 +664,26 @@ class AddPointView(View):
 
 class SearchUserAccountAPI(APIView):
     def get(self, request):
-        user_id = request.session.get("memid")
-        # user_id = "test9090"
+        # user_id = request.session.get("memid")
+        user_id = "test6666"
 
         try:
             user_account_info = WinUserAccount.objects.get(user_id=user_id)
-            account_default_setting = user_account_info.user_account_default
+            account_default_setting = user_account_info.get(
+                "user_account_default", None
+            )
 
             if account_default_setting == 1:
-                user_account = {"user_account": user_account_info.user_account1}
-                user_account["user_account_id"] = user_account_info.user_account_id
+                user_account = {"user_account": user_account_info["user_account1"]}
+                user_account["user_account_id"] = user_account_info["user_account_id"]
 
             elif account_default_setting == 2:
-                user_account = {"user_account": user_account_info.user_account2}
-                user_account["user_account_id"] = user_account_info.user_account_id
+                user_account = {"user_account": user_account_info["user_account2"]}
+                user_account["user_account_id"] = user_account_info["user_account_id"]
 
             elif account_default_setting == 3:
-                user_account = {"user_account": user_account_info.user_account3}
-                user_account["user_account_id"] = user_account_info.user_account_id
+                user_account = {"user_account": user_account_info["user_account3"]}
+                user_account["user_account_id"] = user_account_info["user_account_id"]
 
         except ObjectDoesNotExist as ex:
             logger.info(ex)
