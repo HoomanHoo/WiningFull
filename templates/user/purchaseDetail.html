@@ -62,31 +62,25 @@
 		{%for dto in dtos%}
 		<tr>
 			<td>
-				<a href="/detail/winedetail?wine_id={{dto.wine_id}}">
-					<img src="{{dto.wine_image}}" width="77" height="100">
-				</a>
+				<img src="{{dto.wine_image}}" width="77" height="100">
 			</td>
-            <td class="align-middle">
-               <a href="/detail/winedetail?wine_id={{dto.wine_id}}">{{dto.wine_name}}<br>
+            <td>
+               <a href="/detail/winedetail?wine_id={{wine_image.wine.wine_id}}">{{dto.wine_name}}<br>
                {{dto.wine_name_eng}}</a>
             </td>
-            <td class="align-middle">
+            <td>
             	{{dto.purchase_price}}원 결제
             </td>
-			<td class="text-center align-middle">
+			<td>
 				{{dto.purchase_number}}
 			</td>
-			<td  class="align-middle">
+			<td>
 				{%if dto.sell_id not in reviews and dto.purchase_det_state == 2 %}
-					<button type="button" onclick="location.href='reviewWrite?sell_id={{dto.sell_id}}'" class="btn btn-danger">
-						리뷰쓰기
-					</button>				
+					<button type="button" onclick="location.href='reviewWrite?sell_id={{dto.sell_id}}'"><i class="icon-cart-add mr-2"></i>리뷰 작성</button>
 				{% elif dto.sell_id not in reviews and dto.purchase_det_state != 2 %}
 					수령 코드 승인 후 리뷰를 작성할 수 있습니다
 				{%else%}
-					<button type="button" class="btn btn-dark">
-						작성완료
-					</button>
+					리뷰 작성 완료
 				{%endif%}
 			</td>
 		</tr>
@@ -116,29 +110,7 @@
 	#layoutSidenav_content {
 			margin-left: 400px; /* 사이드바의 너비 + 여유 여백 만큼 설정 */
 	}
-  .write-button {
-    background-color: #ffc107; /* 변경할 색상 */
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    font-size: 18px;
-    border-radius: 5px;
-    cursor: pointer;
-    display: inline-block;
-    transition: background-color 0.3s, transform 0.2s;
-  }
-
-  .write-button:before {
-    content: '\f044'; /* FontAwesome 아이콘 코드 */
-    font-family: 'FontAwesome';
-    font-size: 18px;
-    margin-right: 5px;
-  }
-
-  .write-button:hover {
-    background-color: #e0a800; /* 변경할 hover 색상 */
-    transform: scale(1.05);
-  }
+	
 </style>
 
 

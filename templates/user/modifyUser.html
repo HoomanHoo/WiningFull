@@ -34,7 +34,7 @@
         
        	footer {
             text-align: center;
-            padding: 33px;
+            padding: 3px;
             background-color: black;
             color: #ffffff;
         }
@@ -42,7 +42,6 @@
         footer p {
             font-size: 90%;
             margin: 4px;
-            padding: 3px;
         }
     </style>
 </head>
@@ -86,19 +85,10 @@
 						<form method="post" action="modifyUser" name="modifyform">
 							<input type="hidden" name="user_id" value="{{dto.user_id}}">
 		    
+		    
 						        <div class="form-row">
 						            <div class="form-group col-md-12">
-						                <label for="inputName">Your Name</label>
-						                <br>
-						                <input type="text" class="form-control" id="user_repasswd" value="{{dto.user_name}}" name="user_repasswd" readonly>
-						            </div>
-						        </div>
-						        <div class="form-row">
-						            <div class="form-group col-md-12">
-						                <label for="inputName">Your ID</label>		    
-								        <div class="form-group">
-								            <input type="text" name="writer" class="form-control input-small" value="{{ request.session.memid }}" readonly>
-								        </div>
+						                <label for="inputName">Your ID</label>: {{dto.user_id}}
 						            </div>
 						            <div class="form-group col-md-12">
 						                <label for="inputName">Your Password</label>
@@ -109,6 +99,11 @@
 						            <div class="form-group col-md-12">
 						                <label for="inputName">Your Confirm Password</label>
 						                <input type="password" class="form-control" id="user_repasswd" value="{{dto.user_passwd}}" name="user_repasswd">
+						            </div>
+						            <div class="form-group col-md-12">
+						                <label for="inputName">Your Name</label>
+						                <br>
+						                {{dto.user_name}}
 						            </div>
 						        </div>
 						        <div class="form-row">

@@ -4,12 +4,16 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
+		<title> Wining </title>
+		<!-- ♠ bootstrap 적용 -->
 		
 		<style>
+
+			
 			.search-form-container {
 			    position: relative;
-			    margin-bottom: 30px; /* 입력 창 아래 여백 추가 */
 			}
+			
 
 			.wining-image {
                 width: 300px; /* 이미지의 너비 조절 */
@@ -19,25 +23,8 @@
                 left: 50%; /* 가운데로 정렬 */
                 transform: translateX(-50%); /* 가운데로 정렬 */
             }
-	        .bottom-container {
-	            text-align: center;
-	            margin-top: 300px!important; /* 지도 위 여백 추가 */
-	        }
-		    .map-container {
-		        width: 50%;
-		        height: 400px;
-		        margin: 0 auto;
-		        border: 2px solid #ddd;
-		        border-radius: 10px;
-		        overflow: hidden;
-		    }
-		
-		    #map {
-		        width: 100%;
-		        height: 100%;
-		    }
+            
 		</style>
-		
 		<script src="/static/js/jquery-3.6.4.js"></script>
 		<script src="/static/js/script_search.js"></script>
 		
@@ -47,14 +34,15 @@
 		
 		
 		{% block select %}
+		
 		<br><br>						
+
+		
 		{% endblock %}
-		
-		
 		<br><br>
 		{% block input %}								<!-- 검색 입력 창 -->
 		<!-- 검색어 입력하고 submit 하면 "http://localhost:8000/search/searchbynamelist" -->
-		<div class="center-container">		
+		<div  class="center-container">		
 			<div id="rootDiv" class="search-form-container">
 				<img src="{% static 'logo1.png' %}" alt="logo1" class="wining-image">
 				<div class="search-form" style="text-align: center">
@@ -77,37 +65,13 @@
 		</div>
 		<script type="module" src="/static/js/searchKeyInputScript.js" defer></script>
 		{% endblock %}
-	
-		
-			{% block list %}
-			
-			
-		    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-		     
-		    <div class="bottom-container">
-		    	<div class="map-container">
-		    		<div id="map" style="width:100%;height:400px;"></div>
-		    	</div>
-				
-				<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=	cd247f915cddf375fc8e5421bd160e98"></script>
-				<script>
-					var container = document.getElementById('map');
-					var options = {
-							center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울의 좌표로 변경
-						level: 3
-					};
-			
-					var map = new kakao.maps.Map(container, options);
-				</script>
-		   </div>
- 
-		
-			{% endblock %}	
 
+		{% block list %}
+		
+		{% endblock %}
 
 
 
 
 	</body>
-	
 </html>
