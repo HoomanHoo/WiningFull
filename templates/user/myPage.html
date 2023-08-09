@@ -53,7 +53,7 @@
                                 <div class="card bg-primary text-white mb-4">
                                     <div class="card-body">{{dto.user_point}} Point</div>
                                     <div class="card-footer d-flex align-items-center justify-content-between">
-                                    	<a class="small text-white" href="#" id="showChargeForm">충전하기</a>
+                                    	<a class="small text-white" href="addPoint" id="showChargeForm">충전하기</a>
                                         <a class="small text-white" href="addPointHis">더보기 > </a>
                                         <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                                     </div>
@@ -177,7 +177,7 @@
         
         
         <!--page 넘어가지 않고  myPage내부에서 충전 바로 되도록 설정 -->
-        <script>
+        {% comment %} <script>
 			document.addEventListener("DOMContentLoaded", function() {
 			    var showChargeFormButton = document.getElementById("showChargeForm");
 			    var chargeForm = document.getElementById("chargeForm");
@@ -186,7 +186,7 @@
 			        chargeForm.style.display = "block";
 			    });
 			});
-		</script>
+		</script> {% endcomment %}
 		
     </body>
 </html>

@@ -13,7 +13,14 @@ from Wining import settings
 from purchasing.usecase import decrypt_receive_code
 from store.usecase.pagination import db_preprocessing, pagenation
 from user.kakao_token_module import kakao_token
-from user.models import WinUser, WinUserGrade, WinUserFavorite, WinReview, WinPointHis
+from user.models import (
+    WinUser,
+    WinUserAccount,
+    WinUserGrade,
+    WinUserFavorite,
+    WinReview,
+    WinPointHis,
+)
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.dateformat import DateFormat
 from datetime import datetime
@@ -36,7 +43,13 @@ from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
-from rest_framework import serializers
+
+from user.serializers.serializers import (
+    AccountPatchSerializer,
+    AccountSerializer,
+    SelectAccountSerializer,
+    WinUserAccountSerializer,
+)
 
 logger = logging.getLogger("user")
 
@@ -102,9 +115,7 @@ class KakaoLogoutView(View):
 
 class LogoutView(View):
     def get(self, request):
-        ACCESS_TOKEN = request.session.get(
-                "access_Token", None
-            )
+        ACCESS_TOKEN = request.session.get("access_Token", None)
         if ACCESS_TOKEN is None:
             del request.session["memid"]
             return redirect("login")
@@ -336,7 +347,6 @@ class DeleteView(View):
             )  # access token = none이면 login으로 리다이렉트 하거나 refresh 토큰으로 업데이트해야함
             print("access_Token", request.session.get("access_Token", None))
 
-           
             if ACCESS_TOKEN is None:
                 del request.session["memid"]
 
@@ -346,13 +356,13 @@ class DeleteView(View):
                     "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
                     "Authorization": f"Bearer {ACCESS_TOKEN}",
                 }
-    
+
                 logout_url = "https://kapi.kakao.com/v1/user/unlink"
-    
+
                 requests.post(logout_url, headers=request_header)
                 del request.session["access_Token"]
                 del request.session["memid"]
-    
+
                 return redirect("login")
         else:
             template = loader.get_template("user/delete.html")
@@ -450,14 +460,13 @@ class MyPageView(View):
         user_grade = dto.user_grade_id
 
         wine_images = []
-        
-        
+
         for v in detail_v:
             wine_images.append([v.wine.wine_image, v.wine.wine_id])
-        
-        print(detail_v)    
+
+        print(detail_v)
         print(wine_images)
-            
+
         if memid:
             context = {
                 "memid": memid,
@@ -502,11 +511,11 @@ class ReviewWriteView(View):
         user_id = request.session.get("memid")
         sell_id = request.POST.get("sell_id")
         dto = WinReview(
-            user = WinUser.objects.get(user_id=user_id),
-            sell_id = sell_id,
-            review_content = request.POST["content"],
-            review_score = request.POST["rating"],
-            review_reg_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            user=WinUser.objects.get(user_id=user_id),
+            sell_id=sell_id,
+            review_content=request.POST["content"],
+            review_score=request.POST["rating"],
+            review_reg_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         )
         dto.save()
 
@@ -550,7 +559,7 @@ class PurchaseDetailView(View):
                         "purchase_number": purchase_number,
                         "purchase_time": purchase_time,
                         "sell_id": sell_id,
-                        "purchase_det_state" : purchase_det_state,
+                        "purchase_det_state": purchase_det_state,
                     }
                 )
 
@@ -569,25 +578,19 @@ class MyBoardView(View):
         print(dtos.count())
 
         board_images = []
-        
 
         for dto in dtos:
             images = WinBoardImg.objects.filter(board=dto)
 
             if images.exists():
                 board_images.append(images[0].board_image)
-                
-                
+
             else:
                 board_images.append("")
-                
 
-        
-        
         dtos_and_images = zip(dtos, board_images)
-            
+
         for dto in dtos:
-            
             print(dto.board_reg_time)
             print(dto.board_read_count)
             print(dto.board_title)
@@ -606,11 +609,15 @@ class MyCommentView(View):
     def get(self, request):
         template = loader.get_template("user/myComment.html")
         user_id = request.session.get("memid")
-        dtos = WinComment.objects.select_related("board").filter(user_id=user_id).order_by("-comment_reg_time")
-        
+        dtos = (
+            WinComment.objects.select_related("board")
+            .filter(user_id=user_id)
+            .order_by("-comment_reg_time")
+        )
+
         for dto in dtos:
             print(dto.board.board_title)
-        
+
         context = {"dtos": dtos}
 
         return HttpResponse(template.render(context, request))
@@ -640,9 +647,9 @@ class AddPointView(View):
         dto.save()
 
         pdto = WinPointHis(
-            user = WinUser.objects.get(user_id=dto.user_id),
-            point_reg = datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            point_add = chargepoint,
+            user=WinUser.objects.get(user_id=dto.user_id),
+            point_reg=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            point_add=chargepoint,
         )
 
         pdto.save()
@@ -652,23 +659,31 @@ class AddPointView(View):
 
 class SearchUserAccountAPI(APIView):
     def get(self, request):
-        user_id = request.session.get("memid")
-        # user_id = "test9090"
-        user_account_info = WinUserAccount.objects.filter(user_id=user_id).values()[0]
+        # user_id = request.session.get("memid")
+        user_id = "test6666"
 
-        account_default_setting = user_account_info["user_account_default"]
+        try:
+            user_account_info = WinUserAccount.objects.get(user_id=user_id)
+            account_default_setting = user_account_info.get(
+                "user_account_default", None
+            )
 
-        if account_default_setting == 1:
-            user_account = {"user_account": user_account_info["user_account1"]}
+            if account_default_setting == 1:
+                user_account = {"user_account": user_account_info["user_account1"]}
+                user_account["user_account_id"] = user_account_info["user_account_id"]
 
-        elif account_default_setting == 2:
-            user_account = {"user_account": user_account_info["user_account2"]}
+            elif account_default_setting == 2:
+                user_account = {"user_account": user_account_info["user_account2"]}
+                user_account["user_account_id"] = user_account_info["user_account_id"]
 
-        elif account_default_setting == 3:
-            user_account = {"user_account": user_account_info["user_account3"]}
+            elif account_default_setting == 3:
+                user_account = {"user_account": user_account_info["user_account3"]}
+                user_account["user_account_id"] = user_account_info["user_account_id"]
 
-        elif account_default_setting == "" or account_default_setting is None:
+        except ObjectDoesNotExist as ex:
+            logger.info(ex)
             user_account = {"user_account": "결제 수단이 등록되지 않았습니다"}
+            user_account["user_account_id"] = -1
 
         serialized = SelectAccountSerializer(user_account)
         json_result = JSONRenderer().render(serialized.data)
@@ -676,28 +691,70 @@ class SearchUserAccountAPI(APIView):
         return Response(json_result)
 
 
-class SelectAccountSerializer(serializers.Serializer):
-    user_account = serializers.CharField()
-
-
 class UpdateUserDefaultAccountAPI(APIView):
-    def get(self, request):
-        user_id = request.session.get("memid")
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, **kwargs):
+        account_id = kwargs.get("account_id", None)
         # user_id = "test9090"
-        user_account_info = WinUserAccount.objects.filter(user_id=user_id).values(
-            "user_account1", "user_account2", "user_account3"
-        )[0]
+        user_account_info = WinUserAccount.objects.filter(
+            user_account_id=account_id
+        ).values("user_account1", "user_account2", "user_account3")[0]
 
         serialized = AccountSerializer(user_account_info)
         json_result = JSONRenderer().render(serialized.data)
 
         return Response(json_result)
 
+    def patch(self, request, *args, **kwargs):
+        select_account = request.data.get("selectedAccount")
+        account_id = kwargs.get("account_id", None)
+        data = {"user_account_id": account_id, "user_account_default": select_account}
 
-class AccountSerializer(serializers.Serializer):
-    user_account1 = serializers.CharField()
-    user_account2 = serializers.CharField()
-    user_account3 = serializers.CharField()
+        try:
+            instance = WinUserAccount.objects.get(pk=account_id)
+
+            serializer = AccountPatchSerializer(
+                instance=instance, data=data, partial=True
+            )
+            if serializer.is_valid():
+                update_data = serializer.save()
+                account_default_setting = update_data.user_account_default
+                if account_default_setting == 1:
+                    user_account = {"user_account": update_data.user_account1}
+
+                elif account_default_setting == 2:
+                    user_account = {"user_account": update_data.user_account2}
+
+                elif account_default_setting == 3:
+                    user_account = {"user_account": update_data.user_account3}
+
+                user_account["user_account_id"] = update_data.user_account_id
+
+                serialized = SelectAccountSerializer(user_account)
+                json_result = JSONRenderer().render(serialized.data)
+
+                return Response(json_result)
+
+        except ObjectDoesNotExist as ex:
+            logger.info(ex)
+            user_account = {"user_account": "결제 수단이 등록되지 않았습니다"}
+            updated_serialize = WinUserAccountSerializer(instance)
+            json_result = JSONRenderer().render(updated_serialize.data)
+            return Response(json_result, status=500)
+
+
+class InsertPaymentMethodView(View):
+    def get(self, request):
+        template = loader.get_template("user/paymentMethod.html")
+        context = {}
+        return HttpResponse(template.render(context, request))
+
+
+class InsertPaymentMethodAPI(APIView):
+    pass
 
 
 class AddPointHisView(View):

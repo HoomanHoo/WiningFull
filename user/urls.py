@@ -23,10 +23,22 @@ urlpatterns = [  # init_url == "http://localhost:8000/user/login"
     path("kakaologin/<str:act>", views.KaKaoLogin.as_view(), name="kakaoLoginRefresh"),
     path("inputUser", views.KakaoRedirectURI.as_view(), name="inputUser"),
     path("templogin", views.TempLoginView.as_view(), name="tempLogin"),
-    path("account", views.SearchUserAccountAPI.as_view(), name="searchUserAccount"),
     path(
-        "updatedefaultaccount",
+        "account",
+        views.SearchUserAccountAPI.as_view(),
+        name="searchUserAccount",
+    ),
+    path(
+        "account/<int:account_id>",
         views.UpdateUserDefaultAccountAPI.as_view(),
         name="updateDefaultAccount",
+    ),
+    path(
+        "payment-method", views.InsertPaymentMethodView.as_view(), name="paymentMethod"
+    ),
+    path(
+        "payment-method-api",
+        views.InsertPaymentMethodAPI.as_view(),
+        name="paymentMethodAPI",
     ),
 ]
