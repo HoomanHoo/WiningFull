@@ -32,10 +32,10 @@
                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="reviewList">리뷰관리</a>
                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="purchaseDetail">구매내역</a>
                 
-                {% if dto.user_grade_id == 1 %}
+                {% if rdto.user_grade_id == 1 %}
                 <a class="nav-link" href="myReceiveCode">수령 코드 확인</a>
                 {% endif %}
-                {% if dto.user_grade_id == 2 %}
+                {% if rdto.user_grade_id == 2 %}
                 <a class="nav-link" href="../store/storeMyPage">점주 페이지</a>
                 {% endif %}
                </div>
@@ -48,6 +48,8 @@
 <div class="container" id="layoutSidenav_content" >
     <div class="row justify-content-center">
         <div class="col-md-10">
+        	<br><h2>내가 작성한 Review.</h2>
+           	<h5><br>총 {{review_c}}개의 리뷰를 작성했습니다<br></h5>
             <table class="table">
                 <thead>
                     <tr>
