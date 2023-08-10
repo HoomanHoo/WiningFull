@@ -50,6 +50,7 @@ from user.serializers.serializers import (
     SelectAccountSerializer,
     WinUserAccountSerializer,
 )
+from user.db_access.query_set import check_id
 
 logger = logging.getLogger("user")
 
@@ -339,7 +340,9 @@ class DeleteView(View):
     def get(self, request):
         template = loader.get_template("user/delete.html")
         user_id = request.session.get("memid")
-        context = {"user_id": user_id}
+        ddto = check_id(user_id=user_id)["user_info"]
+        
+        context = {"user_id": user_id, "ddto":ddto}
 
         return HttpResponse(template.render(context, request))
 
@@ -393,6 +396,7 @@ class ModifyUserView(View):
         template = loader.get_template("user/modifyUser.html")
         user_id = request.session.get("memid")
         dto = WinUser.objects.get(user_id=user_id)
+        
         print(dto.user_grade_id)
         if dto.user_grade_id == 1:
             try:
@@ -500,8 +504,9 @@ class ReviewListView(View):
         template = loader.get_template("user/reviewList.html")
         user_id = request.session.get("memid")
         dtos = WinReview.objects.filter(user_id=user_id).order_by("-review_reg_time")
+        rdto = check_id(user_id=user_id)["user_info"]
 
-        context = {"dtos": dtos}
+        context = {"dtos": dtos, "rdto": rdto}
 
         return HttpResponse(template.render(context, request))
 
@@ -538,6 +543,7 @@ class PurchaseDetailView(View):
     def get(self, request):
         template = loader.get_template("user/purchaseDetail.html")
         user_id = request.session.get("memid")
+        pdto = check_id(user_id=user_id)["user_info"]
         # dtos = WinPurchase.objects.filter(user_id = user_id)
         purchases = WinPurchase.objects.filter(user_id=user_id).order_by(
             "-purchase_time"
@@ -575,7 +581,7 @@ class PurchaseDetailView(View):
                     }
                 )
 
-        context = {"dtos": dtos, "reviews": reviews}
+        context = {"dtos": dtos, "reviews": reviews, "pdto" : pdto}
 
         return HttpResponse(template.render(context, request))
 
@@ -584,6 +590,8 @@ class MyBoardView(View):
     def get(self, request):
         template = loader.get_template("user/myBoard.html")
         user_id = request.session.get("memid")
+        bdto = check_id(user_id=user_id)["user_info"]
+        
         dtos = WinBoard.objects.filter(user_id=user_id).order_by("-board_reg_time")
 
         print(dtos)
@@ -612,6 +620,7 @@ class MyBoardView(View):
         context = {
             "dtos_and_images": dtos_and_images,
             "user_id": user_id,
+            "bdto" : bdto,
         }
 
         return HttpResponse(template.render(context, request))
@@ -621,6 +630,7 @@ class MyCommentView(View):
     def get(self, request):
         template = loader.get_template("user/myComment.html")
         user_id = request.session.get("memid")
+        cdto = check_id(user_id=user_id)["user_info"]
         dtos = (
             WinComment.objects.select_related("board")
             .filter(user_id=user_id)
@@ -630,7 +640,7 @@ class MyCommentView(View):
         for dto in dtos:
             print(dto.board.board_title)
 
-        context = {"dtos": dtos}
+        context = {"dtos": dtos, "cdto" : cdto}
 
         return HttpResponse(template.render(context, request))
 

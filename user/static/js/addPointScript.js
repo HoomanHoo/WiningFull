@@ -85,10 +85,6 @@ const addPoint = Vue.createApp({
             location.href = "payment-method";
         }
 
-        const back = () => {
-            location.href = "myPage";
-        }
-
 
         Vue.onMounted(() => {
             const url = "account"
@@ -113,7 +109,6 @@ const addPoint = Vue.createApp({
             show,
             accountList,
             userAccountId,
-            back,
             invisible,
             selectAccount,
             clickDecidedValue,

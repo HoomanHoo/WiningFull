@@ -31,60 +31,52 @@
 	                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="reviewList">리뷰관리</a>
 	                   <a class="list-group-item list-group-item-action list-group-item-light p-3" href="purchaseDetail">구매내역</a>
 	
-		                {% if dto.user_grade_id == 1 %}
+		                {% if cdto.user_grade_id == 1 %}
 		                <a class="nav-link" href="myReceiveCode">수령 코드 확인</a>
 		                {% endif %}
-		                {% if dto.user_grade_id == 2 %}
+		                {% if cdto.user_grade_id == 2 %}
 		                <a class="nav-link" href="../store/mypage">점주 페이지</a>
 		                {% endif %}
 	               </div>
 	    </div>
    </nav>
 
-<div class="container mt-4" id="layoutSidenav_content">
-	{%for dto in dtos%}
-    <div class="card p-3">
-        <div class="row">
-        <div class="col-md-8">
-	        <div class="mt-2">
-		       	<div class="d-flex flex-row mt-3">
-	                      {% if dto.winboardimg_set.exists %} 
-			              <div class="position-relative snipimage">
-			                프로필이미지 보여질 예정
-			              </div>
-                          {% else %} <!-- 프로필이미지가 없는 경우에 공백이미지 -->
-                          <div class="position-relative snipimage">
-                          	<img src="{% static 'img/emptyimage.PNG' %}" class="rounded img-fluid w-100 img-responsive" style="max-width: 300px; max-height: 300px;">
-                          </div>
-                          {% endif %}
-				<div class="ms-2 d-flex flex-column">
-				
-					<div class="d-flex flex-row align-items-center">
-						<h6>{{dto.comment_reg_time}}</h6>
-						<span class="dots"></span>
-					</div>
-				
-					<div class="d-flex flex-row align-items-center">
-						<h6>{{dto.board.board_title}}</h6>
-						<span class="dots"></span>
-					</div>
-				
-					<h4>
-					<span class="days-ago"> 내용 : 
-				  		<a href="../board/content?num={{dto.board.board_id}}">  
-							{{dto.comment_content}}
-						</a>
-					</span>
-					</h4>
-					
-				</div>
-		       	</div>
-	        </div>
-        </div>
-        </div>
+
+
+    <div class="container mt-4" id="layoutSidenav_content">
+    	<h2>내가 작성한 Comment.</h2>
+    	<h5><br>총 N개의 댓글을 작성했습니다<br></h5>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col"style="width:5%">Board No.</th>
+                    <th scope="col"style="width:27%">Content.</th>
+                    <th scope="col"style="width:5%">Writer.</th>
+                    <th scope="col"style="width:11%">DATE.</th>
+                </tr>
+            </thead>
+            
+            <tbody>
+            {%for dto in dtos %}
+                <tr>
+                	<td>
+                		<a href="/board/content?num={{ dto.board_id }}">{{dto.board_id}}</a>
+                	</td>
+                    <td>
+                    	<a href="/board/content?num={{ dto.board_id }}">{{dto.comment_content}}</a>
+                    </td>
+					<td>
+						{{ dto.user_id }}
+					</td>
+                    <td>
+                    	{{dto.comment_reg_time}}
+                    </td>
+                </tr>
+            {%endfor%}
+            </tbody>
+        </table>
     </div>
-    {%endfor%}
-</div>
+</body>
 
 <style>
 

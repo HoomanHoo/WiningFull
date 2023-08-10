@@ -27,5 +27,5 @@ urlpatterns = [
     path("cart", views.AddPickListView.as_view(), name="addCartList"),
     path("cart/<int:cart_id>", views.PickListView.as_view(), name="cartList"),
     path("order", views.OrderPageView.as_view(), name="orderPage"),
-    # path("remove-buy-list", views.RemoveBuyList.as_view(), name="removeBuyList"),
+    #path("remove-buy-list", views.RemoveBuyList.as_view(), name="removeBuyList"),
 ]
