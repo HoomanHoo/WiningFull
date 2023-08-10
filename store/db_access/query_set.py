@@ -119,6 +119,11 @@ def delete_product(wine_id: str, user_id: str):
     )
 
 
+def delete_user_info(user_id):
+    user_info = WinUser.objects.filter(user_id=user_id)
+    user_info.delete()
+
+
 @transaction.atomic
 def delete_store_info(store_id: str) -> None:
     store_url = WinStoreUrl.objects.filter(store_id=store_id)

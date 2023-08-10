@@ -17,6 +17,7 @@ from store.db_access.query_set import (
     PageSerializer,
     ProductListSerializer,
     PurchaseDetailSerializer,
+    delete_user_info,
     get_product_list,
     get_reviews_by_seller,
     insert_store_info,
@@ -79,26 +80,32 @@ class StoreRegistrationView(View):
         store_reg_num = request.POST.get("storeRegNum", None)
         store_email = request.POST.get("storeEmail")
         store_map_url = request.POST.get("storeMapUrl", None)
+        store_regist = request.POST.get("btnStoreRegist", None)
+        back = request.POST.get("btnBack", None)
 
         store_address = main_address + "@" + detail_address
         # 파이썬에서도 정규식 검증하고 db insert하기
+        if store_regist:
+            try:
+                insert_store_info(
+                    user_id=user_id,
+                    store_address=store_address,
+                    store_name=store_name,
+                    store_reg_num=store_reg_num,
+                    store_email=store_email,
+                    store_map_url=store_map_url,
+                )
 
-        try:
-            insert_store_info(
-                user_id=user_id,
-                store_address=store_address,
-                store_name=store_name,
-                store_reg_num=store_reg_num,
-                store_email=store_email,
-                store_map_url=store_map_url,
-            )
+            except DatabaseError as ex:
+                logger.error(ex)
+                redirect("errorhandling:storeError")
 
-        except DatabaseError as ex:
-            logger.error(ex)
-            redirect("errorhandling:storeError")
+            logger.info(f"{user_id}: store_name: {store_name} StoreRegistrationView")
+            return redirect("productAddition")
 
-        logger.info(f"{user_id}: store_name: {store_name} StoreRegistrationView")
-        return redirect("productAddition")
+        elif back:
+            delete_user_info(user_id=user_id)
+            return redirect("inputStore")
 
     # insert_store_info 라는 함수를 정의하여 사용했다.
 
