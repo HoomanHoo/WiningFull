@@ -9,40 +9,48 @@ const background = Vue.createApp({
         const newPaymentMethod = Vue.ref("");
 
         const addPaymentMethod = () => {
-            // console.log(userAccount2.value);
+            console.log(userAccount1.value);
+            console.log(userAccount2.value);
+            console.log(userAccount3.value);
 
-            // let addNumber = 0;
-            // if (userAccount1.value == "") {
-            //     addNumber = 1;
-            // }
-            // else if (userAccount2.value == "") {
-            //     addNumber = 2;
-            // }
-            // else if (userAccount3.value == "") {
-            //     addNumber = 3;
-            // }
-            // const url = "payment-method-api"
-            // const init = {
-            //     method: "POST",
-            //     headers: {
-            //         "X-CSRFToken": getCookie("csrftoken"),
-            //         "Content-Type": "application/json"
-            //     },
-            //     body: JSON.stringify({
-            //         "newPaymentMethod": newPaymentMethod.value,
-            //         "addNumner": addNumber
-            //     })
-            // }
-            // fetch(url, init).then((response) => {
-            //     if (response.ok) {
-            //         return response.json();
-            //     }
-            //     else {
-            //         alert("¹®Á¦°¡ ¹ß»ýÇÏ¿´½À´Ï´Ù\n ³ªÁß¿¡ ´Ù½Ã ½ÃµµÇØÁÖ¼¼¿ä")
-            //     }
-            // }).then((data) => {
-            //     const responseData = JSON.parse(data);
-            // })
+            let addNumber = 1;
+            if (userAccount1.value == "") {
+                addNumber = 1;
+            }
+            else if (userAccount2.value == "") {
+                addNumber = 2;
+            }
+            else if (userAccount3.value == "") {
+                addNumber = 3;
+            }
+            const url = "payment-method-api"
+            const init = {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "newPaymentMethod": newPaymentMethod.value,
+                    "addNumber": addNumber
+                })
+            }
+            console.log(newPaymentMethod.value);
+            console.log(addNumber);
+            fetch(url, init).then((response) => {
+                if (response.ok) {
+                    return response.json();
+                }
+                else {
+                    alert("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß»ï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½\n ï¿½ï¿½ï¿½ß¿ï¿½ ï¿½Ù½ï¿½ ï¿½Ãµï¿½ï¿½ï¿½ï¿½Ö¼ï¿½ï¿½ï¿½")
+                }
+            }).then((data) => {
+                const responseData = JSON.parse(data);
+                userAccount1.value = responseData["user_account1"];
+                userAccount2.value = responseData["user_account2"];
+                userAccount3.value = responseData["user_account3"];
+                userAccountId.value = responseData["user_account_id"];
+            })
 
         }
 

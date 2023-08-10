@@ -41,7 +41,9 @@ class WinWine(models.Model):
     wine_tannin = models.IntegerField()
     wine_food = models.IntegerField()
     wine_image = models.ImageField(max_length=200, upload_to="images")
-    wine_region = models.ForeignKey("WinWineRegion", models.CASCADE, related_name="regionWine")  #
+    wine_region = models.ForeignKey(
+        "WinWineRegion", models.CASCADE, related_name="regionWine"
+    )  #
 
     class Meta:
         managed = False

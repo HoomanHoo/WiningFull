@@ -157,9 +157,9 @@ class ProductAdditionView(View):
             modify = 0
 
         page_num = 1
-        show_length = 28
+        show_length = 20
         end = int(show_length) * int(page_num)
-        start = end - 28
+        start = end - show_length
         result = get_product_list()
         list_info = db_preprocessing(db_data=result, end_page=end, start_page=start)
         paging_result = pagenation(
@@ -243,12 +243,15 @@ class ProductAdditionView(View):
 
 class ProductListView(APIView):
     def get(self, request, **kwargs):
+        user_id = request.session.get("memid", None)
+        if user_id is None:
+            user_id = request.session.get("temp_id", None)
         page_num = kwargs.get("page_num", 1)
         search_keyword = request.GET.get("srhkeyword", None)
 
-        show_length = 28
+        show_length = 20
         end = int(show_length) * int(page_num)
-        start = end - 28
+        start = end - show_length
         if search_keyword is not None:
             wines = search_product_list(search_keyword=search_keyword)
         else:
@@ -273,9 +276,7 @@ class ProductListView(APIView):
         page_serializer = PageSerializer(pages, context={"wines": serializer})
 
         json_result = JSONRenderer().render(page_serializer.data)
-        logger.info(
-            f"{request.session['memid']} : search_keyword: {search_keyword} ProductListView"
-        )
+        logger.info(f"{user_id} : search_keyword: {search_keyword} ProductListView")
         return Response(json_result)
 
 

@@ -10,7 +10,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from Wining import settings
-from purchasing.usecase import decrypt_receive_code
+
 from store.usecase.pagination import db_preprocessing, pagenation
 from user.kakao_token_module import kakao_token
 from user.models import (
@@ -38,7 +38,7 @@ from django.contrib.messages.context_processors import messages
 from django.urls.base import reverse
 from django.db.models import F
 from django.core.files.storage import default_storage
-from purchasing.usecase.decrypt_receive_code import DecModule
+
 from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -339,9 +339,9 @@ class DeleteView(View):
     def get(self, request):
         template = loader.get_template("user/delete.html")
         user_id = request.session.get("memid")
-        ddto = check_id(user_id=user_id)["user_info"]
-        
-        context = {"user_id": user_id, "ddto":ddto}
+        ddto = WinUser.objects.get(user_id=user_id)
+
+        context = {"user_id": user_id, "ddto": ddto}
 
         return HttpResponse(template.render(context, request))
 
@@ -395,7 +395,7 @@ class ModifyUserView(View):
         template = loader.get_template("user/modifyUser.html")
         user_id = request.session.get("memid")
         dto = WinUser.objects.get(user_id=user_id)
-        
+
         print(dto.user_grade_id)
         if dto.user_grade_id == 1:
             try:
@@ -503,7 +503,7 @@ class ReviewListView(View):
         template = loader.get_template("user/reviewList.html")
         user_id = request.session.get("memid")
         dtos = WinReview.objects.filter(user_id=user_id).order_by("-review_reg_time")
-        rdto = check_id(user_id=user_id)["user_info"]
+        rdto = WinUser.objects.get(user_id=user_id)
 
         context = {"dtos": dtos, "rdto": rdto}
 
@@ -542,7 +542,7 @@ class PurchaseDetailView(View):
     def get(self, request):
         template = loader.get_template("user/purchaseDetail.html")
         user_id = request.session.get("memid")
-        pdto = check_id(user_id=user_id)["user_info"]
+        pdto = WinUser.objects.get(user_id=user_id)
         # dtos = WinPurchase.objects.filter(user_id = user_id)
         purchases = WinPurchase.objects.filter(user_id=user_id).order_by(
             "-purchase_time"
@@ -580,7 +580,7 @@ class PurchaseDetailView(View):
                     }
                 )
 
-        context = {"dtos": dtos, "reviews": reviews, "pdto" : pdto}
+        context = {"dtos": dtos, "reviews": reviews, "pdto": pdto}
 
         return HttpResponse(template.render(context, request))
 
@@ -589,8 +589,8 @@ class MyBoardView(View):
     def get(self, request):
         template = loader.get_template("user/myBoard.html")
         user_id = request.session.get("memid")
-        bdto = check_id(user_id=user_id)["user_info"]
-        
+        bdto = WinUser.objects.get(user_id=user_id)
+
         dtos = WinBoard.objects.filter(user_id=user_id).order_by("-board_reg_time")
 
         print(dtos)
@@ -619,7 +619,7 @@ class MyBoardView(View):
         context = {
             "dtos_and_images": dtos_and_images,
             "user_id": user_id,
-            "bdto" : bdto,
+            "bdto": bdto,
         }
 
         return HttpResponse(template.render(context, request))
@@ -629,7 +629,7 @@ class MyCommentView(View):
     def get(self, request):
         template = loader.get_template("user/myComment.html")
         user_id = request.session.get("memid")
-        cdto = check_id(user_id=user_id)["user_info"]
+        cdto = WinUser.objects.get(user_id=user_id)
         dtos = (
             WinComment.objects.select_related("board")
             .filter(user_id=user_id)
@@ -639,7 +639,7 @@ class MyCommentView(View):
         for dto in dtos:
             print(dto.board.board_title)
 
-        context = {"dtos": dtos, "cdto" : cdto}
+        context = {"dtos": dtos, "cdto": cdto}
 
         return HttpResponse(template.render(context, request))
 
@@ -775,7 +775,7 @@ class InsertPaymentMethodView(View):
 class InsertPaymentMethodAPI(APIView):
     def get(self, request):
         user_id = request.session.get("memid", None)
-        user_id = "test0810"
+        # user_id = "test0810"
         try:
             user_account_info = WinUserAccount.objects.get(user_id=user_id)
             serialized = WinUserAccountSerializer(user_account_info)
@@ -792,6 +792,49 @@ class InsertPaymentMethodAPI(APIView):
             json_result = JSONRenderer().render(serialized.data)
 
             return Response(json_result)
+
+    def post(self, request):  # create_or_update 라도 써야할 듯
+        user_id = request.session.get("memid", None)
+        # user_id = "test0810"
+        new_payment_method = request.data.get("newPaymentMethod", None)
+        add_number = request.data.get("addNumber", None)
+        print("user_id ", new_payment_method)
+        print("user_id addnum", add_number)
+
+        if add_number == 1:
+            print("user_id 1", new_payment_method)
+            user_payment_method = WinUserAccount(
+                user_id=user_id,
+                user_account_default=1,
+                user_account1=new_payment_method,
+            )
+            user_payment_method.save()
+
+        elif add_number == 2:
+            print("user_id 2", new_payment_method)
+            user_payment_method = WinUserAccount(
+                user_id=user_id,
+                user_account_default=1,
+                user_account2=new_payment_method,
+            )
+            user_payment_method.save()
+
+        elif add_number == 3:
+            print("user_id 3", new_payment_method)
+            user_payment_method = WinUserAccount(
+                user_id=user_id,
+                user_account_default=1,
+                user_account3=new_payment_method,
+            )
+            user_payment_method.save()
+
+        else:
+            print("user_id else", new_payment_method)
+
+        print("user_id final", new_payment_method)
+        print("user_payment_method", user_payment_method)
+
+        redirect("paymentMethodAPI")
 
 
 class AddPointHisView(View):

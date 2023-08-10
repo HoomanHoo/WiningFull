@@ -53,7 +53,6 @@ class ListView(View):
             number = number - count - 1
             abs(number)
 
-
             paginator = Paginator(dtos, PAGE_SIZE)
             dtos = paginator.get_page(pagenum)
 
@@ -133,7 +132,7 @@ class WriteView(View):
             board_read_count=0,
             board_reg_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             board_ip=request.META.get("REMOTE_ADDR"),
-            #board_like=0,
+            # board_like=0,
             # board_image=image_url,
         )
         dto.save()  # 생성된 객체를 DB에 저장
@@ -193,13 +192,13 @@ class WriteCommentView(View):
 
         return redirect("board:list")  # 리디렉션할 URL로 수정
 
-@method_decorator(csrf_exempt, name='dispatch')
+
+@method_decorator(csrf_exempt, name="dispatch")
 class UpdateCommentView(View):
     def post(self, request):
         comment_id = request.POST.get("comment_id")  # 수정할 댓글의 ID
         comment_content = request.POST.get("comment_content")  # 수정된 댓글 내용
         user_id = request.POST.get("user_id")  # 댓글 작성자의 ID
-
 
         # 댓글 ID와 내용이 모두 넘어왔는지 확인
         if not comment_id or not comment_content or not user_id:
@@ -221,21 +220,18 @@ class UpdateCommentView(View):
         comment.save()
 
         # 수정된 댓글 내용을 응답으로 보내기
-        return JsonResponse({
-            "success": True,
-            "comment_id": comment.id,
-            "comment_content": comment.comment_content,
-            "comment_reg_time": comment.comment_reg_time.strftime("%Y-%m-%d %H:%M:%S"),
-            "user_id": comment.user_id,
-        })
-        
-        
-        
-        
-        
-        
-        
-        
+        return JsonResponse(
+            {
+                "success": True,
+                "comment_id": comment.id,
+                "comment_content": comment.comment_content,
+                "comment_reg_time": comment.comment_reg_time.strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                ),
+                "user_id": comment.user_id,
+            }
+        )
+
 
 class DeleteCommentView(View):
     def delete(self, request, comment_id=None):
@@ -262,7 +258,6 @@ import json
 
 
 class ContentView(View):
-    
     def get(self, request):
         template = loader.get_template("board/content.html")
         num = request.GET.get("num")
@@ -295,8 +290,6 @@ class ContentView(View):
 
         comment_count = WinComment.objects.filter(board_id=num).count()
 
-        
-
         context = {
             "dto": dto,
             "dtcs": dtcs,
@@ -305,7 +298,6 @@ class ContentView(View):
             "number": number,
             "image_url": image_url,
             "comment_count": comment_count,
-    
         }
         return HttpResponse(template.render(context, request))
 
@@ -323,13 +315,15 @@ class ContentView(View):
                 "message": "모든 필드를 입력해주세요.",
             }
             return HttpResponse(template.render(context, request))
-        
+
         # 댓글 수정을 위한 추가 로직
         if comment_id:
             dtc = get_object_or_404(WinComment, pk=comment_id)
             # 댓글 작성자와 현재 로그인한 사용자가 같은지 검사
             if dtc.user_id != user_id:
-                return JsonResponse({"success": False, "message": "권한이 없습니다."}, status=403)
+                return JsonResponse(
+                    {"success": False, "message": "권한이 없습니다."}, status=403
+                )
 
             dtc.comment_content = comment_content
             dtc.save()
@@ -396,7 +390,7 @@ class UpdateView(View):
             "num": request.GET["num"],
             "pagenum": request.GET["pagenum"],
             "image_url": image_url,
-            "image_name":image_name,
+            "image_name": image_name,
         }
         return HttpResponse(template.render(context, request))
 
@@ -416,8 +410,7 @@ class UpdateView(View):
                 dti.board = dto
             dti.board_image = request.FILES["img"]
             dti.save()
-            
-        
+
         # 이미지 삭제 처리
         delete_image_id = request.POST.get("delete_image_id")
         if delete_image_id:
@@ -439,11 +432,8 @@ class UpdateView(View):
         return redirect("board:list")
 
 
-
-
-
-
 import string
+
 
 class UpdateProView(View):
     @method_decorator(csrf_exempt)
@@ -454,11 +444,16 @@ class UpdateProView(View):
         dto = WinBoard.objects.get(board_id=num)
         dti = WinBoardImg.objects.filter(board=dto).first()
         image_name = dti.board_image.name if dti and dti.board_image else ""
-        
+
         # 캐시 무효화를 위해 랜덤한 문자열을 생성하여 cache_buster로 전달합니다.
-        cache_buster = ''.join(random.choice(string.ascii_lowercase) for _ in range(10))
-        
-        context = {"dto": dto, "dti": dti, "image_name":image_name, "cache_buster":cache_buster, } 
+        cache_buster = "".join(random.choice(string.ascii_lowercase) for _ in range(10))
+
+        context = {
+            "dto": dto,
+            "dti": dti,
+            "image_name": image_name,
+            "cache_buster": cache_buster,
+        }
         return render(request, "updatepro.html", context)
 
     def post(self, request):
@@ -475,9 +470,7 @@ class UpdateProView(View):
                 dti.board = dto
             dti.board_image = request.FILES["img"]
             dti.save()
-            
-            
-        
+
         # 이미지 삭제 처리
         delete_image_id = request.POST.get("delete_image_id")
         if delete_image_id:
@@ -497,12 +490,10 @@ class UpdateProView(View):
             print("첨부된 이미지가 삭제되었습니다.")
         else:
             print("이미지가 수정되지 않아서, 게시글만 수정됩니다.")
-            
-        request.session['modified_post_id'] = dto.board_id
+
+        request.session["modified_post_id"] = dto.board_id
         dto.save()
         return redirect("board:list")
-    
-    
 
 
 class RecentModifiedPostsView(View):
@@ -513,18 +504,14 @@ class RecentModifiedPostsView(View):
         return JsonResponse({"modified_posts": data})
 
 
-
-
-
-
-
-
 class DeleteImageView(View):
     def post(self, request):
         image_id = request.POST.get("delete_image_id")
 
         if not image_id:
-            return JsonResponse({"success": False, "message": "이미지 ID가 필요합니다."}, status=400)
+            return JsonResponse(
+                {"success": False, "message": "이미지 ID가 필요합니다."}, status=400
+            )
 
         try:
             # 이미지 파일을 삭제하기 위해 파일 경로를 구합니다.
@@ -532,37 +519,25 @@ class DeleteImageView(View):
             image_path = dti.board_image.path if dti and dti.board_image else None
 
             if not image_path:
-                return JsonResponse({"success": False, "message": "삭제할 이미지를 찾을 수 없습니다."}, status=404)
+                return JsonResponse(
+                    {"success": False, "message": "삭제할 이미지를 찾을 수 없습니다."}, status=404
+                )
 
             # 이미지 파일이 존재하면 파일을 삭제합니다.
             if os.path.exists(image_path):
                 os.remove(image_path)
                 dti.delete()  # 해당 이미지 객체도 삭제합니다.
             else:
-                return JsonResponse({"success": False, "message": "삭제할 이미지를 찾을 수 없습니다."}, status=404)
+                return JsonResponse(
+                    {"success": False, "message": "삭제할 이미지를 찾을 수 없습니다."}, status=404
+                )
 
             return JsonResponse({"success": True, "message": "이미지가 성공적으로 삭제되었습니다."})
         except Exception as e:
             print(f"Error deleting image: {e}")
-            return JsonResponse({"success": False, "message": "이미지 삭제 중 오류가 발생했습니다."}, status=500)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            return JsonResponse(
+                {"success": False, "message": "이미지 삭제 중 오류가 발생했습니다."}, status=500
+            )
 
 
 import time

@@ -1,6 +1,7 @@
 import random
 import numpy as np
 
+
 def win_corr_code(value):
     return value % 10
 
@@ -40,21 +41,22 @@ def win_corr_alc_inverse(value):
         return 5
 
 
-
 def list_corr_5(list):
-    if list == [0] : 
+    if list == [0]:
         return [1, 2, 3, 4, 5]
-    else :
+    else:
         return list
+
 
 def list_corr_6(list):
-    if list == [0] : 
+    if list == [0]:
         return [1, 2, 3, 4, 5, 6]
-    else :
+    else:
         return list
 
+
 def list_corr_2d(value):
-    #return [(value%100, value//100)]
+    # return [(value%100, value//100)]
     return value + 10
 
 
@@ -63,12 +65,7 @@ def list_corr_2d(value):
 # [11] 일 때 750
 # [12] 일 때 750 이외의 모든 숫자
 # [11, 12] 일 때 모든 숫자
-# [21~25] 일 때 
-
-
-
-
-
+# [21~25] 일 때
 
 
 def win_reco_color(user_select, wine_color):
@@ -133,8 +130,3 @@ def sort(a, b):
 
 def random_generate(list, cnt):
     return random.sample(list, cnt)
-    
-
-
-
-

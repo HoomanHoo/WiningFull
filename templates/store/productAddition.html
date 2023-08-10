@@ -27,11 +27,11 @@
       <div class="col" style="text-align: left">판매할 주류를 선택해주세요</div>
     </div>
     <div class="row">
-      <div class="col-4">
-        <div class="row">
+      <div class="col-4" style="height: 80vh">
+        <div class="row" >
           <div class="col" style="text-align: center">제품명</div>
         </div>
-        <div id="wineList" style="height: 80vh">
+        <div id="wineList" >
           {% for wine in wines %}
           <div class="row">
             <div id="{{ wine.wine_name }}" class="col wineName">
@@ -84,7 +84,7 @@
           </nav>
         </div>
       </div>
-      <div class="col">
+      <div class="col" style="display:block">
         <div class="row">
           <div class="col">제품명</div>
           <div class="col-1">용량(ml)</div>
@@ -95,16 +95,15 @@
           <div class="col">상세 설명</div>
           <div class="col-1"></div>
         </div>
-        <div class="row">
+        <div class="row"  style="height: 70vh; overflow: auto">
           {% csrf_token %}
           <form
             id="productAdd"
             action="/store/product/addition"
             method="post"
-            style="height: 80vh; overflow: visible"
             onsubmit="return checkValue()"
           >
-            <input type="hidden" name="storeId" value="{{store_id}}" />
+            <input type="hidden" name="storeId" value="{{store_id}}" style="height:80vh; overflow-y: auto"/>
             {% for dto in product_list %}
             <div class="row">
               <input

@@ -27,13 +27,16 @@
                         <div v-if="userAccountId != -1" class="input-container">
                             <input class="input-text" type="text" v-model="newPaymentMethod">
                             <div class="row" v-if="userAccount1">
-                                <input id=1 class="input-text" type="button" :value="userAccount1">
+                                <input id=1 class="input-text col" type="button" :value="userAccount1">
+                                <input type="button" class="col-1" value="삭제하기">
                             </div>
                             <div class="row" v-if="userAccount2">
-                                <input id=2 class="input-text" type="button" :value="userAccount2">
+                                <input id=2 class="input-text col" type="button" :value="userAccount2">
+                                <input type="button" class="col-1" value="삭제하기">
                             </div>
                             <div class="row" v-if="userAccount3">
-                                <input id=3 class="input-text" type="button" :value="userAccount3">
+                                <input id=3 class="input-text col" type="button" :value="userAccount3">
+                                <input type="button" class="col-1" value="삭제하기">
                             </div>
                             <br>
                             <br>
