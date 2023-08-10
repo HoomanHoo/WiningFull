@@ -307,6 +307,10 @@ class PickListView(View):
     "cart/<int:cart_id>"
     """
 
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request, **kwargs):
         """
         키워드 인수로 전달받은 cart_id를 통해 현재 존재하는 장바구니 정보를 front로 return함
@@ -344,6 +348,27 @@ class PickListView(View):
 
             logger.info(f"{user_id}: cart_id: {cart_id} PickListView")
             return HttpResponse(template.render(context, request))
+
+    def post(self, request, **kwargs):
+        """
+        json으로 전달받은 cart_detail_id를 통해 해당하는 상품을 장바구니 목록에서 삭제함
+        자후 delete 함수로 바꾸고 serializer 적용 예정
+        """
+        request_body = json.loads(request.body)
+        cart_detail_id = request_body.get("cartDetailId", None)
+        print(cart_detail_id)
+        if cart_detail_id is not None:
+            result = delete_detail_cart_info(cart_det_id=cart_detail_id)
+            logger.info(
+                f"{request.session['memid']} cart_detail_id: {result} RemoveBuyList"
+            )
+            return JsonResponse({"result": "삭제되었습니다"}, status=200)
+
+        else:
+            logger.error(
+                f"{request.session['memid']} no cart_detail_id or another error RemoveBuyList"
+            )
+            return JsonResponse({"result": "문제가 발생했습니다 잠시 후 다시 시도해주세요"}, status=500)
 
 
 class RemoveBuyList(View):
