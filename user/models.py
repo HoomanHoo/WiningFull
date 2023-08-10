@@ -25,9 +25,9 @@ class WinUserAccount(models.Model):
     user_account_id = models.AutoField(primary_key=True)
     user = models.ForeignKey("WinUser", models.CASCADE, db_column="user_id", default="")
     user_account_default = models.IntegerField(default=1)
-    user_account1 = models.CharField(default="", max_length=80)
-    user_account2 = models.CharField(default="", max_length=80)
-    user_account3 = models.CharField(default="", max_length=80)
+    user_account1 = models.CharField(default="", max_length=80, blank=True)
+    user_account2 = models.CharField(default="", max_length=80, blank=True)
+    user_account3 = models.CharField(default="", max_length=80, blank=True)
 
     class Meta:
         db_table = "win_user_account"

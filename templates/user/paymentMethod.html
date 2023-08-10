@@ -2,29 +2,46 @@
 <html>
     <head>
         <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Wining</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-    <link href="/static/css/paymentMethod.css" rel="stylesheet">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Wining</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+            integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+        <link href="/static/css/paymentMethod.css" rel="stylesheet">
+        <script type="module" src="/static/js/paymentMethod.js" defer></script>
     </head>
     <body>
         계좌 등록
-            <div class="container" style="text-align:center">
+        {% csrf_token %}
+            <div id="rootDiv" class="container" style="text-align:center">
                 <div class="row" style="margin-top:100px">
                     <div class="col-2"></div>
                     <div id="background" class="col back">
-                        <div class="input-container">
-                            <input class="input-text" type="text">
+                        <div v-if="userAccountId == -1" class="input-container">
+                            <input class="input-text" type="text" v-model="newPaymentMethod">
                             <br>
                             <br>
-                            <input type="button" value="계좌 등록하기">
+                            <input @click="addPaymentMethod" type="button" value="계좌 등록하기">
+                        </div>
+                        <div v-if="userAccountId != -1" class="input-container">
+                            <input class="input-text" type="text" v-model="newPaymentMethod">
+                            <div class="row" v-if="userAccount1">
+                                <input id=1 class="input-text" type="button" :value="userAccount1">
+                            </div>
+                            <div class="row" v-if="userAccount2">
+                                <input id=2 class="input-text" type="button" :value="userAccount2">
+                            </div>
+                            <div class="row" v-if="userAccount3">
+                                <input id=3 class="input-text" type="button" :value="userAccount3">
+                            </div>
+                            <br>
+                            <br>
+                            <input @click="addPaymentMethod" type="button" value="계좌 추가하기">
                         </div>
                     </div>
                     <div class="col-2"></div>
             </div>
-        <script type="module" src="/static/js/paymentMethod.js" defer></script>
+        
     </body>
 </html>

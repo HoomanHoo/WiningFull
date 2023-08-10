@@ -11,6 +11,7 @@ const addPoint = Vue.createApp({
         const hover = Vue.ref({ "z-index": 3, "position": "absolute", "left": "0vw", "right": "0vw", "top": "0vh", "bottom": "0vh" });
         const unHover = Vue.ref({ "z-index": 1, "position": "relative" });
         const show = Vue.ref(false);
+        const isPayment = Vue.ref(true);
 
         const clickDecidedValue = (event) => {
             const thisElement = event.target;
@@ -71,18 +72,22 @@ const addPoint = Vue.createApp({
 
                 }
                 else {
-                    const responseData = "없뎃";
+                    alert("문제가 발생하였습니다\n 나중에 다시 시도해주세요");
                 }
             }).then((data) => {
                 const responseData = JSON.parse(data)
                 selectedAccount.value = responseData["user_account"];
                 userAccountId.value = responseData["user_account_id"];
                 show.value = false;
-            });;
+            });
         }
 
         const addPaymentMethod = () => {
             location.href = "payment-method";
+        }
+
+        const back = () => {
+            location.href = "myPage";
         }
 
 
@@ -92,6 +97,9 @@ const addPoint = Vue.createApp({
                 const responseData = JSON.parse(data);
                 selectedAccount.value = responseData["user_account"];
                 userAccountId.value = responseData["user_account_id"];
+                if (userAccountId.value == -1) {
+                    isPayment.value = false;
+                }
             })
         })
 
@@ -109,6 +117,7 @@ const addPoint = Vue.createApp({
             show,
             accountList,
             userAccountId,
+            back,
             invisible,
             selectAccount,
             clickDecidedValue,

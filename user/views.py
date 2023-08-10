@@ -50,7 +50,6 @@ from user.serializers.serializers import (
     SelectAccountSerializer,
     WinUserAccountSerializer,
 )
-from user.db_access.query_set import check_id
 
 logger = logging.getLogger("user")
 
@@ -774,7 +773,25 @@ class InsertPaymentMethodView(View):
 
 
 class InsertPaymentMethodAPI(APIView):
-    pass
+    def get(self, request):
+        user_id = request.session.get("memid", None)
+        user_id = "test0810"
+        try:
+            user_account_info = WinUserAccount.objects.get(user_id=user_id)
+            serialized = WinUserAccountSerializer(user_account_info)
+            json_result = JSONRenderer().render(serialized.data)
+
+            return Response(json_result)
+
+        except ObjectDoesNotExist as ex:
+            logger.info(ex)
+            user_account = {"user_account": "결제 수단이 등록되지 않았습니다"}
+            user_account["user_account_id"] = -1
+
+            serialized = SelectAccountSerializer(user_account)
+            json_result = JSONRenderer().render(serialized.data)
+
+            return Response(json_result)
 
 
 class AddPointHisView(View):
