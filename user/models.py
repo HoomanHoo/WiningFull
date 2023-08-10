@@ -12,7 +12,9 @@ class WinUser(models.Model):
     user_tel = models.CharField(max_length=20)
     user_reg_date = models.DateTimeField()
     user_point = models.PositiveIntegerField()
-    user_profile_img = models.ImageField(default="")
+    user_profile_img = models.ImageField(
+        upload_to="profile/", blank=True, max_length=300
+    )
 
     class Meta:
         # managed = False

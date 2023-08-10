@@ -191,7 +191,6 @@ class KakaoRedirectURI(View):
                     context = {"code": -2}
                     return HttpResponse(template.render(context, request))
                 else:
-                 
                     request.session["memid"] = login_info[0]["user_id"]
                     request.session["access_Token"] = result["access_token"]
                     return redirect("myPage")
@@ -237,7 +236,8 @@ class InputUserView(View):
             user_tel=request.POST["user_tel"],
             user_reg_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             user_point=user_point,
-        )
+            user_profile_img=request.FILES.get("user_profile", None),
+        )  # request.FILES.get("user_profile", None)
         dto.save()
 
         fdto = WinUserFavorite(
@@ -301,8 +301,9 @@ class InputStoreView(View):
             user_name=request.POST["user_name"],
             user_email=request.POST["user_email"],
             user_tel=request.POST["user_tel"],
-            user_reg_date=DateFormat(datetime.now()).format("Y-m-d h:i:s"),
+            user_reg_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             user_point=user_point,
+            user_profile_img=request.FILES.get("user_profile", None),
         ).save()
         request.session["temp_id"] = user_id
 

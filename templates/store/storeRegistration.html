@@ -106,7 +106,9 @@
             </div>
         </div>
     </form>
-    <form id="backForm" action="registration" method="post"></form>
+    <form id="backForm" action="registration" method="post">
+        <input type="hidden" name="userId" value="{{ user_id }}">
+    </form>
     <div class="row">
         <div class="col" style="text-align: center;">
             <input type="submit" name="btnStoreRegist" form="storeRegistForm" value="다음">

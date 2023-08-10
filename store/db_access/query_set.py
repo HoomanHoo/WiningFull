@@ -121,7 +121,9 @@ def delete_product(wine_id: str, user_id: str):
 
 def delete_user_info(user_id):
     user_info = WinUser.objects.filter(user_id=user_id)
-    user_info.delete()
+    print(user_info)
+    result = user_info.delete()
+    print(result)
 
 
 @transaction.atomic

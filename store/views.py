@@ -74,18 +74,19 @@ class StoreRegistrationView(View):
 
     def post(self, request):
         user_id = request.POST.get("userId", None)
-        main_address = request.POST.get("mainAddress", None)
-        detail_address = request.POST.get("detailAddress", None)
-        store_name = request.POST.get("storeName", None)
-        store_reg_num = request.POST.get("storeRegNum", None)
-        store_email = request.POST.get("storeEmail")
-        store_map_url = request.POST.get("storeMapUrl", None)
         store_regist = request.POST.get("btnStoreRegist", None)
         back = request.POST.get("btnBack", None)
 
-        store_address = main_address + "@" + detail_address
         # 파이썬에서도 정규식 검증하고 db insert하기
         if store_regist:
+            main_address = request.POST.get("mainAddress", None)
+            detail_address = request.POST.get("detailAddress", None)
+            store_name = request.POST.get("storeName", None)
+            store_reg_num = request.POST.get("storeRegNum", None)
+            store_email = request.POST.get("storeEmail")
+            store_map_url = request.POST.get("storeMapUrl", None)
+            store_address = main_address + "@" + detail_address
+
             try:
                 insert_store_info(
                     user_id=user_id,
@@ -104,6 +105,7 @@ class StoreRegistrationView(View):
             return redirect("productAddition")
 
         elif back:
+            logger.info(f"{user_id}:  back StoreRegistrationView")
             delete_user_info(user_id=user_id)
             return redirect("inputStore")
 
