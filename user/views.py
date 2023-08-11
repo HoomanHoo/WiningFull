@@ -411,7 +411,7 @@ class ModifyUserView(View):
     def post(self, request):
         user_id = request.session.get("memid")
         dto = WinUser.objects.get(user_id=user_id)
-
+        
         dto.user_passwd = request.POST["user_passwd"]
         dto.user_email = request.POST["user_email"]
         dto.user_tel = request.POST["user_tel"]
@@ -455,34 +455,37 @@ class ModifyUserView(View):
         return redirect("myPage")
 
 
+
 class MyPageView(View):
     def get(self, request):
         template = loader.get_template("user/myPage.html")
         memid = request.session.get("memid")
-        dto = WinUser.objects.get(user_id=memid)
-        purchase_c = WinPurchase.objects.filter(user_id=memid).count()
-        review_c = WinReview.objects.filter(user_id=memid).count()
-        cart_c = (
-            WinCartDetail.objects.select_related("cart")
-            .filter(cart__user_id=memid)
-            .count()
-        )
-        detail_v = (
-            WinDetailView.objects.filter(user_id=memid)
-            .order_by("-detail_view_time")[:6]
-            .select_related("wine")
-        )
-        user_grade = dto.user_grade_id
-
-        wine_images = []
-
-        for v in detail_v:
-            wine_images.append([v.wine.wine_image, v.wine.wine_id])
-
-        print(detail_v)
-        print(wine_images)
-
+        
         if memid:
+            dto = WinUser.objects.filter(user_id=memid).first()
+            purchase_c = WinPurchase.objects.filter(user_id=memid).count()
+            review_c = WinReview.objects.filter(user_id=memid).count()
+
+            image_url = dto.user_profile_img.url if dto and dto.user_profile_img else ""
+
+            cart_c = (
+                WinCartDetail.objects.select_related("cart")
+                .filter(cart__user_id=memid)
+                .count()
+            )
+            detail_v = (
+                WinDetailView.objects.filter(user_id=memid)
+                .order_by("-detail_view_time")[:6]
+                .select_related("wine")
+            )
+            
+            user_grade = dto.user_grade_id if dto else None
+            
+            wine_images = []
+
+            for v in detail_v:
+                wine_images.append([v.wine.wine_image, v.wine.wine_id])
+
             context = {
                 "memid": memid,
                 "dto": dto,
@@ -491,11 +494,75 @@ class MyPageView(View):
                 "cart_c": cart_c,
                 "wine_images": wine_images,
                 "user_grade": user_grade,
+                "image_url": image_url,
             }
         else:
             context = {}
 
         return HttpResponse(template.render(context, request))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# class MyPageView(View):
+#     def get(self, request):
+#         template = loader.get_template("user/myPage.html")
+#         memid = request.session.get("memid")
+#         dto = WinUser.objects.get(user_id=memid)
+#         purchase_c = WinPurchase.objects.filter(user_id=memid).count()
+#         review_c = WinReview.objects.filter(user_id=memid).count()
+#
+#
+#         #dto = WinUser.objects.filter(user=dto).first()
+#         #image_url = dto.user_profile.url if dto and dto.user_profile else ""
+#
+#
+#         cart_c = (
+#             WinCartDetail.objects.select_related("cart")
+#             .filter(cart__user_id=memid)
+#             .count()
+#         )
+#         detail_v = (
+#             WinDetailView.objects.filter(user_id=memid)
+#             .order_by("-detail_view_time")[:6]
+#             .select_related("wine")
+#         )
+#         user_grade = dto.user_grade_id
+#
+#         wine_images = []
+#
+#         for v in detail_v:
+#             wine_images.append([v.wine.wine_image, v.wine.wine_id])
+#
+#         print(detail_v)
+#         print(wine_images)
+#
+#         if memid:
+#             context = {
+#                 "memid": memid,
+#                 "dto": dto,
+#                 "purchase_c": purchase_c,
+#                 "review_c": review_c,
+#                 "cart_c": cart_c,
+#                 "wine_images": wine_images,
+#                 "user_grade": user_grade,
+#                 #"image_url": image_url,
+#             }
+#         else:
+#             context = {}
+#
+#         return HttpResponse(template.render(context, request))
 
 
 class ReviewListView(View):

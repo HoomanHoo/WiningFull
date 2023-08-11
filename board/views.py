@@ -287,7 +287,6 @@ class ContentView(View):
 
         dti = WinBoardImg.objects.filter(board=dto).first()
         image_url = dti.board_image.url if dti and dti.board_image else ""
-
         comment_count = WinComment.objects.filter(board_id=num).count()
 
         context = {

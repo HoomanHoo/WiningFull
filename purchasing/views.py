@@ -319,6 +319,7 @@ class PickListView(View):
         cart_id = kwargs.get("cart_id", None)
         page_infos = []
         all_price = 0
+        
 
         if user_id is None:
             logger.error("NO user_id")
@@ -340,10 +341,12 @@ class PickListView(View):
                 all_price += page_info.get("purchase_price")
 
             template = loader.get_template("purchasing/pickList.html")
+
             context = {
                 "page_infos": page_infos,
                 "all_price": all_price,
                 "cart_id": cart_id,
+                
             }
 
             logger.info(f"{user_id}: cart_id: {cart_id} PickListView")

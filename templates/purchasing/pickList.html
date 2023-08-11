@@ -12,8 +12,6 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wining</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
   <script src="/static/js/pickListScript.js" defer></script>
   
@@ -34,6 +32,8 @@
     .cart-item {
       border: 1px solid #ccc;
       margin-bottom: 15px;
+      margin-right:20px;
+      margin-left:220px;
       padding: 10px;
       display: flex;
       align-items: center;
@@ -96,13 +96,14 @@
 
 <!-- 장바구니 -->
 <div class="container py-4">
-  
+  <!--  
    	  <div>
 	    <input type="button" value="뒤로가기" onclick="history.back()" class="btn btn-secondary checkout-btn">
 	  </div><br>
   <h1 class="mb-4">장바구니</h1>
-  
+  -->
   {% for page_info in page_infos %}
+
     <div id="{{ page_info.sell__sell_id }}" class="cart-item">
       <img class="wine-image"
       	   src="{{ page_info.sell__wine__wine_image }}" 
@@ -126,19 +127,28 @@
   {% endfor %}
 
   <div class="checkout-section">
-
     <div class="d-flex">
-      <div>TOTAL :</div>
-      <div id="allPrice" class="cart-total"> {{ all_price }} 원</div>
+      <div></div>
+      
     </div>
     
-    <div class="text-center mt-4">
-      {% csrf_token %}
-      <input type="hidden" id="cartId" value="{{ cart_id }}">
-      <input type="button" id="btnShowBuyList" class="btn btn-primary checkout-btn" value="결제 페이지로 이동" onclick="location='../payment?cartid={{ cart_id }}'">
-    </div>
+    	<div>
+			<div class="d-flex">
+		      <div>TOTAL Price :</div>
+		      <input type="text" id="allPrice" name="allPrice" value="{{all_price}}" readonly style="border:0px">
+		    </div>
+		</div>
     
-  </div>
+		<div class="checkout-section justify-content-end mt-4">
+		  <div class="text-center mt-4 d-flex">
+		    {% csrf_token %}
+		      <input type="hidden" id="cartId" value="{{ cart_id }}">
+		      <input type="button" id="btnShowBuyList" class="btn btn-primary checkout-btn" value="결제 페이지로 이동" onclick="location='../payment?cartid={{ cart_id }}'">
+		  </div>
+  	   </div>
+  	   
+  	   
+</div>
 
 
   
@@ -146,6 +156,7 @@
   
   
 </div>
+</body>
 
 <style>
     /*왼쪽에 MyPage 내용 고정시키는 코드 */

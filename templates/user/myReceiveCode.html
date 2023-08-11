@@ -1,68 +1,125 @@
 {% extends "user/base.html" %}
+
 {% block title %}
-    <title>Wining</title>
+    <title>Wining - 구매 내역</title>
 {% endblock %}
 
 {% block content %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+    }
+
+    .container {
+        margin: 30px auto;
+        padding: 20px;
+        background-color: white;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .header-row, .data-row {
+        border-bottom: 1px solid #dee2e6;
+        padding: 10px 0;
+        display: flex;
+        align-items: center;
+        
+    }
+
+    .header-row .col, .data-row .col {
+        padding: 5px 10px;
+        flex: 1;
+    }
+
+    .data-row:hover {
+        background-color: #e0e0e0;
+    }
+
+    .pagination-row {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .pagination-row .page-link {
+        color: #007bff;
+    }
+
+    .pagination-row .page-link:hover {
+        color: #0056b3;
+    }
+
+    .btn-back {
+        margin-top: 20px;
+    }
+    
+</style>
+    
+        
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="button" value="이전으로" onclick="location='myPage'" class="btn btn-secondary btn-back">
+        
+   
 <div class="container">
-    <h2 class="text-center mb-4">구매 내역</h2>
-    <div class="row header-row">
-        <div class="col">제품명</div>
-        <div class="col">수령 점포명</div>
-        <div class="col">수량</div>
-        <div class="col">금액</div>
-        <div class="col">수령 코드</div>
-        <div class="col">수령 상태</div>
-    </div>
+    <h2 class="page-title">구매 내역</h2>
+<div class="header-row">
+    <div class="col-6">제품명</div>
+    <div class="col" style="width: 15%">수령 점포명</div>
+    <div class="col" style="width: 10%">수량</div>
+    <div class="col" style="width: 12%">금액</div>
+    <div class="col" style="width: 10%">수령 코드</div>
+    <div class="col" style="width: 10%">수령 상태</div>
+</div>
     {% if state == -1 %}
-    <div class="row text-center">
-        <div class="col">
+    <div class="data-row text-center">
+        <div class="col" colspan="6">
             <p class="mt-4">구매 이력이 없습니다</p>
         </div>
     </div>
     {% endif %}
     {% if state != -1 %}
     {% for pdto in pdtos %}
-    <div class="row data-row">
-        <div class="col">{{ pdto.wine_name }}</div>
+    <div class="data-row">
+        <div class="col-6">{{ pdto.wine_name }}</div>
         <div class="col">{{ pdto.store_name }}</div>
         <div class="col">{{ pdto.purchase_det_number }}</div>
         <div class="col">{{ pdto.purchase_det_price }}</div>
         <div class="col">{{ pdto.receive_code }}</div>
         <div class="col">
-    {% if pdto.purchase_state == 1 %}
-        미수령
-    {% else %}
-        수령
-    {% endif %}
-</div>
+            {% if pdto.purchase_state == 1 %}
+                미수령
+            {% else %}
+                수령
+            {% endif %}
+        </div>
     </div>
     {% endfor %}
-    <div class="row pagination-row justify-content-center">
-        <div class="col">
-            <nav aria-label="Page navigation">
-                <ul class="pagination">
-                    <li class="page-item {% if pages_count.0 < 6 %}disabled{% endif %}">
-                        <a class="page-link prev" name="pages" href="{% if pages_count.0 >= 6 %}{{ pages_count.0|add:-1 }}{% endif %}">Previous</a>
-                    </li>
-                    {% for i in pages_count %}
-                    <li class="page-item page-num-list">
-                        <a id="{{ i }}" class="page-link page-num" name="pages" href="{{ i }}">{{ i }}</a>
-                    </li>
-                    {% endfor %}
-                    <li class="page-item {% if pages_count|last < 6 %}disabled{% endif %}">
-                        <a class="page-link next" name="pages" href="{% if pages_count|last >= 6 %}{{ pages_count.0|add:1 }}{% endif %}">Next</a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
+    <div class="pagination-row">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li class="page-item {% if pages_count.0 < 6 %}disabled{% endif %}">
+                    <a class="page-link prev" name="pages" href="{% if pages_count.0 >= 6 %}{{ pages_count.0|add:-1 }}{% endif %}">Previous</a>
+                </li>
+                {% for i in pages_count %}
+                <li class="page-item page-num-list">
+                    <a id="{{ i }}" class="page-link page-num" name="pages" href="{{ i }}">{{ i }}</a>
+                </li>
+                {% endfor %}
+                <li class="page-item {% if pages_count|last < 6 %}disabled{% endif %}">
+                    <a class="page-link next" name="pages" href="{% if pages_count|last >= 6 %}{{ pages_count.0|add:1 }}{% endif %}">Next</a>
+                </li>
+            </ul>
+        </nav>
     </div>
     {% endif %}
-    <div class="row text-center mt-4">
-        <div class="col">
-            <input type="button" value="뒤로가기" onclick="location='myPage'" class="btn btn-secondary">
-        </div>
-    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>

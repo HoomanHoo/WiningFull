@@ -1,6 +1,9 @@
 from django.urls.conf import path
 from user import views
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [  # init_url == "http://localhost:8000/user/login"
     path("login", views.LoginView.as_view(), name="login"),
     path("logout", views.KakaoLogoutView.as_view(), name="logout"),
@@ -42,3 +45,11 @@ urlpatterns = [  # init_url == "http://localhost:8000/user/login"
         name="paymentMethodAPI",
     ),
 ]
+
+urlpatterns += static(
+    settings.STATIC_URL, document_root=settings.STATIC_URL
+)  # MEDIA 경로 추가
+urlpatterns += static(
+    settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
+)  # MEDIA 경로 추가
+
