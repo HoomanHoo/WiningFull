@@ -1,50 +1,95 @@
 <!DOCTYPE html>
+
+
 <html>
+{%extends "user/base.html"%}
+{%load static%}
+{%block title%} <h2> </h2> {%endblock%}
+
+{%csrf_token%}
+
+{%block content%}
     <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Wining</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
-            integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-        <link href="/static/css/paymentMethod.css" rel="stylesheet">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/addPoint.css'%}">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+        <script src="{% static 'js/jquery-3.6.4.js'%}"></script>
+        <script src="{% static 'js/bootstrap.min.js' %}"></script>	
+        <script src="{% static 'js/script_user.js'%}"></script>
         <script type="module" src="/static/js/paymentMethod.js" defer></script>
     </head>
     <body>
-        계좌 등록
         {% csrf_token %}
-            <div id="rootDiv" class="container" style="text-align:center">
-                <div class="row" style="margin-top:100px">
-                    <div class="col-2"></div>
-                    <div id="background" class="col back">
-                        <div v-if="userAccountId == -1" class="input-container">
-                            <input class="input-text" type="text" v-model="newPaymentMethod">
-                            <br>
-                            <br>
-                            <input @click="addPaymentMethod" type="button" value="계좌 등록하기">
-                        </div>
-                        <div v-if="userAccountId != -1" class="input-container">
-                            <input class="input-text" type="text" v-model="newPaymentMethod">
-                            <div class="row" v-if="userAccount1">
-                                <input id=1 class="input-text col" type="button" :value="userAccount1">
-                                <input type="button" class="col-1" value="삭제하기">
+        <div id="rootDiv" class="container" style="text-align:center">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-7">
+                        <div class="row" style="margin-top:100px" >
+                            <div class="card shadow-lg border-0 rounded-lg mt-5" v-show="listShow">
+                                <div class="card-body" style="height:67vh">
+                                    
+                                    <div v-if="userAccountId != -1" class="input-container">
+                                        <div class="form-group" v-if="userAccount1">
+                                            <div class="col">
+                                                <input id="1" class="btn btn-light" type="button" name="userAccount" :value="userAccount1">
+                                                <input type="button" class="text-center btn btn-light"  @click="deleteAccount" value="삭제하기">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" v-if="userAccount2">
+                                            <div class="col">
+                                                <input id="2" class="btn btn-light" type="button" name="userAccount" :value="userAccount2">
+                                                <input type="button" class=" my-4 text-center btn btn-light"  @click="deleteAccount" value="삭제하기">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row" v-if="userAccount3">
+                                            <div class="col">
+                                                <input id="3" class="btn btn-light" type="button" name="userAccount" :value="userAccount3">
+                                                <input type="button" class="my-4 text-center btn btn-light" @click="deleteAccount" value="삭제하기">
+                                            </div>
+                                        </div>
+                                        <div class="card-footer">
+                                            <div class="input-buttons">
+                                                <input @click="registPaymentMethod" class="btn btn-primary btn-block" type="button" value="계좌 등록 및 추가하기">
+                                                <input @click="back" class="btn btn-primary btn-block" type="button" value="뒤로가기">
+                                            </div>
+                                        </div>
+                                    </div>
+                            
+                                    
+                                </div>
                             </div>
-                            <div class="row" v-if="userAccount2">
-                                <input id=2 class="input-text col" type="button" :value="userAccount2">
-                                <input type="button" class="col-1" value="삭제하기">
+                            <div class="card shadow-lg border-0 rounded-lg mt-5"  v-show="addShow">
+                                <div class="card-body">
+                                    <div class="form-group" :style="unHover">
+                                        <h4>- 없이 번호만 입력해주세요</h4>
+                                        <div :style="hover" style="text-align:right;">
+                                        <input type="button" class="text-center btn btn-light" @click="unvisible" value="X" style=" margin-bottom:10px">   
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="form-group"  style=" width:inherit; display:block">
+                                        <input class="form-control py-4" type="text" v-model="newPaymentMethod">                                  
+                                    </div>
+                                    <div class="form-group">
+                                        <ul >
+                                            <li v-for="bank in bankList" :key="bank.key" :vlaue="bank.name" style="list-style: none; float:left;">
+                                                <input type="button" class="btn btn-light" @click="addPaymentMethod" :value="bank.name" style="width:8vw; height:10vh; text-align:center">
+                                            </li>
+                                        </ui>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="input-buttons">
+                                            <input @click="sendNewMethod" class="btn btn-primary btn-block" type="button" value="계좌 등록하기">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="row" v-if="userAccount3">
-                                <input id=3 class="input-text col" type="button" :value="userAccount3">
-                                <input type="button" class="col-1" value="삭제하기">
-                            </div>
-                            <br>
-                            <br>
-                            <input @click="addPaymentMethod" type="button" value="계좌 추가하기">
                         </div>
                     </div>
-                    <div class="col-2"></div>
+                </div>
             </div>
-        
+        </div>
     </body>
+    {%endblock%}
 </html>

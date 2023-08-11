@@ -27,7 +27,7 @@
 							<div class="card-header">
 								<div class="row">
 									<div class="col text-center my-4 text-col">
-									<h3 class="font-weight-light hover-col">&nbsp;&nbsp;충전하기</h3>
+										<h3 class="font-weight-light hover-col">&nbsp;&nbsp;충전하기</h3>
 									</div>
 									<div @click="back" class="col-1 my-4 text-center btn btn-light"> X</div>
 								</div>
@@ -76,16 +76,17 @@
 												<input id="2" @click="changeDefaultAccount" class="col btn btn-light m-1" type="button" :value="[[accountList.user_account2]]">
 											</div>
 											<div v-if="! accountList.user_account2" class="form-group">
-												<input id="2" @click="addPaymentMethod" class="col btn btn-light m-1" type="button" value="not -1 결제수단 등록하기">
+												<input id="2" @click="addPaymentMethod" class="col btn btn-light m-1" type="button" value="결제수단 등록하기">
 											</div>
 											<div v-if="accountList.user_account3" class="form-group">
 												<input id="3" @click="changeDefaultAccount" class="col btn btn-light m-1" type="button" :value="[[accountList.user_account3]]">
 											</div>
-											<div v-if="! accountList.user_account3" class="form-group">
-												<input id="3" @click="addPaymentMethod" class="col btn btn-light m-1" type="button" value="not -1 결제수단 등록하기">
+											<div v-if="! accountList.user_account3 && accountList.user_account2" class="form-group">
+												<input id="3" @click="addPaymentMethod" class="col btn btn-light m-1" type="button" value="결제수단 등록하기">
 											</div>
 											<div class="card-footer">
 												<div class="input-buttons">
+													<input id="3" @click="addPaymentMethod" class="btn btn-primary btn-block" type="button" value="결제수단 수정하기">
 													<input @click="invisible" type="button" class="btn btn-primary btn-block" value="닫기">
 												</div>
 											</div>
@@ -93,7 +94,7 @@
 
 										<div v-if="userAccountId == -1">
 											<div class="form-group">
-												<input id="1" @click="addPaymentMethod" class="col btn btn-light m-1" type="button" value="is -1 결제수단 등록하기">
+												<input id="1" @click="addPaymentMethod" class="col btn btn-light m-1" type="button" value="결제수단 등록하기">
 											</div>
 											<div class="card-footer">
 												<div class="input-buttons">

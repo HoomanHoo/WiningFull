@@ -850,7 +850,7 @@ class InsertPaymentMethodAPI(APIView):
 
             return Response(json_result)
 
-        except ObjectDoesNotExist as ex:
+        except (ObjectDoesNotExist, Exception) as ex:
             logger.info(ex)
             user_account = {"user_account": "결제 수단이 등록되지 않았습니다"}
             user_account["user_account_id"] = -1
@@ -860,48 +860,82 @@ class InsertPaymentMethodAPI(APIView):
 
             return Response(json_result)
 
-    def post(self, request):  # create_or_update 라도 써야할 듯
+    def post(self, request):
         user_id = request.session.get("memid", None)
         # user_id = "test0810"
         new_payment_method = request.data.get("newPaymentMethod", None)
         add_number = request.data.get("addNumber", None)
+        is_initial = request.data.get("isInitial", None)
         print("user_id ", new_payment_method)
         print("user_id addnum", add_number)
 
-        if add_number == 1:
-            print("user_id 1", new_payment_method)
+        if is_initial == -1:
             user_payment_method = WinUserAccount(
                 user_id=user_id,
                 user_account_default=1,
                 user_account1=new_payment_method,
             )
             user_payment_method.save()
-
-        elif add_number == 2:
-            print("user_id 2", new_payment_method)
-            user_payment_method = WinUserAccount(
-                user_id=user_id,
-                user_account_default=1,
-                user_account2=new_payment_method,
-            )
-            user_payment_method.save()
-
-        elif add_number == 3:
-            print("user_id 3", new_payment_method)
-            user_payment_method = WinUserAccount(
-                user_id=user_id,
-                user_account_default=1,
-                user_account3=new_payment_method,
-            )
-            user_payment_method.save()
-
         else:
-            print("user_id else", new_payment_method)
+            if add_number == 1:
+                print("user_id 1", new_payment_method)
 
-        print("user_id final", new_payment_method)
-        print("user_payment_method", user_payment_method)
+                WinUserAccount.objects.filter(user_account_id=is_initial).update(
+                    user_account_default=1, user_account1=new_payment_method
+                )
 
-        redirect("paymentMethodAPI")
+            elif add_number == 2:
+                print("user_id 2", new_payment_method)
+                WinUserAccount.objects.filter(user_account_id=is_initial).update(
+                    user_account_default=2, user_account2=new_payment_method
+                )
+
+            elif add_number == 3:
+                print("user_id 3", new_payment_method)
+                WinUserAccount.objects.filter(user_account_id=is_initial).update(
+                    user_account_default=3, user_account3=new_payment_method
+                )
+
+            else:
+                print("user_id else", new_payment_method)
+
+        user_account_info = WinUserAccount.objects.get(user_id=user_id)
+        serialized = WinUserAccountSerializer(user_account_info)
+        json_result = JSONRenderer().render(serialized.data)
+
+        return Response(json_result)
+
+    def delete(self, request):
+        target_column = int(request.data.get("deleteColumn", None))
+        user_account_id = request.data.get("userAccountId", None)
+
+        print("target_column first:", target_column)
+
+        if target_column == 1:
+            print("target_column1")
+            WinUserAccount.objects.filter(user_account_id=user_account_id).update(
+                user_account1="", user_account_default=2
+            )
+
+        elif target_column == 2:
+            print("target_column2")
+            WinUserAccount.objects.filter(user_account_id=user_account_id).update(
+                user_account2="", user_account_default=1
+            )
+
+        elif target_column == 3:
+            print("target_column3")
+            WinUserAccount.objects.filter(user_account_id=user_account_id).update(
+                user_account3="", user_account_default=1
+            )
+
+        print("target_column final")
+
+        user_account_info = WinUserAccount.objects.get(user_account_id=user_account_id)
+        serialized = WinUserAccountSerializer(user_account_info)
+        json_result = JSONRenderer().render(serialized.data)
+
+        return Response(json_result)
 
 
 class AddPointHisView(View):
