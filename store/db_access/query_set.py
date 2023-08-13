@@ -305,6 +305,7 @@ def search_receive_code(receive_code: str) -> str or dict:
             user_name=F("purchase_detail__purchase__user__user_name"),
             wine_name=F("purchase_detail__sell__wine__wine_name"),
             purchase_state=F("purchase_detail__purchase_det_state"),
+            user_id=F("purchase_detail__purchase__user__user_id"),
         )
         .filter(receive_code=receive_code, purchase_state=1)
         .values(
@@ -314,6 +315,7 @@ def search_receive_code(receive_code: str) -> str or dict:
             "store_name",
             "user_name",
             "wine_name",
+            "user_id",
         )
     )
     end = time.time()
@@ -327,6 +329,7 @@ def search_receive_code(receive_code: str) -> str or dict:
             "store_name": "",
             "user_name": "",
             "wine_name": "",
+            "user_id": "",
         }
 
     else:
@@ -336,6 +339,7 @@ def search_receive_code(receive_code: str) -> str or dict:
 class PurchaseDetailSerializer(serializers.ModelSerializer):
     store_name = serializers.ReadOnlyField()  # (source="store_name")
     user_name = serializers.ReadOnlyField()  # (source="user_name")
+    user_id = serializers.ReadOnlyField()
     wine_name = serializers.ReadOnlyField()
 
     class Meta:

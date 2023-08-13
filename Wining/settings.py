@@ -85,7 +85,7 @@ SECRET_KEY = "django-insecure-t+x=)475)9=g3d_s84v!pps^irv8f$)6wfz@094&^ujxh10beg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.0.13"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -232,4 +232,21 @@ KAKAO_REDIRECT_URI3 = ""
 LOGOUT_REDIRECT_URI = ""
 
 
-mimetypes.add_type("application/javascript", ".js", True)
+mimetypes.add_type(
+    "application/javascript", ".js", True
+)  # 자바스크립트 파일을 text/plain으로 읽는 경우를 방지하기 위함
+
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.naver.com"
+EMAIL_USE_SSL = False
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+
+with open("C:\email_service\wining_email_account.txt", "r") as mail:
+    while True:
+        EMAIL_HOST_USER = str(mail.readline().strip())
+        EMAIL_HOST_PASSWD = str(mail.readline().strip())
+        DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+        if not mail.readline():
+            break
