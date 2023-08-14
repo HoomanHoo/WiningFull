@@ -38,7 +38,7 @@ from purchasing.db_access.query_set import (
     get_cart_list_page_info,
     get_detail_info,
 )
-from purchasing.usecase.send_mail import send_email
+from purchasing.usecase.send_mail import send_purchase_email
 
 from store.usecase.pagination import db_preprocessing
 
@@ -491,7 +491,7 @@ class OrderPageView(View):
                 name_and_email = get_user_name_and_email(user_id=user_id)
                 user_name = name_and_email[0]
                 user_email = name_and_email[1]
-                send_email(
+                send_purchase_email(
                     user_name=user_name,
                     user_email=user_email,
                     purchase_info_list=list(detail_infos),

@@ -10,6 +10,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from Wining import settings
+from purchasing.usecase.send_mail import send_charge_email
 
 from store.usecase.pagination import db_preprocessing, pagenation
 from user.kakao_token_module import kakao_token
@@ -411,7 +412,7 @@ class ModifyUserView(View):
     def post(self, request):
         user_id = request.session.get("memid")
         dto = WinUser.objects.get(user_id=user_id)
-        
+
         dto.user_passwd = request.POST["user_passwd"]
         dto.user_email = request.POST["user_email"]
         dto.user_tel = request.POST["user_tel"]
@@ -455,12 +456,11 @@ class ModifyUserView(View):
         return redirect("myPage")
 
 
-
 class MyPageView(View):
     def get(self, request):
         template = loader.get_template("user/myPage.html")
         memid = request.session.get("memid")
-        
+
         if memid:
             dto = WinUser.objects.filter(user_id=memid).first()
             purchase_c = WinPurchase.objects.filter(user_id=memid).count()
@@ -478,9 +478,9 @@ class MyPageView(View):
                 .order_by("-detail_view_time")[:6]
                 .select_related("wine")
             )
-            
+
             user_grade = dto.user_grade_id if dto else None
-            
+
             wine_images = []
 
             for v in detail_v:
@@ -500,19 +500,6 @@ class MyPageView(View):
             context = {}
 
         return HttpResponse(template.render(context, request))
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # class MyPageView(View):
@@ -730,13 +717,21 @@ class AddPointView(View):
         user_id = request.session.get("memid")
         dto = WinUser.objects.get(user_id=user_id)
         user_point = dto.user_point + chargepoint
-
+        user_email = dto.user_email
+        user_name = dto.user_name
         dto.user_point = user_point
+        point_reg = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         dto.save()
+        send_charge_email(
+            user_name=user_name,
+            user_email=user_email,
+            charge_point=chargepoint,
+            charge_time=point_reg,
+        )
 
         pdto = WinPointHis(
             user=WinUser.objects.get(user_id=dto.user_id),
-            point_reg=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            point_reg=point_reg,
             point_add=chargepoint,
         )
 

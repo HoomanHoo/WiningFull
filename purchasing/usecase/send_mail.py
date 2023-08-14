@@ -1,18 +1,36 @@
 import smtplib
 from email.mime.text import MIMEText
 import time
-from django.core.mail import EmailMessage, get_connection
 from Wining import settings
 
 
-def send_email(
+def send_charge_email(user_name: str, user_email: str, charge_point: int, charge_time):
+    user_subject = user_name + "님의 포인트 충전 내역입니다."
+    user_message = (
+        user_name
+        + "님의 포인트 충전 내역입니다. \n"
+        + str(charge_point)
+        + "원 \n"
+        + "충전 일시: "
+        + str(charge_time)
+    )
+
+    smtp = smtplib.SMTP("smtp.naver.com", 587)
+    smtp.ehlo()
+    smtp.starttls()
+    smtp.login(user=settings.EMAIL_HOST_USER, password=settings.EMAIL_HOST_PASSWD)
+    msg = MIMEText(user_message)
+    msg["From"] = settings.EMAIL_HOST_USER
+    msg["Subject"] = user_subject
+    msg["To"] = str(user_email)
+    smtp.sendmail(settings.EMAIL_HOST_USER, str(user_email), msg.as_string())
+    smtp.close()
+
+
+def send_purchase_email(
     user_name: str,
     user_email: str,
     purchase_info_list: list,
-    # store_name_list: str,
-    # store_email_list: str,
-    # receive_code_list: str,
-    # wine_name_list: str,
 ):
     store_email_list = []
     wine_name_list = {}
@@ -22,7 +40,7 @@ def send_email(
     purchase_det_price_list = {}
     store_address_list = {}
 
-    customer_message = user_name + "님의 결제 내역입니다."
+    customer_message = user_name + "님의 결제 내역입니다.\n"
 
     for purchase_info in purchase_info_list:
         wine_name = purchase_info["purchase_detail_id__sell__wine__wine_name"]
@@ -60,7 +78,6 @@ def send_email(
 
         elif store_email in store_email_list:
             wine_name_list[store_email].append(wine_name)
-            # store_name_list[store_email].append(store_name)
             purchase_det_number_list[store_email].append(purchase_det_number)
             receive_code_list[store_email].append(receive_code)
             purchase_det_price_list[store_email].append(purchase_det_price)
@@ -71,8 +88,6 @@ def send_email(
     from_email = str(settings.EMAIL_HOST_USER)
     message = customer_message
 
-    print(settings.EMAIL_HOST_USER)
-    print(settings.EMAIL_HOST_PASSWD)
     smtp = smtplib.SMTP("smtp.naver.com", 587)
     smtp.ehlo()  # say Hello
     smtp.starttls()  # TLS 사용시 필요
@@ -84,42 +99,40 @@ def send_email(
     msg["To"] = to
     smtp.sendmail(from_email, str(user_email), msg.as_string())
 
-    # smtp.quit()
-    time.sleep(1)
+    time.sleep(0.3)
 
     for store_email in store_email_list:
         store_message = (
-            str(store_name_list[store_email]) + "님 " + user_name + "님의 주문 내역 입니다"
+            str(store_name_list[store_email][0]) + "님 " + user_name + "님의 주문 내역 입니다\n"
         )
-        store_message += (
-            "\n"
-            + str(wine_name_list[store_email])
-            + str(purchase_det_number_list[store_email])
-            + "개"
-            + str(purchase_det_price_list[store_email])
-            + "원"
+        for idx, wine_name in enumerate(wine_name_list[store_email]):
+            store_message += (
+                "\n"
+                + str(wine_name)
+                + " "
+                + str(purchase_det_number_list[store_email][idx])
+                + "개 "
+                + str(purchase_det_price_list[store_email][idx])
+                + "원 "
+                + "\n"
+            )
+        subject = (
+            str(store_name_list[store_email][0]) + "님 " + user_name + "님의 주문 내역 입니다"
         )
-        subject = str(store_name_list[store_email]) + "님 " + user_name + "님의 주문 내역 입니다"
         to = str(store_email)
         from_email = str(settings.EMAIL_HOST_USER)
         message = store_message
-
-        print("store")
-        print(settings.EMAIL_HOST_PASSWD)
-        # smtp = smtplib.SMTP("smtp.naver.com", 587)
-        # smtp.ehlo()  # say Hello
-        # smtp.starttls()  # TLS 사용시 필요
-        # smtp.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWD)
 
         msg = MIMEText(message)
         msg["From"] = settings.EMAIL_HOST_USER
         msg["Subject"] = subject
         msg["To"] = to
         smtp.sendmail(from_email, str(store_email), msg.as_string())
-        time.sleep(1)
+        time.sleep(0.3)
 
     smtp.quit()
 
+    # django mail은 smtp 단에서 인증 오류가 발생하여 사용할 수 없음
     # result = EmailMessage(
     #     subject=subject,
     #     body=message,
