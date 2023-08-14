@@ -243,7 +243,8 @@ EMAIL_USE_SSL = False
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 
-with open("C:\email_service\wining_email_account.txt", "r") as mail:
+ACCOUNT_PATH = os.path.join(BASE_DIR, "/email_service/wining_email_account.txt")
+with open(ACCOUNT_PATH, "r") as mail:
     while True:
         EMAIL_HOST_USER = str(mail.readline().strip())
         EMAIL_HOST_PASSWD = str(mail.readline().strip())
