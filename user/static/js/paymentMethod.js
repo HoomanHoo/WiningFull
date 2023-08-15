@@ -139,7 +139,7 @@ const background = Vue.createApp({
 
         Vue.onMounted(() => {
             const url = "payment-method-api"
-            console.log(url);
+
             fetch(url).then((response) => response.json()).then((data) => {
                 const responseData = JSON.parse(data);
                 userAccount1.value = responseData["user_account1"];

@@ -225,11 +225,17 @@ STATICFILES_FINDERS = (
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-KAKAO_REST_API_KEY = ""
-KAKAO_REDIRECT_URI1 = ""
-KAKAO_REDIRECT_URI2 = ""
-KAKAO_REDIRECT_URI3 = ""
-LOGOUT_REDIRECT_URI = ""
+KAKAO_PATH = os.path.join(BASE_DIR, "/private_files/kakao_settings.txt")
+with open(KAKAO_PATH, "r", encoding="utf-8") as kakao:
+    while True:
+        KAKAO_REST_API_KEY = str(kakao.readline().strip())
+        KAKAO_REDIRECT_URI1 = str(kakao.readline().strip())
+        KAKAO_REDIRECT_URI2 = str(kakao.readline().strip())
+        KAKAO_REDIRECT_URI3 = str(kakao.readline().strip())
+        LOGOUT_REDIRECT_URI = str(kakao.readline().strip())
+
+        if not kakao.readline():
+            break
 
 
 mimetypes.add_type(
@@ -243,8 +249,8 @@ EMAIL_USE_SSL = False
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 
-ACCOUNT_PATH = os.path.join(BASE_DIR, "/email_service/wining_email_account.txt")
-with open(ACCOUNT_PATH, "r") as mail:
+ACCOUNT_PATH = os.path.join(BASE_DIR, "/private_files/wining_email_account.txt")
+with open(ACCOUNT_PATH, "r", encoding="utf-8") as mail:
     while True:
         EMAIL_HOST_USER = str(mail.readline().strip())
         EMAIL_HOST_PASSWD = str(mail.readline().strip())

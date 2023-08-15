@@ -861,10 +861,12 @@ class InsertPaymentMethodAPI(APIView):
         new_payment_method = request.data.get("newPaymentMethod", None)
         add_number = request.data.get("addNumber", None)
         is_initial = request.data.get("isInitial", None)
-        print("user_id ", new_payment_method)
-        print("user_id addnum", add_number)
+        print("user_id ", user_id)
+        print("addnum", add_number)
+        print("is_inital", is_initial)
 
-        if is_initial == -1:
+        if is_initial == 1:
+            print(user_id)
             user_payment_method = WinUserAccount(
                 user_id=user_id,
                 user_account_default=1,
