@@ -49,7 +49,7 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th scope="col"style="width:5%">Board No.</th>
+                    <th scope="col"style="width:5%" align='center'>Board No.</th>
                     <th scope="col"style="width:27%">Content.</th>
                     <th scope="col"style="width:5%">Writer.</th>
                     <th scope="col"style="width:11%">DATE.</th>
@@ -60,7 +60,7 @@
             {%for dto in dtos %}
                 <tr>
                 	<td>
-                		<a href="/board/content?num={{ dto.board_id }}">{{dto.board_id}}</a>
+                		<a href="/board/content?num={{ dto.board_id }}">&nbsp;&nbsp;&nbsp;{{dto.board_id}}</a>
                 	</td>
                     <td>
                     	<a href="/board/content?num={{ dto.board_id }}">{{dto.comment_content}}</a>

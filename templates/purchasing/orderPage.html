@@ -1,66 +1,70 @@
 <!DOCTYPE html>
-
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Wining</title>
-    <meta name="description" content="" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
-      crossorigin="anonymous"
-    />
-    <script src="/static/js/detailProductInfoScript.js" defer></script>
-  </head>
-  <body>
-    <div class="row">
-      <div class="col">수령 코드</div>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Wining</title>
+  <meta name="description" content="" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .container {
+      margin-top: 20px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .table {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    .table-row {
+      border-bottom: 1px solid #ccc;
+      padding: 10px 0;
+    }
+    .back-button {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Wining 주문 내역</h1>
     </div>
-    <div class="row">
-      <div class="col">제품명</div>
-      <div class="col-1">수량</div>
-      <div class="col">가격</div>
-      <div class="col">점포명</div>
-      <div class="col">점포 주소</div>
-      <div class="col">수령코드</div>
+    <div class="table">
+      <div class="table-row row header-row">
+        <div class="col-6" style="width: 29%">제품명</div>
+        <div class="col-6" style="width: 7%"align="center">수량</div>
+        <div class="col-6" style="width: 10%"align="right">가격</div>
+        <div class="col-6" style="width: 12%">점포명</div>
+        <div class="col-6" style="width: 31%">점포 주소</div>
+        <div class="col-6" style="width: 10%">수령코드</div>
+      </div>
+      {% for detail_info in detail_infos %}
+      <div class="table-row row header-row">
+        <div class="col-6" style="width: 29%">{{detail_info.purchase_detail_id__sell__wine__wine_name}}</div>
+        <div class="col-6" style="width: 7%" align="center">{{detail_info.purchase_detail_id__purchase_det_number}}</div>
+        <div class="col-6" style="width: 10%" align="right">{{detail_info.purchase_detail_id__purchase_det_price}}</div>
+        <div class="col-6" style="width: 12%">{{detail_info.purchase_detail_id__sell__store__store_name}}</div>
+        <div class="col-6" style="width: 31%">{{detail_info.purchase_detail_id__sell__store__store_address}}</div>
+        <div class="col-6" style="width: 10%">{{detail_info.receive_code}}</div>
+      </div>
+      {% endfor %}
     </div>
-    {% for detail_info in detail_infos %}
-    <div class="row">
-      <div class="col">
-        {{detail_info.purchase_detail_id__sell__wine__wine_name}}
-      </div>
-      <div class="col-1">
-        {{detail_info.purchase_detail_id__purchase_det_number}}
-      </div>
-      <div class="col">
-        {{detail_info.purchase_detail_id__purchase_det_price}}
-      </div>
-      <div class="col">
-        {{detail_info.purchase_detail_id__sell__store__store_name}}
-      </div>
-      <div class="col">
-        {{detail_info.purchase_detail_id__sell__store__store_address}}
-      </div>
-      <div class="col">{{detail_info.receive_code}}</div>
+    <div class="back-button">
+      <button class="btn btn-primary" onclick="location='/search/main'">메인 페이지로 이동</button>
     </div>
-    {% endfor %}
-    <div class="row">
-      <div class="col">
-        <input
-          type="button"
-          value="메인 페이지로 이동"
-          onclick="location='/search/main'"
-        />
-      </div>
-    </div>
+  </div>
 
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
-      crossorigin="anonymous"
-    ></script>
-  </body>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+  <script src="/static/js/detailProductInfoScript.js" defer></script>
+</body>
 </html>

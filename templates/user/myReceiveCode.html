@@ -73,14 +73,14 @@
 <div class="header-row">
     <div class="col-6">제품명</div>
     <div class="col" style="width: 15%">수령 점포명</div>
-    <div class="col" style="width: 10%">수량</div>
-    <div class="col" style="width: 12%">금액</div>
+    <div class="col" style="width: 10%" align="center">수량</div>
+    <div class="col" style="width: 12%" align="right">금액</div>
     <div class="col" style="width: 10%">수령 코드</div>
-    <div class="col" style="width: 10%">수령 상태</div>
+    <div class="col" style="width: 10%" align="center">수령 상태</div>
 </div>
     {% if state == -1 %}
     <div class="data-row text-center">
-        <div class="col" colspan="6">
+        <div class="col">
             <p class="mt-4">구매 이력이 없습니다</p>
         </div>
     </div>
@@ -88,12 +88,14 @@
     {% if state != -1 %}
     {% for pdto in pdtos %}
     <div class="data-row">
-        <div class="col-6">{{ pdto.wine_name }}</div>
+        <div class="col-6">
+        	{{ pdto.wine_name }}
+        </div>
         <div class="col">{{ pdto.store_name }}</div>
-        <div class="col">{{ pdto.purchase_det_number }}</div>
-        <div class="col">{{ pdto.purchase_det_price }}</div>
+        <div class="col" align="center">{{ pdto.purchase_det_number }}</div>
+        <div class="col" align="right">{{ pdto.purchase_det_price }}</div>
         <div class="col">{{ pdto.receive_code }}</div>
-        <div class="col">
+        <div class="col" align="center">
             {% if pdto.purchase_state == 1 %}
                 미수령
             {% else %}

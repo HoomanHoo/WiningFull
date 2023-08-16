@@ -42,7 +42,7 @@ const background = Vue.createApp({
                     return response.json();
                 }
                 else {
-                    alert("������ �߻��Ͽ����ϴ�\n ���߿� �ٽ� �õ����ּ���")
+                    alert("?????? ???????????\n ????? ??? ?o????????")
                 }
             }).then((data) => {
                 const responseData = JSON.parse(data);

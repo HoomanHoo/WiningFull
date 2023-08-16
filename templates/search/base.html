@@ -63,9 +63,8 @@
         }
         
        	.header-image {
-	        width: 10%; /* 이미지의 너비 조절 */
-	        max-width: 80px; /* 이미지 품질 유지를 위한 최대 크기 설정 */
-	        height: auto; /* 이미지의 높이 조절 */
+	        width: 80px; /* 이미지 품질 유지를 위한 최대 크기 설정 */
+	        height: 80px; /* 이미지의 높이 조절 */
 	        position: absolute; /* 절대 위치로 설정하여 메뉴바 오른쪽 상단에 고정 */
 	        top: 8%; /* 원하는 Y 축 위치로 조정 */
 	        left: 2%; /* 원하는 X 축 위치로 조정 */
@@ -137,8 +136,8 @@
             margin: 4px;
         }
 
-        .red-text {
-            color: #ff0000;
+        .yellow-text {
+            color: #FFE400;
             font-weight: bold;
         }
 
@@ -258,7 +257,7 @@
         {% if request.session.memid %}
             <div class="right-align right-margin">
                 <i class="fas fa-user"></i>
-                <span class='red-text'>{{ request.session.memid }}</span>님이 로그인하였습니다.
+                <span class='yellow-text'>{{ request.session.memid }}</span>님이 로그인하였습니다.
                 &nbsp;
                 <a href="#" class="logout-button btn btn-primary">로그아웃</a>
                 <a href="#">
@@ -267,7 +266,7 @@
             </div>
         {% else %}
             <div class="right-align right-margin">
-                <span class='red-text'>로그인되지 않은 상태입니다.</span>
+                <span class='yellow-text'>로그인되지 않은 상태입니다.</span>
             </div>
         {% endif %}
         {% if request.session.memid %}
