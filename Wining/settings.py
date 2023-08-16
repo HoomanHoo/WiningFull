@@ -80,7 +80,12 @@ LOGGING = {
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-t+x=)475)9=g3d_s84v!pps^irv8f$)6wfz@094&^ujxh10beg"
+SECRET_PATH = os.path.join(BASE_DIR, "private_files", "secret_key.txt")
+with open(SECRET_PATH, "r", encoding="utf-8") as secret_key:
+    while True:
+        SECRET_KEY = str(secret_key.readline().strip())
+        if not secret_key.readline():
+            break
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -225,7 +230,7 @@ STATICFILES_FINDERS = (
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-KAKAO_PATH = os.path.join(BASE_DIR, "/private_files/kakao_settings.txt")
+KAKAO_PATH = os.path.join(BASE_DIR, "private_files", "kakao_settings.txt")
 with open(KAKAO_PATH, "r", encoding="utf-8") as kakao:
     while True:
         KAKAO_REST_API_KEY = str(kakao.readline().strip())
@@ -249,7 +254,7 @@ EMAIL_USE_SSL = False
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 
-ACCOUNT_PATH = os.path.join(BASE_DIR, "/private_files/wining_email_account.txt")
+ACCOUNT_PATH = os.path.join(BASE_DIR, "private_files", "wining_email_account.txt")
 with open(ACCOUNT_PATH, "r", encoding="utf-8") as mail:
     while True:
         EMAIL_HOST_USER = str(mail.readline().strip())
