@@ -1,6 +1,9 @@
 from django.urls.conf import path
 from store import views
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
     path(
         "registration",
@@ -69,3 +72,11 @@ urlpatterns = [
         name="reviewList",
     ),
 ]
+
+
+urlpatterns += static(
+    settings.STATIC_URL, document_root=settings.STATIC_URL
+)  # MEDIA 경로 추가
+urlpatterns += static(
+    settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
+)  # MEDIA 경로 추가

@@ -17,27 +17,30 @@
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
 </head>
 
-<body class="sb-nav-fixed">   
-    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-        <div class="border-start border-end bg-white" id="sidebar-wrapper" style="width:300px;">
-            <div class="sidebar-heading border-bottom bg-light" align="center"><b>MyPage</b></div>
-            <div class="list-group list-group-flush">
-                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="modifyUser">회원정보수정</a>
-                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="delete">회원탈퇴</a>
-                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myBoard">게시글관리</a>
-                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myComment">댓글관리</a>
-                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="reviewList">리뷰관리</a>
-                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="purchaseDetail">구매내역</a>
+<body>
 
-                {% if bdto.user_grade_id == 1 %}
-                <a class="nav-link" href="myReceiveCode">수령 코드 확인</a>
-                {% endif %}
-                {% if bdto.user_grade_id == 2 %}
-                <a class="nav-link" href="../store/mypage">점주 페이지</a>
-                {% endif %}
-            </div>
-        </div>
-    </nav>
+	<div class="col" >
+	    <nav class="sb-nav-fixed navbar navbar-expand-lg navbar-light bg-light border-bottom">
+	        <div class="border-start border-end bg-white" id="sidebar-wrapper" style="width:300px;">
+	            <div class="sidebar-heading border-bottom bg-light" align="center"><b>MyPage</b></div>
+	            <div class="list-group list-group-flush">
+	                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="modifyUser">회원정보수정</a>
+	                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="delete">회원탈퇴</a>
+	                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myBoard">게시글관리</a>
+	                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myComment">댓글관리</a>
+	                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="reviewList">리뷰관리</a>
+	                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="purchaseDetail">구매내역</a>
+	
+	                {% if bdto.user_grade_id == 1 %}
+	                <a class="nav-link" href="myReceiveCode">수령 코드 확인</a>
+	                {% endif %}
+	                {% if bdto.user_grade_id == 2 %}
+	                <a class="nav-link" href="../store/mypage">점주 페이지</a>
+	                {% endif %}
+	            </div>
+	        </div>
+	    </nav>
+	</div>
     
     <div class="container mt-4" id="layoutSidenav_content">
     	<h2>내가 작성한 Post.</h2>
@@ -76,7 +79,8 @@
         </table>
     </div>
 </body>
-
+<br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br>
 <style>
     /*왼쪽에 MyPage 내용 고정시키는 코드 */
     #sidebar-wrapper {
