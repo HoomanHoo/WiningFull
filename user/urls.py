@@ -48,8 +48,8 @@ urlpatterns = [  # init_url == "http://localhost:8000/user/login"
 
 urlpatterns += static(
     settings.STATIC_URL, document_root=settings.STATIC_URL
-)  # MEDIA 뎩씉 혖늏
+)  # MEDIA 경로 추가
 urlpatterns += static(
     settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
-)  # MEDIA 뎩씉 혖늏
+)  # MEDIA 경로 추가
 
