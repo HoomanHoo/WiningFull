@@ -130,7 +130,7 @@ input::-webkit-input-placeholder {
 }
 
 .hover-inner-element {
-    /* div hover ??? ??????? */
+    /* div hover 안에서 중앙정렬해야함 */
     width: inherit;
     height: inherit;
 

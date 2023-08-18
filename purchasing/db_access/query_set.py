@@ -356,8 +356,10 @@ def get_detail_info(purchase_id):
             "purchase_detail_id__purchase_det_price",
             "purchase_detail_id__sell__store__store_name",
             "purchase_detail_id__sell__store__store_address",
+            "purchase_detail_id__sell__store__store_email",
             "receive_code",
         )
+        .order_by("purchase_detail_id__sell__store__store_email")
     )
 
     return detail_infos
@@ -411,3 +413,10 @@ class ReviewSerializer(serializers.Serializer):
     review_content = serializers.CharField()
     review_time = serializers.CharField()
     review_score = serializers.IntegerField()
+
+
+def get_user_name_and_email(user_id):
+    name_and_email = WinUser.objects.filter(user_id=user_id).values_list(
+        "user_name", "user_email"
+    )[0]
+    return name_and_email

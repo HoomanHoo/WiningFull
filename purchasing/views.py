@@ -28,6 +28,7 @@ from purchasing.db_access.query_set import (
     get_product_info,
     get_info_of_buy_one,
     get_product_reviews,
+    get_user_name_and_email,
     get_user_point,
     insert_enc_receive_codes,
     insert_purchase,
@@ -37,6 +38,7 @@ from purchasing.db_access.query_set import (
     get_cart_list_page_info,
     get_detail_info,
 )
+from purchasing.usecase.send_mail import send_purchase_email
 
 from store.usecase.pagination import db_preprocessing
 
@@ -319,7 +321,6 @@ class PickListView(View):
         cart_id = kwargs.get("cart_id", None)
         page_infos = []
         all_price = 0
-        
 
         if user_id is None:
             logger.error("NO user_id")
@@ -346,7 +347,6 @@ class PickListView(View):
                 "page_infos": page_infos,
                 "all_price": all_price,
                 "cart_id": cart_id,
-                
             }
 
             logger.info(f"{user_id}: cart_id: {cart_id} PickListView")
@@ -456,8 +456,9 @@ class OrderPageView(View):
         if result is None:
             logger.error("No buy list")
             return redirect("purchasing:buyList")
+
         else:
-            try:
+            try:  # with transaction 걸어줘야함
                 receive_codes = []
                 enc_receive_codes = []
                 purchase_infos = insert_purchase(result)
@@ -486,6 +487,15 @@ class OrderPageView(View):
                         detail_info.get("receive_code")
                     ).decode("utf-8")
                     detail_info["receive_code"] = receive_code
+
+                name_and_email = get_user_name_and_email(user_id=user_id)
+                user_name = name_and_email[0]
+                user_email = name_and_email[1]
+                send_purchase_email(
+                    user_name=user_name,
+                    user_email=user_email,
+                    purchase_info_list=list(detail_infos),
+                )
 
                 logger.info(
                     f"{user_id}: purchase_id: {purchase_id} current_time: {current_time} OrderPageView"

@@ -80,12 +80,17 @@ LOGGING = {
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-t+x=)475)9=g3d_s84v!pps^irv8f$)6wfz@094&^ujxh10beg"
+SECRET_PATH = os.path.join(BASE_DIR, "private_files", "secret_key.txt")
+with open(SECRET_PATH, "r", encoding="utf-8") as secret_key:
+    while True:
+        SECRET_KEY = str(secret_key.readline().strip())
+        if not secret_key.readline():
+            break
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.0.13"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -225,11 +230,35 @@ STATICFILES_FINDERS = (
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-KAKAO_REST_API_KEY = "3928e19c741cff6d9be9122659cfc5ce"
-KAKAO_REDIRECT_URI1 = "http://localhost:8000/user/inputUser"
-KAKAO_REDIRECT_URI2 = "http://localhost:8000/user/inputUserInfo"
-KAKAO_REDIRECT_URI3 = "http://localhost:8000/user/inputStore"
-LOGOUT_REDIRECT_URI = "http://localhost:8000/user/locallogout"
+KAKAO_PATH = os.path.join(BASE_DIR, "private_files", "kakao_settings.txt")
+with open(KAKAO_PATH, "r", encoding="utf-8") as kakao:
+    while True:
+        KAKAO_REST_API_KEY = str(kakao.readline().strip())
+        KAKAO_REDIRECT_URI1 = str(kakao.readline().strip())
+        KAKAO_REDIRECT_URI2 = str(kakao.readline().strip())
+        KAKAO_REDIRECT_URI3 = str(kakao.readline().strip())
+        LOGOUT_REDIRECT_URI = str(kakao.readline().strip())
+
+        if not kakao.readline():
+            break
 
 
-mimetypes.add_type("application/javascript", ".js", True)
+mimetypes.add_type(
+    "application/javascript", ".js", True
+)  # 자바스크립트 파일을 text/plain으로 읽는 경우를 방지하기 위함
+
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.naver.com"
+EMAIL_USE_SSL = False
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+
+ACCOUNT_PATH = os.path.join(BASE_DIR, "private_files", "wining_email_account.txt")
+with open(ACCOUNT_PATH, "r", encoding="utf-8") as mail:
+    while True:
+        EMAIL_HOST_USER = str(mail.readline().strip())
+        EMAIL_HOST_PASSWD = str(mail.readline().strip())
+        DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+        if not mail.readline():
+            break

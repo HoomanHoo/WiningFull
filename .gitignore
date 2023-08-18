@@ -12,3 +12,4 @@ __pycache__
 *.pydevproject
 *.prefs
 
+/private_files
