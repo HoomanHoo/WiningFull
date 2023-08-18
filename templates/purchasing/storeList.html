@@ -1,8 +1,8 @@
-{%extends "user/base.html"%}
-{%load static%}
+{% comment %} {%extends "user/base.html"%} {% endcomment %}
+{% comment %} {%load static%}
 {%block title%} <h2> </h2> {%endblock%}
 
-{%block content%}
+{%block content%} {% endcomment %}
 
 
 <!DOCTYPE html>
@@ -79,12 +79,13 @@
 	
 </html>
 
-<style>
+{% comment %} <style>
 	.row-header {
 	  font-weight: bold;
 	  background-color: #FFEAEA;
 	}
 </style>
+ {% endcomment %}
 
 
 
@@ -94,5 +95,4 @@
 
 
 
-
-{% endblock %}
+{% comment %} {% endblock %} {% endcomment %}
