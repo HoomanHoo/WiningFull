@@ -349,6 +349,7 @@ class StoreMyPageView(View): # 점주 페이지
                    "list" : db_data,
                    "pages_count" : pages_count, 
                    "image_url" : image_url,
+                   "dto" : dto
                    }
         logger.info(f"{user_id}: page_num: {page_num} StoreMyPageView")
         return HttpResponse(template.render(context, request))

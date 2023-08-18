@@ -32,10 +32,10 @@
 	                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="purchaseDetail">구매내역</a>
 	
 	                {% if bdto.user_grade_id == 1 %}
-	                <a class="nav-link" href="myReceiveCode">수령 코드 확인</a>
+	                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myReceiveCode">수령 코드 확인</a>
 	                {% endif %}
 	                {% if bdto.user_grade_id == 2 %}
-	                <a class="nav-link" href="../store/mypage">점주 페이지</a>
+	                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="../store/mypage">점주 페이지</a>
 	                {% endif %}
 	            </div>
 	        </div>
@@ -44,7 +44,7 @@
     
     <div class="container mt-4" id="layoutSidenav_content">
     	<h2>내가 작성한 Post.</h2>
-    	<h5><br>총 N개의 게시글을 작성했습니다<br></h5>
+    	<h5><br>총 {{board_c}}개의 게시글을 작성했습니다<br></h5>
         <table class="table">
             <thead>
                 <tr>
