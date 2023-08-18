@@ -13,7 +13,7 @@ class WinUser(models.Model):
     user_reg_date = models.DateTimeField()
     user_point = models.PositiveIntegerField()
     user_profile_img = models.ImageField(
-        upload_to="profile/", blank=True, max_length=300
+        upload_to="profile/", blank=True, max_length=300, default=""
     )
 
     class Meta:
@@ -50,7 +50,7 @@ class WinUserFavorite(models.Model):
     fav_third_priority = models.IntegerField()
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_user_favorite"
 
 
@@ -59,7 +59,7 @@ class WinUserGrade(models.Model):
     user_grade_name = models.CharField(unique=True, max_length=30)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_user_grade"
 
 
@@ -70,18 +70,18 @@ class WinPointHis(models.Model):
     point_add = models.IntegerField()
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_point_his"
 
 
 class WinReview(models.Model):
     review_id = models.AutoField(primary_key=True)
     user = models.ForeignKey("WinUser", models.CASCADE)  #
-    sell = models.ForeignKey("store.WinSell", models.CASCADE)  #
+    sell = models.ForeignKey("store.WinSell", models.CASCADE, default="")  #
     review_content = models.CharField(max_length=500)
     review_score = models.DecimalField(max_digits=2, decimal_places=1)
     review_reg_time = models.DateTimeField()
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_review"

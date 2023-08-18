@@ -11,7 +11,7 @@ class WinStore(models.Model):
     store_state = models.IntegerField(default=0)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_store"
 
 
@@ -21,7 +21,7 @@ class WinStoreExcel(models.Model):
     store_excel = models.CharField(max_length=300)  #
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_store_excel"
 
 
@@ -31,7 +31,7 @@ class WinStoreUrl(models.Model):
     store_map_url = models.CharField(max_length=300)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_store_url"
 
 
@@ -56,5 +56,5 @@ class WinSell(models.Model):
     sell_state = models.IntegerField()
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_sell"

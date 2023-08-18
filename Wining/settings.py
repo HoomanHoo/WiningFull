@@ -245,7 +245,7 @@ with open(KAKAO_PATH, "r", encoding="utf-8") as kakao:
 
 mimetypes.add_type(
     "application/javascript", ".js", True
-)  # ÀÚ¹Ù½ºÅ©¸³Æ® ÆÄÀÏÀ» text/plainÀ¸·Î ÀÐ´Â °æ¿ì¸¦ ¹æÁöÇÏ±â À§ÇÔ
+)  # ï¿½Ú¹Ù½ï¿½Å©ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ text/plainï¿½ï¿½ï¿½ï¿½ ï¿½Ð´ï¿½ ï¿½ï¿½ì¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½Ï±ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

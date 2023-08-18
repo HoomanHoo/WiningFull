@@ -15,7 +15,7 @@ class WinSearch(models.Model):
     search_time = models.DateTimeField()
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_search"
 
 
@@ -25,5 +25,5 @@ class WinSearchN(models.Model):
     search_n_time = models.DateTimeField()
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_search_n"

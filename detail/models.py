@@ -10,12 +10,12 @@ from django.db import models
 
 class WinDetailView(models.Model):
     detail_view_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey("user.WinUser", models.CASCADE)  #
+    user = models.ForeignKey("user.WinUser", models.CASCADE, default="")  #
     wine = models.ForeignKey("WinWine", models.CASCADE)  #
     detail_view_time = models.DateTimeField()
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_detail_view"
 
 
@@ -25,7 +25,7 @@ class WinDetailViewN(models.Model):
     detail_view_n_time = models.DateTimeField()
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_detail_view_n"
 
 
@@ -46,7 +46,7 @@ class WinWine(models.Model):
     )  #
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_wine"
 
 
@@ -55,5 +55,5 @@ class WinWineRegion(models.Model):
     wine_region_name = models.CharField(max_length=100)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_wine_region"

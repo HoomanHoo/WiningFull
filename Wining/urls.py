@@ -19,6 +19,10 @@ from django.urls import path
 from django.urls.conf import include
 from django.conf.urls.static import static
 from Wining import settings
+from errorhandling.views import Error404View, Error500View
+
+handler404 = Error404View.as_view()
+handler500 = Error500View.as_view()
 
 urlpatterns = [
     path("admin/", admin.site.urls),
