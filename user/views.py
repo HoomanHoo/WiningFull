@@ -558,8 +558,9 @@ class ReviewListView(View):
         user_id = request.session.get("memid")
         dtos = WinReview.objects.filter(user_id=user_id).order_by("-review_reg_time")
         rdto = WinUser.objects.get(user_id=user_id)
+        review_c = WinReview.objects.filter(user_id=user_id).count()
 
-        context = {"dtos": dtos, "rdto": rdto}
+        context = {"dtos": dtos, "rdto": rdto, "review_c" : review_c}
 
         return HttpResponse(template.render(context, request))
 
@@ -604,6 +605,7 @@ class PurchaseDetailView(View):
         reviews = WinReview.objects.filter(user_id=user_id).values_list(
             "sell_id", flat=True
         )
+        purchase_c = WinPurchase.objects.filter(user_id=user_id).count()
         dtos = []
 
         for purchase in purchases:
@@ -611,6 +613,7 @@ class PurchaseDetailView(View):
 
             for purchase_detail in purchase_details:
                 wine_name = purchase_detail.sell.wine.wine_name
+                wine_id = purchase_detail.sell.wine.wine_id
                 wine_name_eng = purchase_detail.sell.wine.wine_name_eng
                 wine_image = purchase_detail.sell.wine.wine_image
                 purchase_price = purchase_detail.purchase_det_price
@@ -624,6 +627,7 @@ class PurchaseDetailView(View):
                 dtos.append(
                     {
                         "wine_name": wine_name,
+                        "wine_id" : wine_id,
                         "wine_name_eng": wine_name_eng,
                         "wine_image": wine_image,
                         "purchase_price": purchase_price,
@@ -634,7 +638,7 @@ class PurchaseDetailView(View):
                     }
                 )
 
-        context = {"dtos": dtos, "reviews": reviews, "pdto": pdto}
+        context = {"dtos": dtos, "reviews": reviews, "pdto": pdto, "purchase_c" : purchase_c}
 
         return HttpResponse(template.render(context, request))
 
@@ -644,7 +648,7 @@ class MyBoardView(View):
         template = loader.get_template("user/myBoard.html")
         user_id = request.session.get("memid")
         bdto = WinUser.objects.get(user_id=user_id)
-
+        board_c = WinBoard.objects.filter(user_id=user_id).count()
         dtos = WinBoard.objects.filter(user_id=user_id).order_by("-board_reg_time")
 
         print(dtos)
@@ -674,6 +678,7 @@ class MyBoardView(View):
             "dtos_and_images": dtos_and_images,
             "user_id": user_id,
             "bdto": bdto,
+            "board_c" : board_c
         }
 
         return HttpResponse(template.render(context, request))
@@ -684,6 +689,7 @@ class MyCommentView(View):
         template = loader.get_template("user/myComment.html")
         user_id = request.session.get("memid")
         cdto = WinUser.objects.get(user_id=user_id)
+        comment_c = WinComment.objects.filter(user_id=user_id).count()
         dtos = (
             WinComment.objects.select_related("board")
             .filter(user_id=user_id)
@@ -693,7 +699,7 @@ class MyCommentView(View):
         for dto in dtos:
             print(dto.board.board_title)
 
-        context = {"dtos": dtos, "cdto": cdto}
+        context = {"dtos": dtos, "cdto": cdto, "comment_c" : comment_c}
 
         return HttpResponse(template.render(context, request))
 
