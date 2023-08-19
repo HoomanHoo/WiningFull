@@ -14,7 +14,7 @@
 
 
     <body class="sb-nav-fixed">   
-		<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+		<nav>
 		
 	 <div class="border-start border-end bg-white" id="sidebar-wrapper" style="width:300px;">
          <div class="sidebar-heading border-bottom bg-light" align="center"><b>MyPage</b></div>
@@ -27,10 +27,10 @@
                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="purchaseDetail">구매내역</a>
 
 	                {% if dto.user_grade_id == 1 %}
-	                <a class="nav-link" href="myReceiveCode">수령 코드 확인</a>
+	                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myReceiveCode">수령 코드 확인</a>
 	                {% endif %}
 	                {% if dto.user_grade_id == 2 %}
-	                <a class="nav-link" href="../store/mypage">점주 페이지</a>
+	                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="../store/mypage">점주 페이지</a>
 	                {% endif %}
                </div>
          </div>
@@ -63,7 +63,7 @@
                        
                        
 
-                        <div class="row">
+                       <div class="row">
                             <div class="col-xl-3 col-md-6">
                                 <div class="card bg-primary text-white mb-4">
                                     <div class="card-body">{{dto.user_point}} Point</div>
@@ -74,34 +74,11 @@
                                     </div>
                                 </div>
                             </div>
-                            
-							
-                            <div id="chargeForm" style="display:none;">
-								<form method="post" action="addPoint" name="addpoint">
-									<div class="container">
-										<div class="wrapper"> 
-											<div class="outer-card"> 
-												<div class="forms">
-													<input class="inputbutton" type="button" value="X" onclick="location='myPage'">
+                        
 
-													<div class="input-items"> 
-														<input id="chargePoint" name="point" type="number" placeholder="충전금액을 입력해주세요" size="19"> 
-													</div>
-													<div class="input-items"> 
-														<span id="currentPoint">보유 포인트 :<b> {{dto.user_point}}</b></span>
-													</div>
-												</div> 
-												<div class="input-buttons"> 
-													<input type="submit" id="charge" value="충전하기">
-												</div> 
-											</div> 
-										</div> 
-									</div>
-								</form>
-                            </div>
                             
                             
-                            
+ 
                             <div class="col-xl-3 col-md-6">
                                 <div class="card bg-warning text-white mb-4">
                                     <div class="card-body">주문내역 {{purchase_c}}</div>
@@ -111,6 +88,9 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                        
+                      
                             <div class="col-xl-3 col-md-6">
                                 <div class="card bg-success text-white mb-4">
                                     <div class="card-body">나의 리뷰 {{review_c}}</div>
@@ -137,11 +117,11 @@
                         
                         
                         <div class="row">
-                            <div class="col-xl-6">
+                            <div class="col-xl-24">
                                 <div class="card mb-4">
                                     <div class="card-header">
                                         <i class="fas fa-chart-area me-1"></i>
-                                        <b>Recent Searched.</b>
+                                        <b>Recent Searched 6.</b>
                                         <span><b></b></span>
                                     </div>
 	                                
@@ -156,45 +136,20 @@
 							  			{%endfor%}
 							      		</div>
 							      	</div>
-							     
-									      
-                                    <div class="card-body"><canvas id="myAreaChart" width="100%" height="40"></canvas></div>
-                                </div>
+                                   </div>
                             </div>
                             
                             <!--  -->
-                            <div class="col-xl-6">
-                                <div class="card mb-4">
-                                    <div class="card-header">
-                                        <i class="fas fa-chart-bar me-1"></i>
-                                        <b>여기다가 넣을만한 게 뭐가 있니?</b>
-                                    </div>
-                                    <div class="card-body"><canvas id="myBarChart" width="100%" height="40"></canvas></div>
-                                </div>
-                            </div>
+
                             
                         </div>
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <i class="fas fa-table me-1"></i>
-                                기타 등등
-                            </div>
-                            <div>
-                            	etc<br>
-                            	etc<br>
-                            </div>
 
-                        </div>
                     </div>
                 </main>
 
             </div>
 		</nav>
 
-        <script src="js/scripts.js"></script>
-        <script src="assets/demo/chart-area-demo.js"></script>
-        <script src="assets/demo/chart-bar-demo.js"></script>
-        <script src="js/datatables-simple-demo.js"></script>
         
         
         <!--page 넘어가지 않고  myPage내부에서 충전 바로 되도록 설정 -->

@@ -1,4 +1,4 @@
-{% comment %} {% extends "purchasing/base.html" %} {% endcomment %}
+{% extends "purchasing/base.html" %}
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'css/myBoard.css' %}">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -84,10 +84,10 @@
                 <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'purchaseDetail' %}">구매내역</a>
 
                {% if bdto.user_grade_id == 1 %}
-                <a class="nav-link" href="myReceiveCode">수령 코드 확인</a>
+                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myReceiveCode">수령 코드 확인</a>
                 {% endif %}
                 {% if bdto.user_grade_id == 2 %}
-                <a class="nav-link" href="../store/mypage">점주 페이지</a>
+                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="../store/mypage">점주 페이지</a>
                 {% endif %}
             </div>
         </div>
@@ -178,6 +178,9 @@
         integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
         crossorigin="anonymous"></script>
 </body>
+
+<br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br>
 <style>
     /*왼쪽에 MyPage 내용 고정시키는 코드 */
     #sidebar-wrapper {
