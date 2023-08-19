@@ -350,6 +350,7 @@ class PurchaseDetailSerializer(serializers.ModelSerializer):
             "purchase_det_price",
             "store_name",
             "user_name",
+            "user_id",
             "wine_name",
         ]
 

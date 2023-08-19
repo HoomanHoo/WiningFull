@@ -1,196 +1,181 @@
-{%extends "user/base.html"%}
-{%load static%}
-{%block title%} <h2> </h2> {%endblock%}
 
-{%block content%}
 
-<!DOCTYPE html>
-<html lang="en">
-
+{% load static %}
+{%csrf_token%}
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>와인 상세 정보</title> 
+  <title>와인 상세 정보</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  
   <style>
-  
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-    }
-
-    .container {
-      padding: 20px;
-      background-color: white;
-      border-radius: 10px;
-      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .wine-image {
-      display: block;
-      margin: 0 auto;
-      max-width: 200px;
-      height: auto;
-    }
-
-    h2 {
-      margin-top: 20px;
-    }
-
-    .info {
-      color: #007bff;
-      font-weight: bold;
-    }
-
-    .button-container {
-      margin-top: 20px;
-      text-align: center;
-    }
-
-    .input-button {
-      padding: 10px 30px;
-      background-color: #007bff;
-      border: none;
-      color: white;
-      cursor: pointer;
-      border-radius: 5px;
-      transition: background-color 0.2s;
-    }
-
-    .input-button:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-    
-    
-    .row, .recommend-list{
-      text-align: center;
-    }
-    
-    
-    .wine-info-table {
-      width: 100%;
-      margin-top: 30px;
-      border-collapse: collapse;
-      text-align: center;
-    }
-
-    .wine-info-table th,
-    .wine-info-table td {
-      border: 1px solid #e0e0e0;
-      padding: 10px;
-    }
-    
-    
-    .recommend-container {
-      margin-top: 40px;
-      text-align: center;
-    }
-
-    .recommend-title {
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-
-    .recommend-list {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 20px;
-    }
-
-    .recommend-item {
-      flex: 0 0 calc(15.92% - 20px);
-      background-color: white;
-      border: 1px solid #e0e0e0;
-      border-radius: 5px;
-      padding: 10px;
-      text-align: center;
-    }
-
-    .recommend-image {
-      max-width: 70px;
-      height: 100px;
-    }
+  .fakeimg {
+    height: 200px;
+    background: #aaa;
+  }
   </style>
 </head>
-
 <body>
-  <div class="container">
-    <div class="row">
-      <div class="col-md-6 offset-md-3 text-center">
-        <img src="{{ wine_info.wine_image }}" class="wine-image">
-        <h2>{{ wine_info.wine_name }}</h2>
-        <h5>{{ wine_info.wine_name_eng }}</h5>
-        <p>{{ wine_info.wine_capacity }} mL
-          {% if wine_info.wine_capacity == 750 %}
-          (표준 용량)
-          {% endif %}
-        </p>
-      </div>
-    </div>
-    
-    <div class="row mt-5">
-      <div class="col-md-8 offset-md-2">
-        <table class="table wine-info-table">
-          <thead>
-            <tr>
-              <th>분류</th>
-              <th>생산 국가</th>
-              <th>사이드음식</th>
-              <th>도수</th>
-              <th>당도</th>
-              <th>산도</th>
-              <th>탄닌</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>{{ det_kind }}</td>
-              <td>{{ region.wine_region_name }}</td>
-              <td>{{ det_food }}</td>
-              <td>{{ wine_info.wine_alc }}%</td>
-              <td>{{ wine_info.wine_dangdo }}</td>
-              <td>{{ wine_info.wine_sando }}</td>
-              <td>{{ wine_info.wine_tannin }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
 
-    <div class="row mt-4">
-      <div class="col-md-6 offset-md-3 text-center">
-        {% if request.session.memid %}
-        <a class="btn btn-primary btn-block" href="../purchasing/wine/{{ wine_info.wine_id }}/stores">매장 리스트업</a>
-        {% else %}
-        <button class="btn btn-secondary btn-block" disabled>매장 리스트업</button>
-        {% endif %}
-        <button class="btn btn-secondary btn-block" onclick="history.back()">뒤로 가기</button>
-      </div>
-    </div>
-    <br><br><br>
 
-	<div class="row mt-8">
-	  <div class="col-md-12 text-center">
-	    <h3 class="recommend-title">추천 와인</h3>
-	    <div class="row recommend-list">
-	      {% for recommend in recommend_list %}
-	      <div class="col-2 recommend-item">
-	        <a href="winedetail?wine_id={{recommend.wine_id}}">
-	          <img src="../{{recommend.wine_image}}" class="recommend-image">
-	          <div>{{ recommend.wine_name }}</div>
-	        </a>
-	      </div>
-	      {% endfor %}
-	    </div>
-	  </div>
+
+{% block detail %}
+<br><br><br>
+	<div style="text-align:center"> 
+		<img src="{{ wine_info.wine_image }}" width="300" height="400"> 
 	</div>
 
+<div class="row" style="text-align:center">
+	<h2>{{ wine_info.wine_name }} </h2>
+</div>
+<div class="row" style="text-align:center">
+	<h5>{{ wine_info.wine_name_eng }} </h5>
+</div>
+<div class="row" style="text-align:center">
+	<h5>{{ wine_info.wine_capacity }} mL 
+	{% if wine_info.wine_capacity == 750 %}
+		(표준 용량)
+	{% endif %}
+</h5>
+</div>
+<br>
+<br>
+
+<div class="container mt-5" style="text-align:center">
+  <div class="row" style="text-align:center">
+    <div class="col-sm-4">
+      <div class="fakeimg"> <span class="info"> 분류 : {{ det_kind }} </span> </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="fakeimg"> <span class="info"> 생산 국가 : {{ region.wine_region_name }} </span> </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="fakeimg"> <span class="info"> 사이드 음식 : {{ det_food }} </span> </div>
+    </div>
+   <div class="row">
+   </div>
   </div>
-  
+  <br><br>
+  <div class="row" style="text-align:center">
+   <div class="col-sm-4">
+     <div class="fakeimg"> <span class="info"> 도수 : {{ wine_info.wine_alc }}% </span> </div>
+   </div>
+   <div class="col-sm-8" style="text-align:center">
+     <div class="fakeimg" style="text-align:center">
+     	<div style="text-align:center">
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+		<canvas id="chartTaste" width="800" height="200"></canvas>
+		<script>		
+		let taste_spec = [];
+		taste_spec.push("{{ wine_info.wine_dangdo }}");
+		taste_spec.push("{{ wine_info.wine_sando }}");
+		taste_spec.push("{{ wine_info.wine_tannin }}");
+		
+		let taste_spec_name = ["당도", "산도", "탄닌"];
+		
+		const ctxTaste = document.getElementById('chartTaste').getContext('2d');
+		const chartTaste = new Chart(ctxTaste, {
+		    type: 'bar',
+		    data: {
+		        labels: taste_spec_name,
+		        datasets: [{
+		            label: 'wine_taste',
+		            data: taste_spec,
+		            backgroundColor: [
+		                'rgba(255, 99, 132, 0.5)'
+		            ],
+		            borderColor: [
+		                'rgba(255, 99, 132, 1)'
+		            ],
+		            borderWidth: 1
+		        }]
+		    },
+		    options: {
+		    	responsive: false,
+		        scales: {
+		            y: {
+						ticks: {
+							min: 0,
+							max: 5,
+							fontSize : 20
+						}
+					}
+		        }
+		    }
+		});
+		</script>
+		</div>
+		<div>
+			
+		</div>
+		</div>
+		
+		
+		
+		
+	 
+   </div>
+  	</div>
+  </div>  
+ <br><br>
+  <div class="row">
+ 	<div class="col_" style="float: left;">
+  		{% if request.session.memid %}
+		    <input class="inputbutton" type="button" value="매장 리스트업" style="padding: 10px 30px;"
+		    	onclick="location='../purchasing/wine/{{ wine_info.wine_id }}/stores'">    
+		    	<!-- onclick="location='../purchasing/store-list?wine_id={{ wine_info.wine_id }}'"> -->	    	
+		{% else %}   	
+		    <input class="inputbutton" type="button" value="매장 리스트업" style="padding: 10px 30px;"
+		    	value="구매하려면 로그인을 해야합니다." disabled="disabled">
+		
+		{% endif %}
+		</div>
+	<div class="col_" style="float: left;"> 
+			<br>
+		    	<input class="inputbutton" type="button" value="뒤로 가기" style="padding: 10px 30px;"
+		    	onclick="history.back()">
+  	</div>	
+  	
+  </div>
+		
+	{% endblock %}	
+	{% block recommend %}	
+
+	<div class="row">
+	     <div class="col-sm-12">
+	      	<div class="well">
+	  			{%for recommend in recommend_list %}
+	  			<a href="winedetail?wine_id={{recommend.wine_id}}">
+	  				<img src="../{{recommend.wine_image}}" width=150 height=150>
+	  			</a>
+	  			{%endfor%}
+	      	</div>
+	      </div>
+	</div>
+
+	
+	{% endblock %}	
+
+
+<style>
+.fakeimg {
+            height: 200px;
+            background-color: #F8E0E6;
+        }
+
+
+
+.row	{
+			text-align : center;
+		}
+</style>
+
+<br>
+<div class="mt-5 p-4 bg-dark text-white text-center">
+  <p></p>
+</div>
+
 </body>
-{% endblock %}
+</html>

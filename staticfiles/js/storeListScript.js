@@ -91,32 +91,3 @@ Vue.createApp({
 
 }).mount("#newList");
 
-
-
-
-
-// import { createApp } from "https://unpkg.com/vue@3/dist/vue.global.js";
-
-const app = Vue.createApp({
-  data() {
-    return {
-      responseData: [], // 서버에서 받아올 데이터
-    };
-  },
-  methods: {
-    move(sellId) {
-      // 클릭 시 상세 페이지로 이동
-      window.location.href = `/purchasing/store/${sellId}`;
-    },
-  },
-});
-
-app.mount("#storeList");
-
-
-
-
-
-
-
-

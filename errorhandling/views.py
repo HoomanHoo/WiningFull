@@ -19,7 +19,8 @@ class StoreErrorView(View):
         context = {}
 
         return HttpResponse(template.render(context, request))
-        
+    
+
 class Error404View(View):
     def get(self, request):
         template = loader.get_template("errorhandling/404page.html")
@@ -32,3 +33,4 @@ class Error500View(View):
         template = loader.get_template("errorhandling/500page.html")
         context = {}
 
+        return HttpResponse(template.render(context, request))

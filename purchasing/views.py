@@ -41,7 +41,6 @@ from purchasing.db_access.query_set import (
 from purchasing.usecase.send_mail import send_purchase_email
 
 from store.usecase.pagination import db_preprocessing
-from user.models import WinUser
 
 
 logger = logging.getLogger("purchasing")
@@ -202,9 +201,8 @@ class BuyListView(View):
         cart_id = request.GET.get("cartid", None)
         quantity = request.GET.get("qnty", None)
         user_point = get_user_point(user_id)
-        bdto = WinUser.objects.get(user_id=user_id)
         template = loader.get_template("purchasing/buyList.html")
-        context = {"user_point": user_point, "bdto" : bdto}
+        context = {"user_point": user_point}
         dtos = []
         all_price = 0
 
@@ -321,7 +319,6 @@ class PickListView(View):
         """
         user_id = request.session.get("memid")
         cart_id = kwargs.get("cart_id", None)
-        bdto = WinUser.objects.get(user_id=user_id)
         page_infos = []
         all_price = 0
 
@@ -350,7 +347,6 @@ class PickListView(View):
                 "page_infos": page_infos,
                 "all_price": all_price,
                 "cart_id": cart_id,
-                "bdto" : bdto
             }
 
             logger.info(f"{user_id}: cart_id: {cart_id} PickListView")
@@ -504,9 +500,11 @@ class OrderPageView(View):
                 logger.info(
                     f"{user_id}: purchase_id: {purchase_id} current_time: {current_time} OrderPageView"
                 )
+
             except DatabaseError as db_error:
                 logger.error(db_error)
                 return redirect("errorhandling:purchaseError")
 
+            print(detail_infos)
             context = {"detail_infos": detail_infos}
             return HttpResponse(template.render(context, request))

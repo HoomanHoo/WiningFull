@@ -93,6 +93,7 @@ const addPoint = Vue.createApp({
 
         Vue.onMounted(() => {
             const url = "account"
+            console.log("staticfiles");
             fetch(url).then((response) => response.json()).then((data) => {
                 const responseData = JSON.parse(data);
                 selectedAccount.value = responseData["user_account"];

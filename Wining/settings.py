@@ -89,8 +89,8 @@ with open(SECRET_PATH, "r", encoding="utf-8") as secret_key:
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-
-ALLOWED_HOSTS = ["*"]
+print("wining")
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.0.3"]
 
 
 # Application definition
@@ -245,7 +245,7 @@ with open(KAKAO_PATH, "r", encoding="utf-8") as kakao:
 
 mimetypes.add_type(
     "application/javascript", ".js", True
-)  # �ڹٽ�ũ��Ʈ ������ text/plain���� �д� ��츦 �����ϱ� ����
+)  
 
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

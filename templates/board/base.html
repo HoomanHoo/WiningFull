@@ -126,8 +126,8 @@
 	            margin: 4px;
 	        }
 	
-	        .yellow-text {
-	            color:#FFE400;
+	        .red-text {
+	            color:	#FFFF00;
 	            font-weight: bold;
 	        }
 	
@@ -225,7 +225,7 @@
         {% if request.session.memid %}
             <div class="right-align right-margin">
                 <i class="fas fa-user"></i>
-                <span class='yellow-text'>{{ request.session.memid }}</span>님이 로그인하였습니다.
+                <span class='red-text'>{{ request.session.memid }}</span>님이 로그인하였습니다.
                 &nbsp;
                 <a href="#" class="logout-button btn btn-primary">로그아웃</a>
                 <a href="#">
@@ -234,7 +234,7 @@
             </div>
         {% else %}
             <div class="right-align right-margin">
-                <span class='yellow-text'>로그인되지 않은 상태입니다.</span>
+                <span class='red-text'>로그인되지 않은 상태입니다.</span>
             </div>
         {% endif %}
         {% if request.session.memid %}

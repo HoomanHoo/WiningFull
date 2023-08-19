@@ -38,20 +38,6 @@ from store.db_access.query_set import (
 )
 from purchasing.usecase.receive_code_create_enc_module import EncModule
 from store.usecase.pagination import db_preprocessing, pagenation
-from django.core.management.commands import startapp
-
-
-
-# 여기부터 추가한 것들
-
-from user.models import (
-    WinUser,
-)
-
-
-
-
-
 
 # Create your views here.
 
@@ -304,58 +290,16 @@ class DiscontinueProductView(View):
         return JsonResponse({"result": "삭제되었습니다"}, status=200)
 
 
-class StoreMyPageView(View): # 점주 페이지
-    def get(self, request, **kwargs):
+class StoreMyPageView(View):
+    def get(self, request):
         user_id = request.session.get("memid")
-        
-
-        
-        info = get_store_info(user_id=user_id)
-        full_address = info.get("store_address").split("@")
-        main_address = full_address[0]
-        detail_address = full_address[1]
-        
-        memid = request.session.get("memid")#
-        dto = WinUser.objects.filter(user_id=memid).first() #
-        image_url = dto.user_profile_img.url if dto and dto.user_profile_img else "" #
-        
-        page_num = kwargs.get("pageNum", 1)
         template = loader.get_template("store/storeMyPage.html")
-        show_length=30
-        end = int(show_length) * int(page_num)
-        start = end - 30
-        detail_sell_list = get_detail_sell_list(user_id=user_id)
-        list_info = db_preprocessing(
-            db_data=detail_sell_list, end_page=end, start_page=start
-        )
-        pagination_result = pagenation(
-            show_length=show_length,
-            page_num=page_num,
-            end_page=end,
-            start_page=start,
-            datas=list_info,
-        )
-        
-        db_data = pagination_result["db_data"]
-        pages_count = pagination_result["pages_count"]
-        print(pages_count)        
-        
-        
-        
-        context = {"user_id": user_id,
-                   "info": info,
-                   "main_address": main_address,
-                   "detail_address": detail_address,
-                   "list" : db_data,
-                   "pages_count" : pages_count, 
-                   "image_url" : image_url,
-                   "dto" : dto
-                   }
-        logger.info(f"{user_id}: page_num: {page_num} StoreMyPageView")
+        context = {"user_id": user_id}
+        logger.info(f"{user_id}: StoreMyPageView")
         return HttpResponse(template.render(context, request))
 
 
-class SearchReceiveCodeView(View): # 수령코드 검색하기
+class SearchReceiveCodeView(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -384,10 +328,14 @@ class SearchReceiveCodeView(View): # 수령코드 검색하기
     # 수령코드 get 방식으로 검색
 
 
-class SearchReceiveCodeApi(APIView): 
+class SearchReceiveCodeApi(APIView):
     def get(self, request, **kwargs):
-        receive_code = kwargs.get("code", None).replace(" ", "")
-
+        receive_code = kwargs.get("code", None)
+      
+        if receive_code is not None:
+            receive_code = receive_code.replace(" ", "")
+        else:
+            receive_code = "None"
         result = search_receive_code(
             receive_code=EncModule().encrypt_receive_code(receive_code)
         )
@@ -562,7 +510,7 @@ class DropStoreView(View):
         return JsonResponse({"result": text, "code": code}, status=200)
 
 
-class StoreRevenueMainView(View): #판매 주류 보기
+class StoreRevenueMainView(View):
     def get(self, request, **kwargs):
         page_num = kwargs.get("page_num", 1)
         user_id = request.session.get("memid")
@@ -589,7 +537,7 @@ class StoreRevenueMainView(View): #판매 주류 보기
         return HttpResponse(template.render(context, request))
 
 
-class StoreRevenueTermView(View): # 판매 주류 보기
+class StoreRevenueTermView(View):
     def get(self, request):
         user_id = request.session.get("memid")
         term = int(request.GET.get("term", 0))
@@ -601,7 +549,7 @@ class StoreRevenueTermView(View): # 판매 주류 보기
         return JsonResponse({"result": revenue_info}, status=200)
 
 
-class StoreReviewView(View): # 판매 주류 보기 > 리뷰보기
+class StoreReviewView(View):
     def get(self, request, **kwargs):
         sell_id = kwargs.get("sell_id")
         page_num = kwargs.get("page_num", 1)

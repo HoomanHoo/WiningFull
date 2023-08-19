@@ -45,7 +45,7 @@ class WineDetailInfoView(View):
         get_wine_id = get_wines.only("wine_id", "wine_image")
         print(get_wine_id)
         print(get_wine_id[0].wine_image)
-        random_wine_id = random_generate(list(get_wine_id), 6)
+        random_wine_id = random_generate(list(get_wine_id), 5)
         random_list = []
 
         for i in range(len(random_wine_id)):
@@ -59,7 +59,6 @@ class WineDetailInfoView(View):
         print(recommend_list[2].wine_id)
         print(recommend_list[3].wine_id)
         print(recommend_list[4].wine_id)
-        print(recommend_list[5].wine_id)
 
         if request.session.get("memid"):
             detail_rec = WinDetailView(

@@ -33,10 +33,10 @@
                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="purchaseDetail">구매내역</a>
                 
                 {% if rdto.user_grade_id == 1 %}
-                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="myReceiveCode">수령 코드 확인</a>
+                <a class="nav-link" href="myReceiveCode">수령 코드 확인</a>
                 {% endif %}
                 {% if rdto.user_grade_id == 2 %}
-                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="../store/mypage">점주 페이지</a>
+                <a class="nav-link" href="../store/storeMyPage">점주 페이지</a>
                 {% endif %}
                </div>
          </div>
@@ -54,7 +54,7 @@
                 <thead>
                     <tr>
                         <th scope="col" style="width:7%">Product.</th>
-                        <th scope="col" style="width:39%">Info.</th>
+                        <th scope="col" style="width:47%">Info.</th>
                         <th scope="col" style="width:10%">Price.</th>
                         <th scope="col" style="width:23%">Review.</th>
                         <th scope="col">Rate.</th> 
@@ -67,6 +67,7 @@
 							<a href="../detail/winedetail?wine_id={{dto.sell.wine.wine_id}}">
                         		<img src="{{ dto.sell.wine.wine_image }}" width="77" height="100" alt="Wine Image">
                         	</a>
+                        	
                         </td>
 			            <td class="align-middle">
 			               <a href="/detail/winedetail?wine_id={{dto.sell.wine.wine_id}}">{{dto.sell.wine.wine_name}}<br>
@@ -89,8 +90,7 @@
 </body>
 
 
-<br><br><br><br><br><br><br><br>
-<br><br><br><br><br><br><br><br>
+
 
 
 <style>
