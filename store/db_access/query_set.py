@@ -148,6 +148,9 @@ def update_purchase_det_state(purchase_detail_id: str) -> None:
         purchase_detail_id=purchase_detail_id,
     ).update(purchase_det_state=2)
 
+def get_user_info(user_id):
+    user_info = WinUser.objects.get(user_id=user_id)
+    return user_info
 
 def check_store_product_info(user_id: str) -> dict or None:
     info = (

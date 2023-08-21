@@ -10,7 +10,7 @@ urlpatterns = [
         views.StoreRegistrationView.as_view(),
         name="storeRegistration",
     ),
-    path(  # ?P<regnum>([0-9]{3})-?([0-9]{2})-?([0-9]{5})
+    path( 
         "regnums/<str:regnum>",
         views.CheckStoreRegistNumberView.as_view(),
         name="checkRegistNumber",

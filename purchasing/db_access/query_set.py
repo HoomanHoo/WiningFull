@@ -144,6 +144,10 @@ def delete_detail_cart_info(cart_det_id: str) -> tuple:
     result = detail_cart.delete()
     return result
 
+def get_user_info(user_id: str):
+    user_info = WinUser.objects.get(user_id=user_id)
+    return user_info
+
 
 def get_cart_id(user_id: str) -> str or None:
     """

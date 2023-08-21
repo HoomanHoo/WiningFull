@@ -28,6 +28,7 @@ from purchasing.db_access.query_set import (
     get_product_info,
     get_info_of_buy_one,
     get_product_reviews,
+    get_user_info,
     get_user_name_and_email,
     get_user_point,
     insert_enc_receive_codes,
@@ -41,8 +42,6 @@ from purchasing.db_access.query_set import (
 from purchasing.usecase.send_mail import send_purchase_email
 
 from store.usecase.pagination import db_preprocessing
-from user.models import WinUser
-
 
 logger = logging.getLogger("purchasing")
 
@@ -174,7 +173,6 @@ class ReviewLoadAPI(APIView):
 
         serialzered = ReviewSerializer(review_list, many=True)
         json_result = JSONRenderer().render(serialzered.data)
-        logger.info(review_list)
         logger.info(
             f"{request.session['memid']} : sell_id: {sell_id} select_code: {select_code} ReviewLoadAPI"
         )
@@ -202,9 +200,9 @@ class BuyListView(View):
         cart_id = request.GET.get("cartid", None)
         quantity = request.GET.get("qnty", None)
         user_point = get_user_point(user_id)
-        bdto = WinUser.objects.get(user_id=user_id)
+        user_info = get_user_info(user_id=user_id)
         template = loader.get_template("purchasing/buyList.html")
-        context = {"user_point": user_point, "bdto" : bdto}
+        context = {"user_point": user_point, "bdto" : user_info}
         dtos = []
         all_price = 0
 
@@ -321,7 +319,7 @@ class PickListView(View):
         """
         user_id = request.session.get("memid")
         cart_id = kwargs.get("cart_id", None)
-        bdto = WinUser.objects.get(user_id=user_id)
+        user_info = get_user_info(user_id=user_id)
         page_infos = []
         all_price = 0
 
@@ -350,7 +348,7 @@ class PickListView(View):
                 "page_infos": page_infos,
                 "all_price": all_price,
                 "cart_id": cart_id,
-                "bdto" : bdto
+                "bdto" : user_info
             }
 
             logger.info(f"{user_id}: cart_id: {cart_id} PickListView")
@@ -363,7 +361,7 @@ class PickListView(View):
         """
         request_body = json.loads(request.body)
         cart_detail_id = request_body.get("cartDetailId", None)
-        print(cart_detail_id)
+ 
         if cart_detail_id is not None:
             result = delete_detail_cart_info(cart_det_id=cart_detail_id)
             logger.info(
@@ -416,18 +414,6 @@ class OrderPageView(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return View.dispatch(self, request, *args, **kwargs)
-
-    def get(self, request):
-        """
-        해당 함수 실사용 환경에서 호출되는지 확인 못함
-        추후 확인 후 호출되지 않으면 삭제 예정
-        """
-
-        user_id = request.session.get("memid")
-        template = loader.get_template("purchasing/orderPage.html")
-        context = {}
-        logger.info(f"{user_id} : OrderPageView")
-        return HttpResponse(template.render(context, request))
 
     def post(self, request):
         """
@@ -487,6 +473,12 @@ class OrderPageView(View):
                 detail_infos = get_detail_info(purchase_id)
 
                 for detail_info in detail_infos:
+                    raw_store_address = detail_info.get("purchase_detail_id__sell__store__store_address")
+                    
+                    split_store_address = raw_store_address.split("@")
+                    store_address = " ".join(split_store_address)
+
+                    detail_info["purchase_detail_id__sell__store__store_address"] = store_address
                     receive_code = base64.b64decode(
                         detail_info.get("receive_code")
                     ).decode("utf-8")
@@ -509,6 +501,5 @@ class OrderPageView(View):
                 logger.error(db_error)
                 return redirect("errorhandling:purchaseError")
 
-            print(detail_infos)
             context = {"detail_infos": detail_infos}
             return HttpResponse(template.render(context, request))

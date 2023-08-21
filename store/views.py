@@ -20,6 +20,7 @@ from store.db_access.query_set import (
     delete_user_info,
     get_product_list,
     get_reviews_by_seller,
+    get_user_info,
     insert_store_info,
     insert_sell_info,
     delete_store_info,
@@ -40,19 +41,6 @@ from purchasing.usecase.receive_code_create_enc_module import EncModule
 from store.usecase.pagination import db_preprocessing, pagenation
 from django.core.management.commands import startapp
 
-
-
-# 여기부터 추가한 것들
-
-from user.models import (
-    WinUser,
-)
-
-
-
-
-
-
 # Create your views here.
 
 # 일반 정보 입력 후 매장 정보 등록
@@ -64,6 +52,8 @@ logger = logging.getLogger("store")
 
 
 class StoreRegistrationView(View):
+    """
+    """
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return View.dispatch(self, request, *args, **kwargs)
@@ -129,7 +119,7 @@ class StoreRegistrationView(View):
 class CheckStoreRegistNumberView(View):
     def get(self, request, **kwargs):
         reg_num = kwargs.get("regnum", None)
-        print(reg_num)
+
         if reg_num is None:
             logger.error("No reg_num CheckStoreRegistNumberView")
             return JsonResponse({"result": "문제가 발생했습니다 잠시 후 다시 시도해주세요"}, status=500)
@@ -204,8 +194,10 @@ class ProductAdditionView(View):
 
     def post(self, request):
         user_id = request.session.get("temp_id")
+
         if user_id is None:
             user_id = request.session.get("memid")
+
         store_id = request.POST.get("storeId", None)
         sell_ids = request.POST.getlist("sellId", None)
         wine_ids = request.POST.getlist("wineId", None)
@@ -218,7 +210,7 @@ class ProductAdditionView(View):
         current_time = DateFormat(datetime.now()).format("Y-m-d H:i:s")
 
         if btn_product_add is not None:
-            print("product add")
+ 
             try:
                 insert_sell_info(
                     user_id,
@@ -230,16 +222,19 @@ class ProductAdditionView(View):
                     sell_promots,
                     sell_state,
                 )
+
                 if request.session.get("memid"):
                     logger.info(
                         f"{user_id}: wine_ids: {wine_ids} ProductAdditionView append sell_list"
                     )
                     return redirect("sellList", page_num=1)
+                
                 else:
                     logger.info(
                         f"{user_id}: wine_ids: {wine_ids} ProductAdditionView insert sell_list"
                     )
                     return redirect("login")
+                
             except DatabaseError as ex:
                 logger.error(ex)
                 return redirect("errorhandling:storeError")
@@ -258,14 +253,17 @@ class ProductAdditionView(View):
 class ProductListView(APIView):
     def get(self, request, **kwargs):
         user_id = request.session.get("memid", None)
+
         if user_id is None:
             user_id = request.session.get("temp_id", None)
+
         page_num = kwargs.get("page_num", 1)
         search_keyword = request.GET.get("srhkeyword", None)
 
         show_length = 20
         end = int(show_length) * int(page_num)
         start = end - show_length
+
         if search_keyword is not None:
             wines = search_product_list(search_keyword=search_keyword)
         else:
@@ -282,7 +280,6 @@ class ProductListView(APIView):
         pages = {}
 
         pages["pages"] = paging_result["pages_count"]
-        print(pages)
         serializer = ProductListSerializer(
             paging_result["db_data"],
             many=True,
@@ -298,7 +295,7 @@ class DiscontinueProductView(View):
     def get(self, request):
         user_id = request.session.get("memid")
         wine_id = request.GET.get("wineid", None)
-        print(wine_id)
+
         delete_product(wine_id=wine_id, user_id=user_id)
         logger.info(f"{user_id}: wine_id: {wine_id} DiscontinueProductView")
         return JsonResponse({"result": "삭제되었습니다"}, status=200)
@@ -307,17 +304,18 @@ class DiscontinueProductView(View):
 class StoreMyPageView(View): # 점주 페이지
     def get(self, request, **kwargs):
         user_id = request.session.get("memid")
-        
 
-        
         info = get_store_info(user_id=user_id)
         full_address = info.get("store_address").split("@")
         main_address = full_address[0]
         detail_address = full_address[1]
-        
-        memid = request.session.get("memid")#
-        dto = WinUser.objects.filter(user_id=memid).first() #
-        image_url = dto.user_profile_img.url if dto and dto.user_profile_img else "" #
+    
+        user_info = get_user_info(user_id)
+        if user_info and user_info.user_profile_img:
+            image_url = user_info.user_profile_img.url 
+            
+        else:
+            image_url = "" 
         
         page_num = kwargs.get("pageNum", 1)
         template = loader.get_template("store/storeMyPage.html")
@@ -338,10 +336,7 @@ class StoreMyPageView(View): # 점주 페이지
         
         db_data = pagination_result["db_data"]
         pages_count = pagination_result["pages_count"]
-        print(pages_count)        
-        
-        
-        
+
         context = {"user_id": user_id,
                    "info": info,
                    "main_address": main_address,
@@ -349,8 +344,9 @@ class StoreMyPageView(View): # 점주 페이지
                    "list" : db_data,
                    "pages_count" : pages_count, 
                    "image_url" : image_url,
-                   "dto" : dto
+                   "dto" : user_info
                    }
+        
         logger.info(f"{user_id}: page_num: {page_num} StoreMyPageView")
         return HttpResponse(template.render(context, request))
 
@@ -474,6 +470,7 @@ class SellDetailListView(View):
         user_id = request.session.get("memid")
         page_num = kwargs.get("pageNum", 1)
         template = loader.get_template("store/sellDetailList.html")
+
         show_length = 30
         end = int(show_length) * int(page_num)
         start = end - 30
@@ -488,9 +485,10 @@ class SellDetailListView(View):
             start_page=start,
             datas=list_info,
         )
+
         db_data = pagination_result["db_data"]
         pages_count = pagination_result["pages_count"]
-        print(pages_count)
+
         context = {"list": db_data, "pages_count": pages_count}
         logger.info(f"{user_id}: page_num: {page_num} SellDetailListView")
         return HttpResponse(template.render(context, request))
@@ -552,6 +550,7 @@ class DropStoreView(View):
                 drop_store_info(user_id=user_id)
                 text = "등록된 점포가 삭제 되었습니다"
                 code = 1
+
             except Exception as ex:
                 text = "문제가 발생했습니다 잠시 후 다시 시도해주세요"
                 code = -1
@@ -567,6 +566,7 @@ class StoreRevenueMainView(View): #판매 주류 보기
         page_num = kwargs.get("page_num", 1)
         user_id = request.session.get("memid")
         template = loader.get_template("store/storeRevenueMain.html")
+
         show_length = 30
         end = int(show_length) * int(page_num)
         start = end - 30
@@ -581,6 +581,7 @@ class StoreRevenueMainView(View): #판매 주류 보기
             start_page=start,
             datas=list_info,
         )
+
         db_data = paging_result["db_data"]
         pages_count = paging_result["pages_count"]
         context = {"revenue_info": db_data, "pages_count": pages_count}
@@ -593,9 +594,7 @@ class StoreRevenueTermView(View): # 판매 주류 보기
     def get(self, request):
         user_id = request.session.get("memid")
         term = int(request.GET.get("term", 0))
-        print(term)
         revenue_info = list(get_store_revenue(user_id=user_id, term=term))
-        print(revenue_info)
 
         logger.info(f"{user_id}: term: {term} StoreRevenueTermView")
         return JsonResponse({"result": revenue_info}, status=200)
@@ -606,6 +605,7 @@ class StoreReviewView(View): # 판매 주류 보기 > 리뷰보기
         sell_id = kwargs.get("sell_id")
         page_num = kwargs.get("page_num", 1)
         template = loader.get_template("store/storeShowReviews.html")
+
         show_length = 30
         end = int(show_length) * int(page_num)
         start = end - 30
@@ -620,7 +620,7 @@ class StoreReviewView(View): # 판매 주류 보기 > 리뷰보기
         )
         db_data = paging_result["db_data"]
         pages_count = paging_result["pages_count"]
-        context = {"reviews": db_data, "pages_count": pages_count}
 
+        context = {"reviews": db_data, "pages_count": pages_count}
         logger.info(f"{request.session['memid']}: sell_id: {sell_id} StoreReviewView")
         return HttpResponse(template.render(context, request))

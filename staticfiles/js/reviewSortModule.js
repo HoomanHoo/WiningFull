@@ -19,13 +19,10 @@ let selector = Vue.createApp({
             })
         }
         Vue.onMounted(() => {
-            const sellId = document.getElementById("sellId").value;
-            console.log(window.location.pathname);
             const url = window.location.pathname + "/reviews?selectcode=" + selected.value
        
             fetch(url).then((response) => response.json()).then((data) => {
                 reviewDatas.value = JSON.parse(data)
-                console.log(reviewDatas.value);
 
             })
         })
