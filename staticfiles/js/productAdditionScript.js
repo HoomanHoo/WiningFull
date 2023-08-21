@@ -74,6 +74,9 @@ function paging() {
 		if (pages.length < 5) {
 			next.className = "page-item disabled";
 		}
+		else if(pages[pages.length - 1] < 6){
+			next.className = "page-item disabled";
+		}
 		else {
 			next.className = "page-item";
 			document.querySelector(".next").setAttribute("id", pages[4] + 1);

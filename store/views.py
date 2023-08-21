@@ -628,28 +628,32 @@ class StoreReviewView(View): # 판매 주류 보기 > 리뷰보기
         return HttpResponse(template.render(context, request))
     
 
-    class StoreReviewListView(APIView):
-        def get(self, request, **kwargs):
-            sell_id = kwargs.get("sell_id")
-            page_num = kwargs.get("page_num", 1)
-            
-            show_length = 30
-            end = int(show_length) * int(page_num)
-            start = end - 30
-            reviews = get_reviews_by_seller(sell_id=sell_id)
-            list_info = db_preprocessing(db_data=reviews, end_page=end, start_page=start)
-            paging_result = pagenation(
-                show_length=show_length,
-                page_num=page_num,
-                end_page=end,
-                start_page=start,
-                datas=list_info,
-            )
-            db_data = paging_result["db_data"]
-            pages_count = paging_result["pages_count"]
-
-            serialized = ReviewsBySellerSerializer(db_data, many=True).data
-            page_serialized = ReviewPageSerializer(serialized, context={"pages":pages_count})
-
-            return Response(page_serialized.data)
+class StoreReviewListView(APIView):
+    def get(self, request, **kwargs):
+        sell_id = kwargs.get("sell_id")
+        page_num = kwargs.get("page_num", 1)
+        logger.info("StoreReviewListView")
+        show_length = 30
+        end = int(show_length) * int(page_num)
+        start = end - 30
+        reviews = get_reviews_by_seller(sell_id=sell_id)
+        list_info = db_preprocessing(db_data=reviews, end_page=end, start_page=start)
+        paging_result = pagenation(
+            show_length=show_length,
+            page_num=page_num,
+            end_page=end,
+            start_page=start,
+            datas=list_info,
+        )
+        pages = {}
+        pages["pages"] = paging_result["pages_count"]
+        serializer = ReviewsBySellerSerializer(
+            paging_result["db_data"],
+            many=True,
+        ).data
+        page_serializer = ReviewPageSerializer(pages, context={"reviews": serializer})
+   
+        json_result = JSONRenderer().render(page_serializer.data)
+        
+        return Response(json_result)
 

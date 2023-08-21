@@ -298,7 +298,6 @@ def get_store_revenue(user_id: str, term: int = 0):
 
 
 def search_receive_code(receive_code: str) -> str or dict:
-    start = time.time()
 
     result = (
         WinReceiveCode.objects.annotate(
@@ -321,9 +320,7 @@ def search_receive_code(receive_code: str) -> str or dict:
             "user_id",
         )
     )
-    end = time.time()
-    print(end - start)
-    print(len(result))
+
     if result.count() == 0:
         return {
             "purchase_detail_id": -1,
@@ -362,15 +359,15 @@ def get_reviews_by_seller(sell_id: str):
     reviews = (
         WinReview.objects.annotate(reg_date=TruncDate("review_reg_time"))
         .filter(sell_id=sell_id)
-        .values("user", "review_content", "review_score", "reg_date")
+        .values("user_id", "review_content", "review_score", "reg_date")
     )
     return reviews
 
 class ReviewsBySellerSerializer(serializers.ModelSerializer):
-
+    reg_date = serializers.CharField()
     class Meta:
         model = WinReview
-        fields = ["user", "review_content", "review_score", "reg_date"]
+        fields = ["user_id", "review_content", "review_score", "reg_date"]
 
 class ReviewPageSerializer(serializers.Serializer):
     def to_representation(self, instance):

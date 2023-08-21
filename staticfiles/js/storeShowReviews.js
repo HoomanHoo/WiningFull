@@ -5,54 +5,48 @@ for (var i = 0; i < pages.length; i++) {
 }
 
 function paging() {
-
-	let url = "./" + this.id;
+    let reviewList = document.getElementById("reviewList");
+	let url = "./reviews/" + this.id;
 
 	fetch(url).then((response) => response.json()).then((data) => {
+
 		let resultData = JSON.parse(data);
+        let reviews = resultData["reviews"];
+        let pages = resultData["pages"];
 
-		let pages = resultData["pages"];
-		let wines = resultData["reviews"];
-		console.log(pages);
-		wineList.replaceChildren();
-		for (var i = 0; i < wines.length; i++) {
-			let wineId = wines[i].wine_id;
-			let wineName = wines[i].wine_name;
-			let wineCapacity = wines[i].wine_capacity;
-			let wineAlc = wines[i].wine_alc;
+        reviewList.replaceChildren();
+        for (var i = 0; i < reviews.length; i++){
+            let userId = reviews[i].user_id;
+            let reviewContent = reviews[i].review_content;
+            let reviewScore = reviews[i].review_score;
+            let regDate = reviews[i].reg_date;
 
-			let newRow = document.createElement("div");
-			newRow.setAttribute("class", "row");
-			let newWineInfo = document.createElement("div");
-			newWineInfo.setAttribute("id", wineName);
-			newWineInfo.setAttribute("class", "col wineName");
-			let newWineId = document.createElement("input");
-			newWineId.setAttribute("type", "hidden");
-			newWineId.setAttribute("id", wineName + 1);
-			newWineId.setAttribute("value", wineId);
-			let newWineCapacity = document.createElement("input");
-			newWineCapacity.setAttribute("type", "hidden");
-			newWineCapacity.setAttribute("id", wineName + 2);
-			newWineCapacity.setAttribute("value", wineCapacity);
-			let newWineAlc = document.createElement("input");
-			newWineAlc.setAttribute("type", "hidden");
-			newWineAlc.setAttribute("id", wineName + 3);
-			newWineAlc.setAttribute("value", wineAlc);
+            let newRow = document.createElement("div");
+            newRow.setAttribute("class", "row");
 
-			wineList.appendChild(newRow);
-			newRow.appendChild(newWineInfo);
-			newWineInfo.innerText = wineName;
-			newWineInfo.appendChild(newWineId);
-			newWineInfo.appendChild(newWineCapacity);
-			newWineInfo.appendChild(newWineAlc);
+            let newUserCol = document.createElement("div")
+            newUserCol.setAttribute("class", "col");
+            let newReviewContentCol = document.createElement("div")
+            newReviewContentCol.setAttribute("class", "col");
+            let newReviewScoreCol = document.createElement("div")
+            newReviewScoreCol.setAttribute("class", "col");
+            let newRegDateCol = document.createElement("div")
+            newRegDateCol.setAttribute("class", "col");
 
-			const wineNames = document.querySelectorAll(".wineName");
-			for (let i = 0; i < wineNames.length; i++) {
-				wineNames[i].addEventListener("click", addElement);
-			}
-		}
+            reviewList.appendChild(newRow);
+            newRow.appendChild(newUserCol);
+            newUserCol.innerText = userId;
+            newRow.appendChild(newReviewContentCol);
+            newReviewContentCol.innerText = reviewContent;
+            newRow.appendChild(newReviewScoreCol);
+            newReviewScoreCol.innerText = reviewScore;
+            newRow.appendChild(newRegDateCol);
+            newRegDateCol.innerText = regDate;
+        }
+
 		let prev = document.getElementById("prev");
 		let next = document.getElementById("next");
+        
 		if (pages[0] < 6) {
 			prev.className = "page-item disabled";
 		}
@@ -60,7 +54,7 @@ function paging() {
 			prev.className = "page-item";
 			document.querySelector(".prev").setAttribute("id", pages[0] - 1);
 		}
-		if (pages.length < 5) {
+		if (pages[pages.length - 1] < 6) {
 			next.className = "page-item disabled";
 		}
 		else {

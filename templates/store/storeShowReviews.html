@@ -29,22 +29,24 @@
                 작성일
             </div>
         </div>
-        {% for review in reviews %}
-        <div class="row">
-            <div class="col">
-                {{review.user}}
+        <div id="reviewList">
+            {% for review in reviews %}
+            <div class="row">
+                <div class="col">
+                    {{review.user_id}}
+                </div>
+                <div class="col">
+                    {{review.review_content}}
+                </div>
+                <div class="col">
+                    {{review.review_score}}
+                </div>
+                <div class="col">
+                    {{review.reg_date}}
+                </div>
             </div>
-            <div class="col">
-                {{review.review_content}}
-            </div>
-            <div class="col">
-                {{review.review_score}}
-            </div>
-            <div class="col">
-                {{review.reg_date}}
-            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
         <div id="pages" class="row">
             <nav >
                 <ul class="pagination">
@@ -56,13 +58,13 @@
                     {% endif %}
                     {% if start >= 6 %}
                     <li id="prev" class="page-item">
-                        <a class="page-link prev" name="pages" href={{i|add:-1}}>Previous</a>
+                        <a id="{{i|add:-1}}" class="page-link prev" name="pages" >Previous</a>
                     </li>
                     {% endif %}
                     {% endwith %}
                     {% for i in pages_count %}
                         <li class="page-item page-num-list">
-                            <a id="{{i}}" class="page-link page-num" name="pages" href={{i}}>{{i}}</a>
+                            <a id="{{i}}" class="page-link page-num" name="pages" >{{i}}</a>
                         </li>
                     {% endfor %}
                     {% with  end=pages_count|last %}
@@ -73,7 +75,7 @@
                     {% endif %}
                     {% if end >= 6 %}
                     <li id="next" class="page-item disabled">
-                        <a id="{{next}}" class="page-link next" name="pages"href={{i|add:1}}>Next</a>
+                        <a id="{{i|add:1}}" class="page-link next" name="pages">Next</a>
                     </li>
                     {% endif %}
                     {% endwith %}

@@ -88,7 +88,7 @@ with open(SECRET_PATH, "r", encoding="utf-8") as secret_key:
             break
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.0.3"]
 
