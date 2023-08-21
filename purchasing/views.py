@@ -170,11 +170,11 @@ class ReviewLoadAPI(APIView):
         sell_id = kwargs.get("sell_id", 0)
         select_code = int(request.GET.get("selectcode", 1))
 
-        rdtos = get_product_reviews(sell_id=sell_id, select_code=select_code)
+        review_list = get_product_reviews(sell_id=sell_id, select_code=select_code)
 
-        serialzered = ReviewSerializer(rdtos, many=True)
+        serialzered = ReviewSerializer(review_list, many=True)
         json_result = JSONRenderer().render(serialzered.data)
-
+        logger.info(review_list)
         logger.info(
             f"{request.session['memid']} : sell_id: {sell_id} select_code: {select_code} ReviewLoadAPI"
         )

@@ -403,7 +403,7 @@ def get_product_reviews(sell_id: int, select_code: int) -> QuerySet:
         print("list is longer then 6")
         return review_list[:6]
 
-    elif list_length <= 5 and list_length > 1:
+    elif list_length <= 5 and list_length >= 1:
         print("list is short")
         return review_list
 
