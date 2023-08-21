@@ -13,3 +13,4 @@ __pycache__
 *.prefs
 /private_files
 /media/profile
+/.vscode
