@@ -43,8 +43,8 @@ function deleteElement() {
 
 }
 
-// 주어진 이름의 쿠키를 반환하는데,
-// 조건에 맞는 쿠키가 없다면 undefined를 반환합니다.
+// 주어진 이름의 쿠키를 반환한다
+// 조건에 맞는 쿠키가 없다면 undefined를 반환합니다
 function getCookie(name) {
 	let matches = document.cookie.match(new RegExp(
 		"(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"

@@ -76,7 +76,7 @@ urlpatterns = [
 
 urlpatterns += static(
     settings.STATIC_URL, document_root=settings.STATIC_URL
-)  # MEDIA �Ʃ���I A���Ƣ�
+)  # MEDIA 경로 추가
 urlpatterns += static(
     settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
-)  # MEDIA �Ʃ���I A���Ƣ�
+)  # MEDIA 경로 추가

@@ -46,7 +46,6 @@ Vue.createApp({
       let callback = (entries, observer) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            console.log("callback");
             next();
           }
         })
@@ -66,8 +65,6 @@ Vue.createApp({
 
     const next = () => {
       pageNum++;
-      console.log("next");
-      console.log("page_num:" + pageNum);
       fetchList();
     }
 
@@ -77,17 +74,13 @@ Vue.createApp({
     }
 
     Vue.onMounted(() => {
-      console.log("mounted");
       autoScroll();
 
     })
 
     return { responseData, move }
   },
-  //  mounted() {
-  //   this.autoScroll();
-  //   console.log("mounted");
-  // }
+
 
 }).mount("#newList");
 

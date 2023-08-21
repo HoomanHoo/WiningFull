@@ -29,7 +29,6 @@ btnCheck.addEventListener("click", () => {
             }
             else if (responseData["code"] == 1) {
                 alert(responseData["result"])
-                console.log("비밀번호가 맞아")
                 //유저 마이페이지로 리다이렉트
             }
         })
