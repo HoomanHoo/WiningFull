@@ -67,8 +67,13 @@ urlpatterns = [
     path("store-revenue-term", views.StoreRevenueTermView.as_view()),
     path("receive-code/codes/<str:code>", views.SearchReceiveCodeApi.as_view()),
     path(
-        "sell/merchandises/<int:sell_id>/reviews/<int:page_num>",
+        "sell/merchandises/<int:sell_id>/reviews",
         views.StoreReviewView.as_view(),
+        name="merchandiseReview",
+    ),
+    path(
+        "sell/merchandises/<int:sell_id>/reviews/<int:page_num>",
+        views.StoreReviewListView.as_view(),
         name="reviewList",
     ),
 ]

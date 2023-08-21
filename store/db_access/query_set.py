@@ -365,3 +365,16 @@ def get_reviews_by_seller(sell_id: str):
         .values("user", "review_content", "review_score", "reg_date")
     )
     return reviews
+
+class ReviewsBySellerSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = WinReview
+        fields = ["user", "review_content", "review_score", "reg_date"]
+
+class ReviewPageSerializer(serializers.Serializer):
+    def to_representation(self, instance):
+        pages = instance["pages"]
+        reviews = self.context["reviews"]
+
+        return {"pages": pages, "reviews": reviews}

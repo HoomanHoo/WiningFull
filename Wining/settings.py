@@ -245,7 +245,7 @@ with open(KAKAO_PATH, "r", encoding="utf-8") as kakao:
 
 mimetypes.add_type(
     "application/javascript", ".js", True
-)  자바스크립트 파일을 text/plain으로 읽는 것을 방지하기 위함
+)  #자바스크립트 파일을 text/plain으로 읽는 것을 방지하기 위함
 
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

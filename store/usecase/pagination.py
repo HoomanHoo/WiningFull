@@ -38,7 +38,7 @@ def pagenation(
             start_page = page_num - 4
         else:
             start_page = page_num - (page_num % 5) + 1
-        print("page_length: ", page_length)
+
         if page_length - page_num < 3:
             end_page = page_length + 1
         else:
@@ -61,8 +61,8 @@ def db_preprocessing(
     if list_length > 1:
         list_info.append(db_data[start_page:end_page])
 
-    elif list_length == 1:
-        list_info.append(db_data)
+    # elif list_length == 1:
+    #     list_info.append(db_data)
 
     else:
         list_info.append(db_data)
