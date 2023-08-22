@@ -90,7 +90,7 @@ with open(SECRET_PATH, "r", encoding="utf-8") as secret_key:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.0.3"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -162,7 +162,7 @@ DATABASES = {
         "NAME": "bit",
         "USER": "bit",
         "PASSWORD": "bit",
-        "HOST": "localhost",
+        "HOST": "mysql",
         "PORT": "3306",
         "OPTIONS": {
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",

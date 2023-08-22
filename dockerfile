@@ -1,15 +1,10 @@
-# syntax = docker/dockerfile:1.2
-#Dockerfile
+FROM python:3.8
 
-From python:3.8
-WORKDIR /user/src/app
+RUN apt-get update && apt-get install -y python3-pip && apt-get clean
 
-COPY requirements.txt ./
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+WORKDIR /project/
+ADD . /project/
 
-COPY . .
-
-EXPOSE 8000
-
-CMD ["gunicorn", "--bind", "unix:/run/gunicorn.sock", "Wining.wsgi:application"]
+RUN python -m pip install --upgrade pip
+RUN pip3 install -r requirements.txt
+RUN python manage.py makemigrations
