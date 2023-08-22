@@ -10,6 +10,10 @@ services:
      MYSQL_USER: bit
      MYSQL_PASSWORD: bit
      MYSQL_ROOT_PASSWORD: bit
+     TZ: Asia/Seoul
+    command: 
+     - --character-set-server=utf8mb4
+     - --collation-server=utf8mb4_unicode_ci
     volumes:
      - mysql-database:/var/lib/mysql-docker
   nginx:
@@ -28,7 +32,7 @@ services:
       context: .
       dockerfile: dockerfile
     container_name: wining
-    command: gunicorn Wining.wsgi:application --bind 0.0.0.0:8000
+    command: /bin/sh -c "/migrate.sh" && gunicorn Wining.wsgi:application --bind 0.0.0.0:8000
     volumes:
      - ./staticfiles:/project/staticfiles
      - ./media:/project/media

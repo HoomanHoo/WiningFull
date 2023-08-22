@@ -262,3 +262,5 @@ with open(ACCOUNT_PATH, "r", encoding="utf-8") as mail:
         DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
         if not mail.readline():
             break
+
+
