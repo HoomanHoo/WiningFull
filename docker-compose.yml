@@ -16,14 +16,27 @@ services:
      - --character-set-server=utf8mb4
      - --collation-server=utf8mb4_unicode_ci
     healthcheck: 
-      test: ["CMD-SHELL", "mysql -ubit -pbit bit < /save.sql"]
-      interval: 1m
+      test: ["CMD-SHELL", "mysql -uroot -pbit bit < /save.sql"]
+      interval: 1s
       timeout: 1m
-      start_period: 1m
+      start_period: 0s
       retries: 0
     volumes:
      - ./save.sql:/save.sql
      - mysql-database:/var/lib/mysql-docker	#mysql-database:/var/lib/mysql The designated data directory /var/lib/mysql/ is unusable. You can remove all files that the server added to it. 
+  web:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: wining
+    command: sh /migrate.sh
+    volumes:
+     - ./staticfiles:/project/staticfiles
+     - ./media:/project/media
+    expose:
+     - "8001"
+    depends_on:
+     - db
   nginx:
     image: nginx:latest
     container_name: nginx
@@ -35,19 +48,6 @@ services:
      - ./media:/project/media
     depends_on:
      - web
-  web:
-    build:
-      context: .
-      dockerfile: dockerfile
-    container_name: wining
-    command: /bin/sh -c "/migrate.sh"
-    volumes:
-     - ./staticfiles:/project/staticfiles
-     - ./media:/project/media
-    expose:
-     - "8001"
-    depends_on:
-     - db
 volumes: 
   mysql-database:  
 

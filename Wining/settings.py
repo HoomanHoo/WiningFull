@@ -14,6 +14,7 @@ from pathlib import Path
 from django.conf.global_settings import STATICFILES_DIRS
 from django.test.signals import static_finders_changed
 import mimetypes
+import os
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -23,7 +24,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 SESSION_SAVE_EVERY_REQUEST = True
 
-import os
+
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
