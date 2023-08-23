@@ -484,6 +484,7 @@ class OrderPageView(View):
                     ).decode("utf-8")
                     detail_info["receive_code"] = receive_code
 
+                logger.info(user_id)
                 name_and_email = get_user_name_and_email(user_id=user_id)
                 user_name = name_and_email[0]
                 user_email = name_and_email[1]

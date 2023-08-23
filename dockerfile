@@ -6,13 +6,9 @@ WORKDIR /project/
 ADD . /project/
 COPY migrate.sh /migrate.sh
 RUN chmod +x /migrate.sh
+COPY save.sql /save.sql
+RUN chmod +x /save.sql
 
 RUN python -m pip install --upgrade pip
 RUN pip3 install -r requirements.txt
-RUN python manage.py makemigrations detail
-RUN python manage.py makemigrations user
-RUN python manage.py makemigrations board
-RUN python manage.py makemigrations purchasing
-RUN python manage.py makemigrations search
-RUN python manage.py makemigrations store
 

@@ -3,11 +3,7 @@ from detail.models import WinDetailView, WinDetailViewN, WinWine, WinWineRegion
 
 
 class WinDetailViewAdmin(admin.ModelAdmin):
-    list_display = (
-        "detail_view_id", 
-        "user_id", 
-        "wine_id", 
-        "detail_view_time")
+    list_display = ("detail_view_id", "user_id", "wine_id", "detail_view_time")
 
 
 admin.site.register(WinDetailView, WinDetailViewAdmin)
