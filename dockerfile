@@ -15,3 +15,4 @@ RUN python manage.py makemigrations board
 RUN python manage.py makemigrations purchasing
 RUN python manage.py makemigrations search
 RUN python manage.py makemigrations store
+
