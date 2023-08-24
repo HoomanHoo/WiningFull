@@ -24,6 +24,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 SESSION_SAVE_EVERY_REQUEST = True
 
+CSRF_TRUSTED_ORIGINS = ["http://*.192.168.0.2:8001", "http://192.168.0.2:8001", "http://localhost:8001", "http://172.27.0.3:8001", "http://nginx:8001", "http://*:8001"]
 
 
 MEDIA_URL = "/media/"

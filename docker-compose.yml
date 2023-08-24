@@ -5,6 +5,7 @@ services:
     container_name: mysql
     ports:
      - '3307:3307'
+    #init: true
     environment:
      MYSQL_HOST: localhost
      MYSQL_DATABASE: bit
@@ -16,17 +17,19 @@ services:
      TZ: Asia/Seoul
     command: 
      - --character-set-server=utf8mb4
-     - --collation-server=utf8mb4_unicode_ci
-    # healthcheck: 
-    #   test: ["CMD-SHELL", "mysql -uroot -pbit bit < /bit_save.sql"]
-    #   interval: 1s
-    #   timeout: 1m
-    #   start_period: 0s
-    #   retries: 0 accure sql read write problem
+     - --collation-server=utf8mb4_0900_ai_ci
+    #healthcheck: 
+      #test: ["CMD-SHELL", "mysql -uroot -pbit bit < /bit_save.sql"]
+      #interval: 1s
+      #timeout: 4m
+      #retries: 0 #accure sql read write problem
     volumes:
-     - ./bit_save.sql:/bit_save.sql
+     - ./bit_save.sql:/docker-entrypoint-initdb.d/initdb.sql
      - /etc/timezone:/etc/timezone
-     - mysql-database:/var/lib/mysql:rw	# mysql-database:/var/lib/mysql The designated data directory /var/lib/mysql/ is unusable. You can remove all files that the server added to it. - reason: confilct volumes
+     - mysql-database:/var/lib/mysql:rw	# mysql-database:/var/lib/mysql The designated data directory /var/lib/mysql/ is unusable. You can remove all files that the server added to it. - volumes directory already exit so it made conflict
+     #- type: volume
+       #source: db_vol
+       #target: /var/lib/mysql
   web:
     build:
       context: .
