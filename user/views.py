@@ -194,6 +194,7 @@ class KakaoRedirectURI(View):
                 else:
                     request.session["memid"] = login_info[0]["user_id"]
                     request.session["access_Token"] = result["access_token"]
+                    request.session.save()
                     return redirect("myPage")
 
 

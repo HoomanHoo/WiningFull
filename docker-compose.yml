@@ -1,29 +1,32 @@
-version: '3'
+version: '3.7'
 services:
   db:
     image: mysql:8.0.34
     container_name: mysql
-    expose:
-     - "3307"
+    ports:
+     - '3307:3307'
     environment:
+     MYSQL_HOST: localhost
      MYSQL_DATABASE: bit
      MYSQL_USER: bit
      MYSQL_PASSWORD: bit
      MYSQL_ROOT_PASSWORD: bit
      MYSQL_TCP_PORT: 3307
+     MYSQL_PORT: 3307
      TZ: Asia/Seoul
     command: 
      - --character-set-server=utf8mb4
      - --collation-server=utf8mb4_unicode_ci
-    healthcheck: 
-      test: ["CMD-SHELL", "mysql -uroot -pbit bit < /save.sql"]
-      interval: 1s
-      timeout: 1m
-      start_period: 0s
-      retries: 0
+    # healthcheck: 
+    #   test: ["CMD-SHELL", "mysql -uroot -pbit bit < /bit_save.sql"]
+    #   interval: 1s
+    #   timeout: 1m
+    #   start_period: 0s
+    #   retries: 0 accure sql read write problem
     volumes:
-     - ./save.sql:/save.sql
-     - mysql-database:/var/lib/mysql-docker	#mysql-database:/var/lib/mysql The designated data directory /var/lib/mysql/ is unusable. You can remove all files that the server added to it. 
+     - ./bit_save.sql:/bit_save.sql
+     - /etc/timezone:/etc/timezone
+     - mysql-database:/var/lib/mysql:rw	# mysql-database:/var/lib/mysql The designated data directory /var/lib/mysql/ is unusable. You can remove all files that the server added to it. - reason: confilct volumes
   web:
     build:
       context: .
@@ -35,6 +38,8 @@ services:
      - ./media:/project/media
     expose:
      - "8001"
+     - "3307"
+    entrypoint: sh /entrypoint.sh # mysql:3307
     depends_on:
      - db
   nginx:

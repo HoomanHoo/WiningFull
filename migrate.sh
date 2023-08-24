@@ -9,6 +9,7 @@
 #echo $(python manage.py makemigrations)
 #echo $(python manage.py migrate)
 echo $(gunicorn Wining.wsgi:application --bind 0.0.0.0:8001)
+echo "gunicorn Wining.wsgi:application --bind 0.0.0.0:8001"
 
 
 

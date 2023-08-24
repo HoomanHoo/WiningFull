@@ -159,12 +159,13 @@ WSGI_APPLICATION = "Wining.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.mysql",
+        # "ENGINE": "django.db.backends.mysql",
+        "ENGINE": "mysql.connector.django",
         "NAME": "bit",
         "USER": "bit",
         "PASSWORD": "bit",
         "HOST": "mysql",    # mysql docker container 이름 
-        "PORT": "3307",
+        "PORT": "3307", #defiened port in docker-compose.yml
         "OPTIONS": {
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
             "charset": "utf8",

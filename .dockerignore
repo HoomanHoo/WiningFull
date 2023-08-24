@@ -1,0 +1,5 @@
+.gitignore
+.dockerignore
+/**/migrations
+*.pyc
+*.log
