@@ -1,10 +1,10 @@
 #!/usr/bin/bash
 
-# until (curl -v http://mysql:3307/); do
-#     echo "mysql is still set up"
-#     sleep 20
-# done
-sleep 360
+while ! wget mysql:3307 ; do
+    echo "mysql is still set up"
+    sleep 15
+done
+#sleep 360
 echo "mysql is ready"
 
 echo $(python manage.py makemigrations)
