@@ -15,19 +15,37 @@
     />
     <script src="/static/js/detailProductInfoScript.js" defer></script>
     <script type="module" src="/static/js/reviewSortModule.js" defer></script>
+    
+    <style>
+    
+            input[type="submit"],
+        input[type="button"] {
+            padding: 10px 20px;
+            background-color: #007bff;
+            border: none;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover,
+        input[type="button"]:hover {
+            background-color: #0056b3;
+        }
+    
+    </style>
   </head>
   <body>
+  
     <div class="row">
       <div class="col" style="padding-left: 10%">
         <h1>상세 정보</h1>
       </div>
     </div>
+    
     <div class="row">
       <div class="col" style="padding-left: 10%">
-        <img
-          src="{{product_info.wine__wine_image}}"
-          alt="{{product_info.wine__wine_name}}"
-        />
+        <img src="{{product_info.wine__wine_image}}" alt="{{product_info.wine__wine_name}}"/>
       </div>
       <div class="col">
         <div class="row">
@@ -114,16 +132,7 @@
             <div class="col" style="text-align: center">
               <!-- user_id 없으면 회원만 구매 가능하다는 alert -->
               <input type="button" id="btnBuy" name="btnBuy" value="구매" />
-            </div>
-          </div>
-          <div class="row">
-            <div class="col" style="text-align: center">
-              <input
-                type="submit"
-                id="btnAddCart"
-                name="btnAddCart"
-                value="장바구니에 추가"
-              />
+              <input type="submit" id="btnAddCart" name="btnAddCart" value="장바구니에 추가"/>
             </div>
           </div>
         </form>
@@ -131,12 +140,7 @@
     </div>
     <div class="row">
       <div class="col" style="text-align: center">
-        <input
-          type="button"
-          id="btnBack"
-          value="뒤로가기"
-          onclick="history.back()"
-        />
+        <input type="button" id="btnBack" value="뒤로가기" onclick="history.back()" />
       </div>
     </div>
     <div class="row" id="selector">
@@ -155,7 +159,7 @@
         <div id="reviewArea" v-for="review in reviewDatas">
           <div class="row">
             <div class="col" style="text-align: right">[[review.user_id]]</div>
-            <div class="col" style="text-align: left">
+            <div class="col" style="border: 1px solid black; text-align: left">
               [[review.review_content]]
             </div>
             <div class="col">[[review.review_time]]</div>

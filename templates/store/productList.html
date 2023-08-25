@@ -30,7 +30,9 @@
     </div>
     {% for dto in product_list %}
     <div class="row">
-      <div class="col">{{dto.storeSell__wine__wine_name}}</div>
+      <div class="col">
+      	<a href="/detail/winedetail?wine_id={{dto.storeSell__wine__wine_id}}">{{dto.storeSell__wine__wine_name}}</a>
+      </div>
       <div class="col-1">{{dto.storeSell__sell_price}}원</div>
       <div class="col-1">{{dto.storeSell__wine__wine_alc}}%</div>
       <div class="col-1">{{dto.storeSell__wine__wine_capacity}}ml</div>
@@ -41,7 +43,7 @@
           type="button"
           name="btnShowProductReview"
           value="리뷰 보기"
-          onclick="location='../{{dto.storeSell__sell_id}}/reviews'"
+          onclick="location='../{{dto.storeSell__sell_id}}/reviews/1'"
         />
       </div>
     </div>
@@ -93,6 +95,7 @@
           value="추가 및 삭제"
           onclick="location='../../../product/addition/mdfy'"
         />
+        <input type="button" id="btnExcelUpload" value="엑셀로추가" />
         <input
           type="button"
           id="btnBack"

@@ -44,11 +44,11 @@
 		 <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
-						<div class="text-end mt-4">
-						    <h5>{{dto.user_name}}({{memid}})님, 안녕하세요&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h5>
-						</div>					
-                        
-                        
+                         <div class="card-header" align="right">
+                             <i class="fas fa-chart-area me-1"></i>
+                             <b>{{dto.user_name}}({{memid}})님, 안녕하세요&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b>
+                             
+                         </div>				
                         <div class="profile-container">
 						    <div class="profile-image">
 						        <img src="{{ dto.user_profile_img.url }}" alt="User Profile Image">
@@ -121,7 +121,7 @@
                                 <div class="card mb-4">
                                     <div class="card-header">
                                         <i class="fas fa-chart-area me-1"></i>
-                                        <b>Recent Searched 6.</b>
+                                        <b>Recent Searched.</b>
                                         <span><b></b></span>
                                     </div>
 	                                

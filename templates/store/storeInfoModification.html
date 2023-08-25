@@ -1,106 +1,137 @@
 <!DOCTYPE html>
 <html>
 
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Wining</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
-            integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-        <script src="/static/js/storeInfoModificationScript.js" defer></script>
-        <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-    </head>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Wining - 점포 정보 관리 페이지</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="/static/js/storeInfoModificationScript.js" defer></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
 
-    <body>
-        <div class="row">
-            <div class="col" style="text-align: center;">
-                <h1>점포 정보 관리 페이지</h1>
-            </div>
-        </div>
-        {% csrf_token %}
+        .container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #343a40;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .row {
+            margin-bottom: 15px;
+        }
+
+        .col-label {
+            text-align: right;
+            font-weight: bold;
+            color: #6c757d;
+        }
+
+        .col-input {
+            padding-left: 15px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="url"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+        }
+
+        input[type="submit"],
+        input[type="button"] {
+            padding: 10px 20px;
+            background-color: #007bff;
+            border: none;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover,
+        input[type="button"]:hover {
+            background-color: #0056b3;
+        }
+
+        
+        
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>점주 정보 수정</h1>
         <form id="storeInfoModificationForm" method="post" action="../info/modification">
+
             <div class="row">
-                <div class="col" style="text-align: center;">
-                    점주 매장 등록
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-4" style="text-align: right;">
+                <div class="col-label col-4">
                     매장 주소:
                 </div>
-                <div class="col">
-                    <div class="row">
-                        <div class="col">
-                            <input type="text" id="storeAddress" placeholder="매장 주소를 입력해주세요" name="mainAddress" style="width:calc(100%)" value="{{main_address}}" readonly>  
-                            <input type="text" id="detailStoreAddress" placeholder="상세 주소를 입력해주세요" name="detailAddress" value="{{detail_address}}" style="width:calc(100%)">
-                        </div>	
-                        <div class="col">
-                            <div id="mainAddress">
-                            </div>
-                            <div id="detailAddress">
-                            </div>
-                        </div>
-                    </div>	
+                <div class="col-input col">
+                    <input type="text" id="storeAddress" placeholder="매장 주소를 입력해주세요" name="mainAddress"
+                        value="{{main_address}}" readonly>
+                    <input type="text" id="detailStoreAddress" placeholder="상세 주소를 입력해주세요"
+                        name="detailAddress" value="{{detail_address}}">
                 </div>
             </div>
             <div class="row">
-                <div class="col-4" style="text-align: right;">
+                <div class="col-label col-4">
                     상호명:
                 </div>
-                <div class="col">
-                    <div class="row">
-                        <div class="col">
-                            <input type="text" id="storeName" placeholder="상호명을 입력해주세요" name="storeName" value="{{info.store_name}}" style="width:calc(100%)">
-                        </div>
-                        <div id="name" class="col">
-                        </div>
-                    </div>
+                <div class="col-input col">
+                    <input type="text" id="storeName" placeholder="상호명을 입력해주세요" name="storeName"
+                        value="{{info.store_name}}">
                 </div>
             </div>
             <div class="row">
-                <div class="col-4" style="text-align: right;">
+                <div class="col-label col-4">
                     사업자 등록번호:
                 </div>
-                <div class="col">
-                    <div class="row">
-                        <div class="col">
-                            <input type="hidden" id="regNumCheck" name="regNumCheck">
-                            <input type="text" id="storeRegNum" placeholder="000-00-00000" name="storeRegNum" value="{{info.store_reg_num}}" style="width:calc(100%)" readonly>
-                        </div>
-                        <div id="regNum" class="col">
-                        </div>
-                    </div>
+                <div class="col-input col">
+                    <input type="hidden" id="regNumCheck" name="regNumCheck">
+                    <input type="text" id="storeRegNum" placeholder="000-00-00000" name="storeRegNum"
+                        value="{{info.store_reg_num}}" readonly>
                 </div>
             </div>
             <div class="row">
-                <div class="col-4" style="text-align: right;">
+                <div class="col-label col-4">
                     매장 위치 지도 URL(선택):
                 </div>
-                <div class="col">
-                    <div class="row">
-                        <div class="col">
-                            <input type="url" placeholder="URL을 입력해주세요" name="storeMapUrl" value="{{info.storeUrl__store_map_url}}" style="width:calc(100%)">
-                        </div>
-                        <div id="url" class="col">
-                        </div>
-                    </div>
+                <div class="col-input col">
+                    <input type="url" placeholder="URL을 입력해주세요" name="storeMapUrl"
+                        value="{{info.storeUrl__store_map_url}}">
                 </div>
             </div>
             <div class="row">
-                <div class="col-4" style="text-align: right;">
+                <div class="col-label col-4">
                     업무용 이메일:
                 </div>
-                <div class="col">
-                    <div class="row">
-                        <div class="col">
-                            <input type="hidden" id="emailCheck" name="emailCheck">
-                            <input type="email" id="storeEmail" placeholder="example@example.com" name="storeEmail" value="{{info.store_email}}" style="width:calc(100%)">
-                        </div>
-                        <div id="email" class="col">
-                        </div>
-                    </div>
+                <div class="col-input col">
+                    <input type="hidden" id="emailCheck" name="emailCheck">
+                    <input type="email" id="storeEmail" placeholder="example@example.com" name="storeEmail"
+                        value="{{info.store_email}}">
                 </div>
             </div>
             <div class="row">
@@ -109,18 +140,16 @@
                 </div>
             </div>
             <div class="row" style="text-align: center;">
-                <div class="col"></div>
                 <div class="col">
-                    <input type="submit" id="btnConfirm" value="수정 완료">
+                    <input type="submit" id="btnConfirm" value="수정 완료" class="btn-confirm">
                     <input type="button" id="btnCancel" value="수정 취소" onclick="location='../mypage'">
                 </div>
-                <div class="col"></div>
             </div>
         </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
-            crossorigin="anonymous"></script>
-    </body>
-
+</body>
 </html>

@@ -8,28 +8,6 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title> '와인 이름' 검색 결과 </title>
-		
-		<style>
-		
-	        body {
-	            background-color: #f8f9fa;
-	        }
-	
-	        .card {
-	            margin-top: 50px;
-	            margin-bottom: 300px;
-	            margin-right:10px;
-	            margin-left:70px;
-	        }
-	
-	        .card-header {
-	            background-color: #343a40;
-	            color: white;
-	            padding: 15px;
-	            
-	        }
-		
-		</style>
 	</head>
 	<body>
 	
@@ -105,7 +83,7 @@
 
 					
 					<label for="inputName" class="highlight-label">4. 원하는 당도를 고르세요 </label> 
-					<div style="width:60%; margin: 0 auto; text-align: center;"> 
+					<div style="width:60%; margin: 0 auto;"> 
 						<br>
 						<input type="checkbox" name="dangdo" id="d0" value="0" checked="checked" onClick="default_d_check();">
         				<label for="red">선택 없음</label> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -122,7 +100,7 @@
 					</div>
 					<br>
 					<label for="inputName" class="highlight-label">5. 원하는 산도를 고르세요 </label> 
-					<div style="width:60%; margin: 0 auto; text-align: center;"> 
+					<div style="width:60%; margin: 0 auto;"> 
 						<br>
 						<input type="checkbox" name="sando" id="s0" value="0" checked="checked" onClick="default_s_check();">
         				<label for="red">선택 없음</label> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -139,7 +117,7 @@
 					</div>
 					<br>
 					<label for="inputName" class="highlight-label">6. 원하는 탄닌을 고르세요 </label> 
-					<div style="width:60%; margin: 0 auto; text-align: center;"> 
+					<div style="width:60%; margin: 0 auto;"> 
 						<br>
 						<input type="checkbox" name="tannin" id="t0" value="0" checked="checked" onClick="default_t_check();">
         				<label for="red">선택 없음</label> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -156,7 +134,7 @@
 					</div>
 					<br>
 					<label for="inputName" class="highlight-label">7. 와인과 페어링하고 싶은 음식을 고르세요 </label> 
-					<div style="width:60%; margin: 0 auto; text-align: center;"> 
+					<div style="width:60%; margin: 0 auto;"> 
 						<br>
 						<input type="checkbox" name="winefood" id="f0" value="0" checked="checked" onClick="default_f_check();">
         				<label for="red">선택 없음</label> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -176,7 +154,7 @@
 
 					
 					<label for="inputName" class="highlight-label">8. 와인의 원산지를 고르세요 </label> 
-					<div style="width:60%; margin: 0 auto; text-align: center;"> 
+					<div style="width:60%; margin: 0 auto;"> 
 						<br>
 						<input type="checkbox" name="wineregion" id="r0" value="0" checked="checked" onClick="default_r_check();">
         				<label for="red">선택 없음</label> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -202,13 +180,34 @@
 	<br><br>
 			<div style="text-align: center;">
 				<input class="inputbutton" type="submit" value="검색" style="display :inline-block; padding: 10px 30px;">
-			</div>
+			</div><br>
 			
 			
 			</div>
 			</div>
 			</div>
-			
+<style>					
+.inputbutton {
+    background-color: #3498db;
+    border: none;
+    color: white;
+    padding: 10px 30px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s, transform 0.2s;
+    cursor: pointer;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.inputbutton:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+		
+</style>	
 			
 	{% endblock %}
 	
@@ -216,46 +215,74 @@
 	{% block list %}
 	<div align="center" style="margin: 0 auto;">
 		<div>	
-		{% if results_count == 0 %}										<!-- 검색 결과 유무에 따라 나눈다 -->
+			{% if results_count == 0 %}										<!-- 검색 결과 유무에 따라 나눈다 -->
 				검색 결과가 없습니다
-		{% else %}
-				<h3>'{{ search_word }}' 에 대한 검색 결과</h3>
+			{% else %}
 		</div>
-		<div>
-			<h3> 전체 결과 수 : {{ results_count }}	</h3>
-		</div>
-		</div>
-<br><br>
+		<h3>검색 조건에 해당하는 WINE,<span style="color:red;"> &nbsp;{{ results_count }} </span>개를 보여드리겠습니다.</h3>
+	</div><br>
+	
+	
 
-			{% for category_result in category_results %}								<!-- 검색 결과가 있다면 반복문으로 나타낸다 -->
-				
-				<div class="list_outline_include" style=" width:60%; height: 240px; border: 5px solid rgb(255, 136, 139); 
-					border-radius: 1em; padding: 3px 3px 3px 3px; margin: 0 auto;">	    	
-				 	<a href="../detail/winedetail?wine_id={{category_result.wine_id}}">
-				 		<div class="list_image" style="float: left;">
-				 			<img src="../{{category_result.wine_image.url }}" width="150" height="200"> 
-				 		</div>
-							<div class="list_name" id="{category_result.wine_id}}" style="font-size: x-large; font-color:black;"> 
-								{{ category_result.wine_name }}
-							</div>
-							<div class="list_name_eng" style="font-size: large; padding: 5px 5px 5px 5px; font-color:black;"> 
-								{{ category_result.wine_name_eng }} 
-							</div>
-							<div class="list_name_temp" style="font-size: large; padding: 5px 5px 5px 5px; font-color:black;"> 
-					<!--  			종류 : {{category_result.wine_sort}}
-						이름 : {{category_result.wine_name}}  
-						용량 : {{category_result.wine_capacity}} 
-						도수 : {{category_result.wine_alc}}
-						당도 : {{category_result.wine_dangdo}}
-						산도 : {{category_result.wine_sando}}
-						탄닌 : {{category_result.wine_tannin}}
-						음식 : {{category_result.wine_food}}
-						생산지 : {{category_result.wine_region.wine_region_name}} -->
-							</div>
-						</a>	
-					</div>
-				<br><br>
+<!-- 검색 결과가 있다면 반복문으로 나타낸다 -->
+<div class="photo-board">
+			{% for category_result in category_results %}								
+			    <div class="photo-item">
+			        <a href="../detail/winedetail?wine_id={{category_result.wine_id}}">
+			            <img class="photo-image" src="../{{category_result.wine_image.url }}" alt="{{ category_result.wine_name }}">
+			            <div class="photo-name">{{ category_result.wine_name }}</div>
+			            <div class="photo-name-eng">{{ category_result.wine_name_eng }}</div>
+			        </a>
+			    </div>
 			{% endfor %}
+	</div>		
+			
+<style>
+
+.photo-board {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    
+    margin-top: 30px;
+}
+
+.photo-item {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    width: calc(14% - 20px); /* 5개씩 배치하므로 너비 조절 */
+    margin-left: 40px; /* 왼쪽 공백 추가 */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.photo-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.photo-image {
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.photo-name {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.photo-name-eng {
+    color: #666;
+}
+</style>	
+			
+			
 		{% endif %}
 	
 	{% endblock %}

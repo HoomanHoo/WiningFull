@@ -5,6 +5,8 @@
 	<head>
 		<meta charset="UTF-8">
 		
+		
+		<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
 		<style>
 			.search-form-container {
 			    position: relative;
@@ -40,6 +42,7 @@
 		
 		<script src="/static/js/jquery-3.6.4.js"></script>
 		<script src="/static/js/script_search.js"></script>
+		<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 		
 	</head>
 	
@@ -82,7 +85,9 @@
 			{% block list %}
 			
 			
-		    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+		
+		
+		   
 		     
 		    <div class="bottom-container">
 		    	<div class="map-container">
@@ -98,6 +103,21 @@
 					};
 			
 					var map = new kakao.maps.Map(container, options);
+					
+					
+					
+					
+					document.addEventListener('DOMContentLoaded', function() {
+						var swiper = new Swiper('.swiper-container', {
+							slidesPerView: 5, // 한 화면에 보여줄 슬라이드 개수
+							spaceBetween: 20, // 슬라이드 간격
+							loop: true, // 무한 반복 슬라이더
+							navigation: {
+								nextEl: '.swiper-button-next', // 다음 버튼 클래스
+								prevEl: '.swiper-button-prev', // 이전 버튼 클래스
+							},
+						});
+					});
 				</script>
 		   </div>
  

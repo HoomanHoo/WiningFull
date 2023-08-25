@@ -464,7 +464,8 @@ class StoreInfoModificationView(View):
             redirect("errorhandling:storeError")
 
         logger.info(f"{user_id}: StoreInfoModificationView")
-        return redirect("storeInfo")
+        return redirect("storeMyPage")
+        
 
 
 class SellDetailListView(View):

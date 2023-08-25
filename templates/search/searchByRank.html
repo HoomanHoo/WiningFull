@@ -1,57 +1,118 @@
 {% extends "search/base.html" %} 
 {% load static %}
 
-
-
 <!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title> Wining </title>
-		<!-- ♠ bootstrap 적용 -->
+		<title>Wining - 랭킹 검색</title>
+		<!-- 부트스트랩 링크 추가 -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+		<!-- 추가적인 CSS 스타일 -->
+		<style>
+			body {
+				background-color: #f0f3f5;
+				font-family: Arial, sans-serif;
+			}
+			.container {
+				margin-top: 100px;
+				text-align: center;
+			}
+			.input-group {
+				margin-bottom: 20px;
+			}
+			.input-group-prepend, .input-group-append {
+				height: 38px;
+			}
+			.input-group input {
+				border-radius: 30px;
+				padding: 10px 15px;
+			}
+			
+			
+			.inputbutton {
+				padding: 10px 40px;
+				font-size: 16px;
+				border-radius: 30px;
+				background-color: #5f27cd;
+				border: none;
+				color: white;
+				cursor: pointer;
+				transition: background-color 0.3s ease;
+			}
+			.inputbutton:hover {
+				background-color: #341f97;
+			}
+		</style>
 	</head>
 	<body> 
-		
-		{% block select %}								<!-- 검색 방법 선택 -->
-		
-		
+		{% block select %}	
+
 		{% endblock %}
 		<br><br>
 		{% block input %}
 			{% csrf_token %}
-
-
-			
-			<form method="post" action="searchbyranklist" name="searchbyrank">
-				<div style="text-align:center"> 
-					
-					<div> 결과 순서 기준:
-						<select name="rank_category">
-				<!--  	<option value="detailview"> 조회수 </option>		--> 
-						<option value="purchaseqnty"> 구매수 </option>
-						<option value="sellregist"> 판매 등록 수 </option>
-						<option value="reviewqnty"> 리뷰 개수 </option>
-						<option value="reviewavg"> 리뷰 평점 </option>
-				<!-- 	<option value="priceavg"> 평균 가격 </option>		-->
-					</select>
+		<div class="container" style="width:390px;">
+		    <div class="row justify-content-center">
+            	<div class="card">
+	                <div class="card-header">
+	                    <h3 class="text-center">sorted by Rank.</h3>
+	                </div>
+ 					<div class="card-body">	
+						<form method="post" action="searchbyranklist" name="searchbyrank">
+							<div class="input-group">
+								<select class="custom-select" name="rank_category">
+									<option value="purchaseqnty">구매량 많은순</option>
+									<option value="sellregist">등록상품 많은순</option>
+									<option value="reviewqnty">리뷰 많은순</option>
+									<option value="reviewavg">평점 높은순</option>
+								</select>
+							</div>
+							<div class="input-group" style="width:240px;">
+								<input class="form-control" type="number" max="100" name="rank_qnty" placeholder="최대 개수" value="10">
+								<div class="input-group-append">
+									<span class="input-group-text">개</span>
+								</div>
+							</div><br>
+							<div class="form-group text-center">
+								<button class="inputbutton" type="submit">검색 시작</button>
+							</div>
+						</form>
 					</div>
+				</div>
+			</div>
+		</div><br><br><br><br><br><br><br><br><br><br>
+		
+		
+<style>					
+.inputbutton {
+    background-color: #3498db;
+    border: none;
+    color: white;
+    padding: 10px 30px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s, transform 0.2s;
+    cursor: pointer;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-					<br><br><br><br><br><br>
-					<div> 결과 최대 개수
-						<input type="number" max="100" name="rank_qnty" placeholder="개수 입력" value="10">
-					</div>
-					<br>
-					
-				<input class="inputbutton" type="submit" value="검색">
-				
-			</form>
-		{% endblock %}
-
-
-
-		{% block list %}
+.inputbutton:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+		
+</style>	
 		
 		{% endblock %}
-
+		{% block list %}
+		{% endblock %}
+		<!-- 부트스트랩 스크립트 -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 	</body>
 </html>

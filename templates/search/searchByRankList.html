@@ -6,149 +6,261 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title> '와인 이름' 검색 결과 </title>
-	</head>
-	<body>
-	
-	{% block input %}
-			{% csrf_token %}
-
-
+		<title>Wining - 랭킹 검색</title>
+		<!-- 부트스트랩 링크 추가 -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+		<!-- 추가적인 CSS 스타일 -->
+		<style>
+			body {
+				background-color: #f0f3f5;
+				font-family: Arial, sans-serif;
+			}
+			.container {
+				margin-top: 100px;
+				text-align: center;
+			}
+			.input-group {
+				margin-bottom: 20px;
+			}
+			.input-group-prepend, .input-group-append {
+				height: 38px;
+			}
+			.input-group input {
+				border-radius: 30px;
+				padding: 10px 15px;
+			}
 			
-			<form method="post" action="searchbyranklist" name="searchbyrank">
-				<div style="text-align:center"> 
-					<div> 
-						<select name="rank_category">
-				<!--  	<option value="detailview"> 조회수 </option>		--> 
-						<option value="purchaseqnty"> 구매수 </option>
-						<option value="sellregist"> 판매 등록 수 </option>
-						<option value="reviewqnty"> 리뷰 개수 </option>
-						<option value="reviewavg"> 리뷰 평점 </option>
-				<!-- 	<option value="priceavg"> 평균 가격 </option>		-->
-					</select>
-					</div>
+			
+			.inputbutton {
+				padding: 10px 40px;
+				font-size: 16px;
+				border-radius: 30px;
+				background-color: #5f27cd;
+				border: none;
+				color: white;
+				cursor: pointer;
+				transition: background-color 0.3s ease;
+			}
+			.inputbutton:hover {
+				background-color: #341f97;
+			}
+		</style>
+	</head>
+	<body> 
+		{% block select %}	
 
-					<br>
-					<div> 
-						<input type="number" max="100" name="rank_qnty" placeholder="개수 입력" value="10">
-					</div>
-					<br>
-					
-				<input class="inputbutton" type="submit" value="검색">
-				
-			</form>
 		{% endblock %}
+		<br><br>
+		{% block input %}
+			{% csrf_token %}
+		<div class="container" style="width:390px;">
+		    <div class="row justify-content-center">
+            	<div class="card">
+	                <div class="card-header">
+	                    <h3 class="text-center">sorted by Rank.</h3>
+	                </div>
+ 					<div class="card-body">	
+						<form method="post" action="searchbyranklist" name="searchbyrank">
+							<div class="input-group">
+								<select class="custom-select" name="rank_category">
+									<option value="purchaseqnty">구매량 많은순</option>
+									<option value="sellregist">등록상품 많은순</option>
+									<option value="reviewqnty">리뷰 많은순</option>
+									<option value="reviewavg">평점 높은순</option>
+								</select>
+							</div>
+							<div class="input-group" style="width:240px;">
+								<input class="form-control" type="number" max="100" name="rank_qnty" placeholder="최대 개수" value="10">
+								<div class="input-group-append">
+									<span class="input-group-text">개</span>
+								</div>
+							</div><br>
+							<div class="form-group text-center">
+								<button class="inputbutton" type="submit">검색 시작</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div><br><br><br>
 		
-	<br><br>
-	{% block list %}
-									<!-- 전체 결과 수 출력 -->
-<br><br>
+		
+<style>					
+.inputbutton {
+    background-color: #3498db;
+    border: none;
+    color: white;
+    padding: 10px 30px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s, transform 0.2s;
+    cursor: pointer;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
+.inputbutton:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+		
+</style>	
+		{% endblock %}<br><br>
+		
+	
+	{% block list %}<br><br>
+									<!-- 전체 결과 수 출력 -->
 		{% if count == 0 %}										<!-- 검색 결과 유무에 따라 나눈다 -->
 				검색 결과가 없습니다
 		{% else %}
 											<!-- 검색 결과가 있다면 반복문으로 나타낸다 -->
-				
-				{% if rank_category == "sellregist" %}
-					<h4> 판매 등록 수 검색 결과 수 : {{ count }}개 </h4>	<br><br>
-					{% for wine_by_rank in list_by_rank %}
-					
-					<div class="list_outline_start" style=" width:60%; height: 240px; border: 5px solid rgb(170, 0, 4); 
-					border-radius: 1em; padding: 3px 3px 3px 3px; margin: 0 auto;">	    	
-				 	<a href="../detail/winedetail?wine_id={{ wine_by_rank.wine__wine_id }}">
-				 		<div class="list_image" style="float: left;">
-				 			<img src="../{{wine_by_rank.wine__wine_image}}" width="150" height="200"> 
-				 		</div>
-							<div class="list_name" id="{wine_by_rank.sell__wine__wine_id}}" style="font-size: x-large; font-color:black;">
-								{{wine_by_rank.wine__wine_name}}
-							</div>
-							<div class="list_name_eng" style="font-size: large; padding: 5px 5px 5px 5px; font-color:black;"> 
-								{{wine_by_rank.wine__wine_name_eng}} 
-							</div>
+
+		{% if rank_category == "sellregist" %}
+			
+			<div class="container">
+				<h4 align="center"> 가장 많이 등록된 WINE TOP.{{ count }}입니다. </h4><br><br>
+				<div class="photo-list">
+				{% for wine_by_rank in list_by_rank %}		
+					<div class="photo-item"> 	    	
+		 				<a href="../detail/winedetail?wine_id={{ wine_by_rank.wine__wine_id }}">
+		 					<img class="photo-image" src="../{{wine_by_rank.wine__wine_image}}"> 
+							<div class="photo-name" id="{wine_by_rank.sell__wine__wine_id}}">{{wine_by_rank.wine__wine_name}}</div>
+							<div class="photo-name-eng">{{wine_by_rank.wine__wine_name_eng}}</div>
 						</a>
 						<div>
 							판매 등록 수 : {{wine_by_rank.max_count}}
 						</div>
-					</div>
-					<br><br>
-					{% endfor %}
+					</div><br><br>
+				{% endfor %}
+				</div>
+			</div>
 
 					
-				{% elif rank_category == "purchaseqnty" %}
-					<h4> 구매 수 검색 결과 : {{ count }}개 </h4>	<br><br>
-					{% for wine_by_rank in list_by_rank %}
-					
-					<div class="list_outline_start" style=" width:60%; height: 240px; border: 5px solid rgb(170, 0, 4); 
-					border-radius: 1em; padding: 3px 3px 3px 3px; margin: 0 auto;">	    	
-				 	<a href="../detail/winedetail?wine_id={{ wine_by_rank.sell__wine__wine_id }}">
-				 		<div class="list_image" style="float: left;">
-				 			<img src="../{{wine_by_rank.sell__wine__wine_image}}" width="150" height="200"> 
-				 		</div>
-							<div class="list_name" id="{wine_by_rank.sell__wine__wine_id}}" style="font-size: x-large; font-color:black;">
-								{{wine_by_rank.sell__wine__wine_name}}
-							</div>
-							<div class="list_name_eng" style="font-size: large; padding: 5px 5px 5px 5px; font-color:black;"> 
-								{{wine_by_rank.sell__wine__wine_name_eng}} 
-							</div>
+			{% elif rank_category == "purchaseqnty" %}
+			
+			<div class="container">
+				<h4 align="center"> 구매량 많은 WINE TOP.{{ count }} 입니다. </h4><br><br>
+				<div class="photo-list">
+				{% for wine_by_rank in list_by_rank %}
+					<div class="photo-item">   	
+				 		<a href="../detail/winedetail?wine_id={{ wine_by_rank.sell__wine__wine_id }}">
+				 			<img class="photo-image" src="../{{wine_by_rank.sell__wine__wine_image}}"> 
+							<div class="photo-name" id="{wine_by_rank.sell__wine__wine_id}}">{{wine_by_rank.sell__wine__wine_name}}</div>
+							<div class="photo-name-eng">{{wine_by_rank.sell__wine__wine_name_eng}}</div>
 						</a>
 						<div>
-							구매수 : {{wine_by_rank.max_count}}
-					</div>
-					</div>
-					<br><br>
-					{% endfor %}
-					
-				{% elif rank_category == "reviewqnty" %}
-					<h4> 리뷰 개수 검색 결과 : {{ count }}개 </h4>	<br><br>
-					{% for wine_by_rank in list_by_rank %}
-					
-					<div class="list_outline_start" style=" width:60%; height: 240px; border: 5px solid rgb(170, 0, 4); 
-					border-radius: 1em; padding: 3px 3px 3px 3px; margin: 0 auto;">	    	
-				 	<a href="../detail/winedetail?wine_id={{ wine_by_rank.sell__wine__wine_id }}">
-				 		<div class="list_image" style="float: left;">
-				 			<img src="../{{wine_by_rank.sell__wine__wine_image}}" width="150" height="200"> 
-				 		</div>
-							<div class="list_name" id="{wine_by_rank.sell__wine__wine_id}}" style="font-size: x-large; font-color:black;">
-								{{wine_by_rank.sell__wine__wine_name}}
-							</div>
-							<div class="list_name_eng" style="font-size: large; padding: 5px 5px 5px 5px; font-color:black;"> 
-								{{wine_by_rank.sell__wine__wine_name_eng}} 
-							</div>
-						</a>
-						<div>
-							리뷰 개수 : {{wine_by_rank.max_count}}
+							누적 구매량 : {{wine_by_rank.max_count}}
 						</div>
-					</div>
-					<br><br>
-					{% endfor %}
+					</div><br><br>			
+				{% endfor %}
+				</div>
+			</div>
+			
+			
 					
-				{% elif rank_category == "reviewavg" %}
-					<h4> 리뷰 평점 검색 결과 : {{ count }}개 </h4>	<br><br>
+			{% elif rank_category == "reviewqnty" %}
+			
+			<div class="container">
+				<h4 align="center"> 리뷰 많은 WINE TOP.{{ count }} 입니다.</h4><br><br>
+				<div class="photo-list">
+				{% for wine_by_rank in list_by_rank %}
+					<div class="photo-item"> 	    	
+				 		<a href="../detail/winedetail?wine_id={{ wine_by_rank.sell__wine__wine_id }}">
+				 			<img class="photo-image" src="../{{wine_by_rank.sell__wine__wine_image}}">
+							<div class="photo-name" id="{wine_by_rank.sell__wine__wine_id}}">{{wine_by_rank.sell__wine__wine_name}}</div>
+							<div class="photo-name-eng">{{wine_by_rank.sell__wine__wine_name_eng}}</div>
+						</a>
+							<div>
+								리뷰 개수 : {{wine_by_rank.max_count}}
+							</div>
+					</div><br><br>
+				{% endfor %}
+				</div>
+			</div>
+				
+				
+					
+			{% elif rank_category == "reviewavg" %}
+					
+			<div class="container">
+				<h4 align="center"> 평점 높은 WINE TOP.{{ count }} 입니다.</h4><br><br>
+				<div class="photo-list">
 					{% for wine_by_rank in list_by_rank %}
-					
-					<div class="list_outline_start" style=" width:60%; height: 240px; border: 5px solid rgb(170, 0, 4); 
-					border-radius: 1em; padding: 3px 3px 3px 3px; margin: 0 auto;">	    	
-				 	<a href="../detail/winedetail?wine_id={{ wine_by_rank.sell__wine__wine_id }}">
-				 		<div class="list_image" style="float: left;">
-				 			<img src="../{{wine_by_rank.sell__wine__wine_image}}" width="150" height="200"> 
-				 		</div>
-							<div class="list_name" id="{wine_by_rank.sell__wine__wine_id}}" style="font-size: x-large; font-color:black;">
+					<div class="photo-item"> 	    	
+				 		<a href="../detail/winedetail?wine_id={{ wine_by_rank.sell__wine__wine_id }}">
+					 		<img class="photo-image" src="../{{wine_by_rank.sell__wine__wine_image}}" width="150" height="200"> 
+							<div class="photo-name" id="{wine_by_rank.sell__wine__wine_id}}">
 								{{wine_by_rank.sell__wine__wine_name}}
 							</div>
-							<div class="list_name_eng" style="font-size: large; padding: 5px 5px 5px 5px; font-color:black;"> 
+							<div class="photo-name-eng"> 
 								{{wine_by_rank.sell__wine__wine_name_eng}} 
 							</div>
 						</a>
 						<div>
 							리뷰 평점 : {{wine_by_rank.avg}}
 						</div>
-					</div>		
-					<br><br>
+					</div>
+							
+					<br><br> 
 					{% endfor %}
+				</div>
+			</div>
 				
-				{% endif %}
+		{% endif %}
 				<br><br>
-			
+<style>
+
+
+.photo-list {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+
+
+.photo-board {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.photo-item {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    width: calc(17% - 20px); /* 5개씩 배치하므로 너비 조절 */
+    margin-left: 40px; /* 왼쪽 공백 추가 */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.photo-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.photo-image {
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.photo-name {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.photo-name-eng {
+    color: #666;
+}
+</style>		
 		{% endif %}
 	
 	{% endblock %}
@@ -158,3 +270,4 @@
 	
 	</body>
 </html>
+
