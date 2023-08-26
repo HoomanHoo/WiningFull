@@ -42,7 +42,7 @@ services:
     expose:
      - "8001"
      - "3307"
-    entrypoint: /bin/bash /entrypoint.sh # mysql:3307
+    entrypoint: /bin/bash /entrypoint.sh 
     depends_on:
      - db
   nginx:

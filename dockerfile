@@ -11,5 +11,4 @@ RUN pip3 install -r requirements.txt
 COPY migrate.sh /migrate.sh
 COPY bit_save.sql /bit_save.sql
 COPY entrypoint.sh /entrypoint.sh
-COPY entrypoint-db.sh /entrypoint-db.sh
-RUN chmod +x /migrate.sh && chmod +x /bit_save.sql && chmod +x /entrypoint.sh && chmod +x /entrypoint-db.sh
+RUN chmod +x /migrate.sh && chmod +x /bit_save.sql && chmod +x /entrypoint.sh
