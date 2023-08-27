@@ -1,6 +1,7 @@
 import logging
 import json
 import base64
+import asyncio
 
 from django.shortcuts import render, redirect
 from django.views.generic.base import View
@@ -10,7 +11,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.dateformat import DateFormat
 from django.utils.datetime_safe import datetime
-from django.db import DatabaseError
+from django.db import DatabaseError, transaction
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
@@ -202,7 +203,7 @@ class BuyListView(View):
         user_point = get_user_point(user_id)
         user_info = get_user_info(user_id=user_id)
         template = loader.get_template("purchasing/buyList.html")
-        context = {"user_point": user_point, "bdto" : user_info}
+        context = {"user_point": user_point, "bdto": user_info}
         dtos = []
         all_price = 0
 
@@ -348,7 +349,7 @@ class PickListView(View):
                 "page_infos": page_infos,
                 "all_price": all_price,
                 "cart_id": cart_id,
-                "bdto" : user_info
+                "bdto": user_info,
             }
 
             logger.info(f"{user_id}: cart_id: {cart_id} PickListView")
@@ -361,7 +362,7 @@ class PickListView(View):
         """
         request_body = json.loads(request.body)
         cart_detail_id = request_body.get("cartDetailId", None)
- 
+
         if cart_detail_id is not None:
             result = delete_detail_cart_info(cart_det_id=cart_detail_id)
             logger.info(
@@ -449,50 +450,70 @@ class OrderPageView(View):
 
         else:
             try:  # with transaction 걸어줘야함
-                receive_codes = []
-                enc_receive_codes = []
-                purchase_infos = insert_purchase(result)
-                purchase_id = purchase_infos[0]
-                purchase_detail_ids = purchase_infos[1]
+                with transaction.atomic():
+                    receive_codes = []
+                    enc_receive_codes = []
+                    purchase_infos = insert_purchase(result)
+                    purchase_id = purchase_infos[0]
+                    purchase_detail_ids = purchase_infos[1]
 
-                for purchase_detail_id in purchase_detail_ids:
-                    receive_code = create_receive_code(
-                        purchase_num=purchase_detail_id[0]
+                    for purchase_detail_id in purchase_detail_ids:
+                        receive_code = create_receive_code(
+                            purchase_num=purchase_detail_id[0]
+                        )
+                        receive_codes.append(receive_code)
+                        enc_receive_code = EncModule().encrypt_receive_code(
+                            receive_code=receive_code
+                        )
+                        enc_receive_codes.append(enc_receive_code)
+
+                    insert_enc_receive_codes(
+                        enc_receive_codes=enc_receive_codes,
+                        purchase_detail_ids=purchase_detail_ids,
                     )
-                    receive_codes.append(receive_code)
-                    enc_receive_code = EncModule().encrypt_receive_code(
-                        receive_code=receive_code
+
+                    detail_infos = get_detail_info(purchase_id)
+
+                    for detail_info in detail_infos:
+                        raw_store_address = detail_info.get(
+                            "purchase_detail_id__sell__store__store_address"
+                        )
+
+                        split_store_address = raw_store_address.split("@")
+                        store_address = " ".join(split_store_address)
+
+                        detail_info[
+                            "purchase_detail_id__sell__store__store_address"
+                        ] = store_address
+                        receive_code = base64.b64decode(
+                            detail_info.get("receive_code")
+                        ).decode("utf-8")
+                        detail_info["receive_code"] = receive_code
+
+                    name_and_email = get_user_name_and_email(user_id=user_id)
+                    user_name = name_and_email[0]
+                    user_email = name_and_email[1]
+                # start = time.time()
+                asyncio.run(
+                    send_purchase_email(
+                        user_name=user_name,
+                        user_email=user_email,
+                        purchase_info_list=list(detail_infos),
                     )
-                    enc_receive_codes.append(enc_receive_code)
-
-                insert_enc_receive_codes(
-                    enc_receive_codes=enc_receive_codes,
-                    purchase_detail_ids=purchase_detail_ids,
                 )
+                # end = time.time()
+                # print("비동기 함수 실행시간", end - start)
 
-                detail_infos = get_detail_info(purchase_id)
+                # start = time.time()
 
-                for detail_info in detail_infos:
-                    raw_store_address = detail_info.get("purchase_detail_id__sell__store__store_address")
-                    
-                    split_store_address = raw_store_address.split("@")
-                    store_address = " ".join(split_store_address)
+                # s_send_purchase_email(
+                #     user_name=user_name,
+                #     user_email=user_email,
+                #     purchase_info_list=list(detail_infos),
+                # )
 
-                    detail_info["purchase_detail_id__sell__store__store_address"] = store_address
-                    receive_code = base64.b64decode(
-                        detail_info.get("receive_code")
-                    ).decode("utf-8")
-                    detail_info["receive_code"] = receive_code
-
-                logger.info(user_id)
-                name_and_email = get_user_name_and_email(user_id=user_id)
-                user_name = name_and_email[0]
-                user_email = name_and_email[1]
-                send_purchase_email(
-                    user_name=user_name,
-                    user_email=user_email,
-                    purchase_info_list=list(detail_infos),
-                )
+                # end = time.time()
+                # print("동기 함수 실행시간", end - start)
 
                 logger.info(
                     f"{user_id}: purchase_id: {purchase_id} current_time: {current_time} OrderPageView"

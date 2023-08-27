@@ -24,7 +24,6 @@ from purchasing.models import (
 )
 
 
-@transaction.atomic(durable=True)
 def insert_purchase(result: dict) -> list:
     """
     purchaseUseCase 클래스의 calc() 함수의 연산 결과를 매개변수로 하여 Django ORM을 통해 DB에 구매 목록과 정보를 저장하는 함수이다.
@@ -143,6 +142,7 @@ def delete_detail_cart_info(cart_det_id: str) -> tuple:
     detail_cart = WinCartDetail.objects.get(cart_det_id=cart_det_id)
     result = detail_cart.delete()
     return result
+
 
 def get_user_info(user_id: str):
     user_info = WinUser.objects.get(user_id=user_id)
