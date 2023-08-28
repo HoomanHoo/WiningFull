@@ -12,18 +12,22 @@ for (var i = 0; i < pages.length; i++) {
 
 function paging() {
 	let modify = document.getElementById("modify");
-	let url = "../product/pages/" + this.id;
+	let url = "../../product/pages/" + this.id;
 
-	if (document.getElementById("srhByName").value){
+	if (document.getElementById("srhByName").value) {
 		const srhKeyWord = document.getElementById("srhByName").value;
-		url = "../product/pages/" + this.id + "?srhkeyword=" + srhKeyWord
+		url = "../../product/pages/" + this.id + "?srhkeyword=" + srhKeyWord
 	}
 
 	fetch(url).then((response) => response.json()).then((data) => {
-		let resultData = JSON.parse(data);
+		const resultData = JSON.parse(data);
 
 		let pages = resultData["pages"];
-		let wines = resultData["wines"];
+		let wines = resultData["datas"];
+		let nextPage = resultData["next_page"];
+		let prevPage = resultData["prev"];
+		console.log(prevPage);
+		console.log(nextPage);
 		console.log(pages);
 		wineList.replaceChildren();
 		for (var i = 0; i < wines.length; i++) {
@@ -64,17 +68,14 @@ function paging() {
 		}
 		let prev = document.getElementById("prev");
 		let next = document.getElementById("next");
-		if (pages[0] < 6) {
+		if (prevPage < 1) {
 			prev.className = "page-item disabled";
 		}
 		else {
 			prev.className = "page-item";
 			document.querySelector(".prev").setAttribute("id", pages[0] - 1);
 		}
-		if (pages.length < 5) {
-			next.className = "page-item disabled";
-		}
-		else if(pages[pages.length - 1] < 6){
+		if (pages.length < 5 || nextPage == 0) {
 			next.className = "page-item disabled";
 		}
 		else {
@@ -206,7 +207,7 @@ function searchByName() {
 
 			}
 			else if (xhttp.status === 500) {
-				alert("서버에 문제가 발생했습니다. 잠시 뒤 다시 시도해주세요");
+				console.log("서버에 문제가 발생했습니다. 잠시 뒤 다시 시도해주세요");
 			}
 			else {
 				alert("문제가 발생했습니다 잠시 뒤 다시 시도해주세요");
@@ -220,16 +221,16 @@ function searchByName() {
 	xhttp.send();
 }
 
-function checkValue(){
+function checkValue() {
 	prices = document.querySelectorAll("input[name=sellPrice]");
 	promots = document.querySelectorAll("input[name=sellPromot]");
 
-	for (var i = 0; i < prices.length; i++){
-		if(! prices[i].value){
+	for (var i = 0; i < prices.length; i++) {
+		if (!prices[i].value) {
 			alert("판매하고자 하는 상품의 가격을 입력해주세요");
 			return false;
 		}
-		else if(! promots[i].value){
+		else if (!promots[i].value) {
 			alert("상품 설명을 입력해주세요");
 			return false;
 		}

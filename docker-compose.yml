@@ -22,11 +22,13 @@ services:
       #test: ["CMD-SHELL", "mysql -uroot -pbit bit < /bit_save.sql"]
       #interval: 1s
       #timeout: 4m
-      #retries: 0 #accure sql read write problem
+      #retries: 0 # healthcheck 옵션이 DB의 read/write 오류를 발생시킨다 이유는 찾아보아야함
     volumes:
      - ./bit_save.sql:/docker-entrypoint-initdb.d/initdb.sql
      - /etc/timezone:/etc/timezone
-     - mysql-database:/var/lib/mysql:rw	# mysql-database:/var/lib/mysql The designated data directory /var/lib/mysql/ is unusable. You can remove all files that the server added to it. - volumes directory already exit so it made conflict
+     - mysql-database:/var/lib/mysql:rw
+     # mysql-database:/var/lib/mysql The designated data directory /var/lib/mysql/ is unusable. You can remove all files that the server added to it. 
+     #- 디렉토리 충돌이 나서 발생하는 오류. host pc의 volume을 지우거나 디렉토리를 변경해주면 된다.
      #- type: volume
        #source: db_vol
        #target: /var/lib/mysql

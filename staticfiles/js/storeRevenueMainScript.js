@@ -1,30 +1,53 @@
 let term = document.getElementById("term");
-const listDiv = document.getElementById("revenueList");
+const revenueList = document.getElementById("revenueList");
+let pages = document.querySelectorAll("a[name=pages]");
 
-term.addEventListener("change", () => {
+for (var i = 0; i < pages.length; i++) {
+    pages[i].addEventListener("click", paging);
+}
+term.addEventListener("change", paging)
+
+function paging(e) {
+    check = e.type
     let termValue = term.value;
-    fetch("/store/store-revenue-term?term=" + termValue)
+    console.log(check)
+    if (check == "click") {
+        let page_num = this.id;
+        url = "/store/revenue/pages/" + page_num + "/term/" + termValue
+        console.log("click")
+    }
+    else {
+        url = "/store/revenue/pages/" + 1 + "/term/" + termValue
+        console.log("change")
+    }
+
+    fetch(url)
         .then((response) => response.json())
         .then((data) => {
-            const responseData = data["result"];
+            const resultData = JSON.parse(data)
+
+            let pages = resultData["pages"]
+            let revenues = resultData["datas"];
+            let nextPage = resultData["next_page"];
+            let prevPage = resultData["prev"];
+
             let date = "";
-            console.log(responseData);
-            listDiv.replaceChildren();
-            for (let i = 0; i < responseData.length; i++) {
-                let values = new Map(Object.entries(responseData[i]));
+            console.log(resultData);
+            revenueList.replaceChildren();
+            for (let i = 0; i < revenues.length; i++) {
+                let values = revenues[i].date;
                 console.log(values);
                 if (termValue == 0) {
-                    date = values.get("date").substr(0, 10);
+                    date = values.substr(0, 10);
                 }
 
                 else if (termValue == 1) {
-                    console.log(values.get("date"));
-                    date = values.get("date").substr(0, 7) + "월";
+                    date = values.substr(0, 7) + "월";
                     console.log(date);
                 }
 
                 else if (termValue == 2) {
-                    const quarter = values.get("date").substr(5, 2);
+                    const quarter = values.substr(5, 2);
                     console.log(quarter);
                     if (quarter == "01") {
                         date = "1분기";
@@ -40,11 +63,11 @@ term.addEventListener("change", () => {
                     }
                 }
                 else if (termValue == 3) {
-                    date = values.get("date").substr(0, 4) + "년";
+                    date = values.substr(0, 4) + "년";
 
                 }
-                let valueSum = values.get("value_sum");
-                let qntySum = values.get("qnty_sum");
+                let valueSum = revenues[i].value_sum;
+                let qntySum = revenues[i].qnty_sum;
 
                 const newRow = document.createElement("div");
                 newRow.setAttribute("class", "row");
@@ -62,11 +85,47 @@ term.addEventListener("change", () => {
                 newQntySum.innerText = qntySum + "개";
 
 
-                listDiv.appendChild(newRow);
+                revenueList.appendChild(newRow);
                 newRow.appendChild(newDate);
                 newRow.appendChild(newValueSum);
                 newRow.appendChild(newQntySum);
+
+
+            }
+            let prev = document.getElementById("prev");
+            let next = document.getElementById("next");
+            if (prevPage < 1) {
+                prev.className = "page-item disabled";
+            }
+            else {
+                prev.className = "page-item";
+                document.querySelector(".prev").setAttribute("id", pages[0] - 1);
+            }
+            if (pages.length < 5 || nextPage == 0) {
+                next.className = "page-item disabled";
+            }
+            else {
+                next.className = "page-item";
+                document.querySelector(".next").setAttribute("id", pages[4] + 1);
+            }
+            let pageNumList = document.querySelectorAll(".page-num-list");
+            for (var i = 0; i < pageNumList.length; i++) {
+                pageNumList[i].remove();
+            }
+            for (var i = 0; i < pages.length; i++) {
+
+                let newPages = document.createElement("li");
+                newPages.setAttribute("class", "page-item page-num-list");
+                let newPageNum = document.createElement("a");
+                newPageNum.setAttribute("id", pages[i]);
+                newPageNum.setAttribute("class", "page-link page-num");
+                newPageNum.setAttribute("name", "pages");
+                newPageNum.innerText = pages[i];
+
+                newPages.appendChild(newPageNum);
+                next.before(newPages);
+                newPageNum.addEventListener("click", paging);
             }
         })
 
-})
+}

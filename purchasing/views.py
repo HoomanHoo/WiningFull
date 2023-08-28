@@ -493,7 +493,6 @@ class OrderPageView(View):
                     name_and_email = get_user_name_and_email(user_id=user_id)
                     user_name = name_and_email[0]
                     user_email = name_and_email[1]
-                # start = time.time()
                 asyncio.run(
                     send_purchase_email(
                         user_name=user_name,
@@ -501,19 +500,6 @@ class OrderPageView(View):
                         purchase_info_list=list(detail_infos),
                     )
                 )
-                # end = time.time()
-                # print("비동기 함수 실행시간", end - start)
-
-                # start = time.time()
-
-                # s_send_purchase_email(
-                #     user_name=user_name,
-                #     user_email=user_email,
-                #     purchase_info_list=list(detail_infos),
-                # )
-
-                # end = time.time()
-                # print("동기 함수 실행시간", end - start)
 
                 logger.info(
                     f"{user_id}: purchase_id: {purchase_id} current_time: {current_time} OrderPageView"

@@ -10,7 +10,7 @@ urlpatterns = [
         views.StoreRegistrationView.as_view(),
         name="storeRegistration",
     ),
-    path( 
+    path(
         "regnums/<str:regnum>",
         views.CheckStoreRegistNumberView.as_view(),
         name="checkRegistNumber",
@@ -64,7 +64,10 @@ urlpatterns = [
         views.StoreRevenueMainView.as_view(),
         name="storeRevenue",
     ),
-    path("store-revenue-term", views.StoreRevenueTermView.as_view()),
+    path(
+        "revenue/pages/<int:page_num>/term/<int:term>",
+        views.StoreRevenueTermView.as_view(),
+    ),
     path("receive-code/codes/<str:code>", views.SearchReceiveCodeApi.as_view()),
     path(
         "sell/merchandises/<int:sell_id>/reviews",
@@ -74,7 +77,6 @@ urlpatterns = [
     path(
         "sell/merchandises/<int:sell_id>/reviews/<int:page_num>",
         views.StoreReviewListView.as_view(),
-        name="reviewList",
     ),
 ]
 
