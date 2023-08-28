@@ -17,7 +17,7 @@ from store.db_access.query_set import (
     PageSerializer,
     ProductListSerializer,
     PurchaseDetailSerializer,
-    ReviewPageSerializer,
+    RevenueSerializer,
     ReviewsBySellerSerializer,
     delete_user_info,
     get_product_list,
@@ -54,8 +54,8 @@ logger = logging.getLogger("store")
 
 
 class StoreRegistrationView(View):
-    """
-    """
+    """ """
+
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return View.dispatch(self, request, *args, **kwargs)
@@ -113,6 +113,7 @@ class StoreRegistrationView(View):
         elif back:
             logger.info(f"{user_id}:  back StoreRegistrationView")
             delete_user_info(user_id=user_id)
+            request.session["temp_id"] = None
             return redirect("inputStore")
 
     # insert_store_info 라는 함수를 정의하여 사용했다.
@@ -178,18 +179,21 @@ class ProductAdditionView(View):
         pages_count = paging_result["pages_count"]
         db_data = paging_result["db_data"]
         state = paging_result["pages_count"]
+        prev = paging_result.get("prev", 0)
+        next_page = paging_result.get("next_page", 0)
         product_list = get_product_list_by_seller(user_id=user_id)
         store_id = get_store_info(user_id=user_id)["store_id"]
 
-        # 이미 등록된 상품 리스트들도 페이징 처리 할 것
         template = loader.get_template("store/productAddition.html")
+        print(pages_count[-1] + 1)
         context = {
             "wines": db_data,
             "store_id": store_id,
             "product_list": product_list,
             "modify": modify,
             "pages_count": pages_count,
-            "next": pages_count[-1] + 1,
+            "next_page": next_page,
+            "prev": prev,
         }
         logger.info(f"{user_id}: ProductAdditionView")
         return HttpResponse(template.render(context, request))
@@ -212,7 +216,6 @@ class ProductAdditionView(View):
         current_time = DateFormat(datetime.now()).format("Y-m-d H:i:s")
 
         if btn_product_add is not None:
- 
             try:
                 insert_sell_info(
                     user_id,
@@ -230,13 +233,13 @@ class ProductAdditionView(View):
                         f"{user_id}: wine_ids: {wine_ids} ProductAdditionView append sell_list"
                     )
                     return redirect("sellList", page_num=1)
-                
+
                 else:
                     logger.info(
                         f"{user_id}: wine_ids: {wine_ids} ProductAdditionView insert sell_list"
                     )
                     return redirect("login")
-                
+
             except DatabaseError as ex:
                 logger.error(ex)
                 return redirect("errorhandling:storeError")
@@ -281,12 +284,14 @@ class ProductListView(APIView):
         )
         pages = {}
 
-        pages["pages"] = paging_result["pages_count"]
+        pages["pages_count"] = paging_result["pages_count"]
+        pages["prev"] = paging_result.get("prev", 0)
+        pages["next_page"] = paging_result.get("next_page", 0)
         serializer = ProductListSerializer(
             paging_result["db_data"],
             many=True,
         ).data
-        page_serializer = PageSerializer(pages, context={"wines": serializer})
+        page_serializer = PageSerializer(pages, context={"datas": serializer})
 
         json_result = JSONRenderer().render(page_serializer.data)
         logger.info(f"{user_id} : search_keyword: {search_keyword} ProductListView")
@@ -303,7 +308,7 @@ class DiscontinueProductView(View):
         return JsonResponse({"result": "삭제되었습니다"}, status=200)
 
 
-class StoreMyPageView(View): # 점주 페이지
+class StoreMyPageView(View):  # 점주 페이지
     def get(self, request, **kwargs):
         user_id = request.session.get("memid")
 
@@ -311,49 +316,55 @@ class StoreMyPageView(View): # 점주 페이지
         full_address = info.get("store_address").split("@")
         main_address = full_address[0]
         detail_address = full_address[1]
-    
+
         user_info = get_user_info(user_id)
         if user_info and user_info.user_profile_img:
-            image_url = user_info.user_profile_img.url 
-            
+            image_url = user_info.user_profile_img.url
+
         else:
-            image_url = "" 
-        
+            image_url = ""
+
         page_num = kwargs.get("pageNum", 1)
         template = loader.get_template("store/storeMyPage.html")
-        show_length=30
+        show_length = 30
         end = int(show_length) * int(page_num)
         start = end - 30
         detail_sell_list = get_detail_sell_list(user_id=user_id)
         list_info = db_preprocessing(
             db_data=detail_sell_list, end_page=end, start_page=start
         )
-        pagination_result = pagenation(
+        paging_result = pagenation(
             show_length=show_length,
             page_num=page_num,
             end_page=end,
             start_page=start,
             datas=list_info,
         )
-        
-        db_data = pagination_result["db_data"]
-        pages_count = pagination_result["pages_count"]
 
-        context = {"user_id": user_id,
-                   "info": info,
-                   "main_address": main_address,
-                   "detail_address": detail_address,
-                   "list" : db_data,
-                   "pages_count" : pages_count, 
-                   "image_url" : image_url,
-                   "dto" : user_info
-                   }
-        
+        pages_count = paging_result["pages_count"]
+        db_data = paging_result["db_data"]
+        state = paging_result["pages_count"]
+        prev = paging_result.get("prev", 0)
+        next_page = paging_result.get("next_page", 0)
+
+        context = {
+            "user_id": user_id,
+            "info": info,
+            "main_address": main_address,
+            "detail_address": detail_address,
+            "list": db_data,
+            "pages_count": pages_count,
+            "image_url": image_url,
+            "dto": user_info,
+            "prev": prev,
+            "next_page": next_page,
+        }
+
         logger.info(f"{user_id}: page_num: {page_num} StoreMyPageView")
         return HttpResponse(template.render(context, request))
 
 
-class SearchReceiveCodeView(View): # 수령코드 검색하기
+class SearchReceiveCodeView(View):  # 수령코드 검색하기
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -382,7 +393,7 @@ class SearchReceiveCodeView(View): # 수령코드 검색하기
     # 수령코드 get 방식으로 검색
 
 
-class SearchReceiveCodeApi(APIView): 
+class SearchReceiveCodeApi(APIView):
     def get(self, request, **kwargs):
         receive_code = kwargs.get("code", None).replace(" ", "")
 
@@ -465,13 +476,12 @@ class StoreInfoModificationView(View):
 
         logger.info(f"{user_id}: StoreInfoModificationView")
         return redirect("storeMyPage")
-        
 
 
 class SellDetailListView(View):
     def get(self, request, **kwargs):
         user_id = request.session.get("memid")
-        page_num = kwargs.get("pageNum", 1)
+        page_num = kwargs.get("page_num", 1)
         template = loader.get_template("store/sellDetailList.html")
 
         show_length = 30
@@ -481,7 +491,7 @@ class SellDetailListView(View):
         list_info = db_preprocessing(
             db_data=detail_sell_list, end_page=end, start_page=start
         )
-        pagination_result = pagenation(
+        paging_result = pagenation(
             show_length=show_length,
             page_num=page_num,
             end_page=end,
@@ -489,10 +499,18 @@ class SellDetailListView(View):
             datas=list_info,
         )
 
-        db_data = pagination_result["db_data"]
-        pages_count = pagination_result["pages_count"]
+        pages_count = paging_result["pages_count"]
+        db_data = paging_result["db_data"]
+        state = paging_result["pages_count"]
+        prev = paging_result.get("prev", 0)
+        next_page = paging_result.get("next_page", 0)
 
-        context = {"list": db_data, "pages_count": pages_count}
+        context = {
+            "list": db_data,
+            "pages_count": pages_count,
+            "prev": prev,
+            "next_page": next_page,
+        }
         logger.info(f"{user_id}: page_num: {page_num} SellDetailListView")
         return HttpResponse(template.render(context, request))
 
@@ -518,9 +536,8 @@ class SellMerchandiseView(View):
             datas=list_info,
         )
 
-        db_data = paging_result["db_data"]
         pages_count = paging_result["pages_count"]
-
+        db_data = paging_result["db_data"]
         template = loader.get_template("store/productList.html")
         context = {"product_list": db_data, "pages_count": pages_count}
 
@@ -564,7 +581,7 @@ class DropStoreView(View):
         return JsonResponse({"result": text, "code": code}, status=200)
 
 
-class StoreRevenueMainView(View): #판매 주류 보기
+class StoreRevenueMainView(View):  # 매출 보기
     def get(self, request, **kwargs):
         page_num = kwargs.get("page_num", 1)
         user_id = request.session.get("memid")
@@ -585,25 +602,56 @@ class StoreRevenueMainView(View): #판매 주류 보기
             datas=list_info,
         )
 
-        db_data = paging_result["db_data"]
         pages_count = paging_result["pages_count"]
-        context = {"revenue_info": db_data, "pages_count": pages_count}
+        db_data = paging_result["db_data"]
+        state = paging_result["pages_count"]
+        prev = paging_result.get("prev", 0)
+        next_page = paging_result.get("next_page", 0)
+        context = {
+            "revenue_info": db_data,
+            "pages_count": pages_count,
+            "prev": prev,
+            "next_page": next_page,
+        }
 
         logger.info(f"{user_id}: StoreRevenueMainView")
         return HttpResponse(template.render(context, request))
 
 
-class StoreRevenueTermView(View): # 판매 주류 보기
-    def get(self, request):
+class StoreRevenueTermView(APIView):  # 기간별 매출 보기
+    def get(self, request, **kwargs):
         user_id = request.session.get("memid")
-        term = int(request.GET.get("term", 0))
+        term = int(kwargs.get("term", 0))
+        page_num = kwargs.get("page_num", 1)
         revenue_info = list(get_store_revenue(user_id=user_id, term=term))
-
+        show_length = 30
+        end = int(show_length) * int(page_num)
+        start = end - 30
+        revenue_info = get_store_revenue(user_id=user_id, term=term)
+        list_info = db_preprocessing(
+            db_data=revenue_info, end_page=end, start_page=start
+        )
+        paging_result = pagenation(
+            show_length=show_length,
+            page_num=page_num,
+            end_page=end,
+            start_page=start,
+            datas=list_info,
+        )
+        pages = {}
+        pages["pages_count"] = paging_result["pages_count"]
+        db_data = paging_result["db_data"]
+        state = paging_result["pages_count"]
+        pages["prev"] = paging_result.get("prev", 0)
+        pages["next_page"] = paging_result.get("next_page", 0)
+        serialized = RevenueSerializer(db_data, many=True)
+        page_serialized = PageSerializer(pages, context={"datas": serialized.data})
+        json_result = JSONRenderer().render(page_serialized.data)
         logger.info(f"{user_id}: term: {term} StoreRevenueTermView")
-        return JsonResponse({"result": revenue_info}, status=200)
+        return Response(json_result)
 
 
-class StoreReviewView(View): # 판매 주류 보기 > 리뷰보기
+class StoreReviewView(View):  # 판매 주류 보기 > 리뷰보기
     def get(self, request, **kwargs):
         sell_id = kwargs.get("sell_id")
         page_num = kwargs.get("page_num", 1)
@@ -621,19 +669,27 @@ class StoreReviewView(View): # 판매 주류 보기 > 리뷰보기
             start_page=start,
             datas=list_info,
         )
-        db_data = paging_result["db_data"]
-        pages_count = paging_result["pages_count"]
 
-        context = {"reviews": db_data, "pages_count": pages_count}
+        pages_count = paging_result["pages_count"]
+        db_data = paging_result["db_data"]
+        state = paging_result["pages_count"]
+        prev = paging_result.get("prev", 0)
+        next_page = paging_result.get("next_page", 0)
+
+        context = {
+            "reviews": db_data,
+            "pages_count": pages_count,
+            "prev": prev,
+            "next_page": next_page,
+        }
         logger.info(f"{request.session['memid']}: sell_id: {sell_id} StoreReviewView")
         return HttpResponse(template.render(context, request))
-    
+
 
 class StoreReviewListView(APIView):
     def get(self, request, **kwargs):
         sell_id = kwargs.get("sell_id")
         page_num = kwargs.get("page_num", 1)
-        logger.info("StoreReviewListView")
         show_length = 30
         end = int(show_length) * int(page_num)
         start = end - 30
@@ -647,14 +703,16 @@ class StoreReviewListView(APIView):
             datas=list_info,
         )
         pages = {}
-        pages["pages"] = paging_result["pages_count"]
+        logger.info("StoreReviewListView")
+        pages["pages_count"] = paging_result["pages_count"]
+        pages["prev"] = paging_result.get("prev", 0)
+        pages["next_page"] = paging_result.get("next_page", 0)
         serializer = ReviewsBySellerSerializer(
             paging_result["db_data"],
             many=True,
         ).data
-        page_serializer = ReviewPageSerializer(pages, context={"reviews": serializer})
-   
-        json_result = JSONRenderer().render(page_serializer.data)
-        
-        return Response(json_result)
+        page_serializer = PageSerializer(pages, context={"datas": serializer})
 
+        json_result = JSONRenderer().render(page_serializer.data)
+
+        return Response(json_result)

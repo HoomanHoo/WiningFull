@@ -148,9 +148,11 @@ def update_purchase_det_state(purchase_detail_id: str) -> None:
         purchase_detail_id=purchase_detail_id,
     ).update(purchase_det_state=2)
 
+
 def get_user_info(user_id):
     user_info = WinUser.objects.get(user_id=user_id)
     return user_info
+
 
 def check_store_product_info(user_id: str) -> dict or None:
     info = (
@@ -233,10 +235,12 @@ def search_product_list(search_keyword):
 
 class PageSerializer(serializers.Serializer):
     def to_representation(self, instance):
-        pages = instance["pages"]
-        wines = self.context["wines"]
+        pages = instance["pages_count"]
+        prev = instance["prev"]
+        next_page = instance["next_page"]
+        datas = self.context["datas"]
 
-        return {"pages": pages, "wines": wines}
+        return {"pages": pages, "prev": prev, "next_page": next_page, "datas": datas}
 
 
 class ProductListSerializer(serializers.Serializer):
@@ -297,8 +301,13 @@ def get_store_revenue(user_id: str, term: int = 0):
     return queryset
 
 
-def search_receive_code(receive_code: str) -> str or dict:
+class RevenueSerializer(serializers.Serializer):
+    date = serializers.CharField()
+    value_sum = serializers.IntegerField()
+    qnty_sum = serializers.IntegerField()
 
+
+def search_receive_code(receive_code: str) -> str or dict:
     result = (
         WinReceiveCode.objects.annotate(
             purchase_det_number=F("purchase_detail__purchase_det_number"),
@@ -363,15 +372,10 @@ def get_reviews_by_seller(sell_id: str):
     )
     return reviews
 
+
 class ReviewsBySellerSerializer(serializers.ModelSerializer):
     reg_date = serializers.CharField()
+
     class Meta:
         model = WinReview
         fields = ["user_id", "review_content", "review_score", "reg_date"]
-
-class ReviewPageSerializer(serializers.Serializer):
-    def to_representation(self, instance):
-        pages = instance["pages"]
-        reviews = self.context["reviews"]
-
-        return {"pages": pages, "reviews": reviews}

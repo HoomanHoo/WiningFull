@@ -3,3 +3,8 @@
 /**/migrations
 *.pyc
 *.log
+Wining/dev_settings.py
+Wining/dev_wsgi.py
+dev_manage.py
+wining_local_nginx_config
+README.md

@@ -29,24 +29,44 @@ def pagenation(
     else:
         if (list_length % show_length) == 0:
             page_length = list_length // show_length
+            print(page_length)
+            print("1")
         else:
             page_length = (list_length // show_length) + 1
+            print(page_length)
+            print("2")
 
         if 0 < page_num and page_num < 6:
             start_page = 1
+            print("3")
         elif page_num % 5 == 0:
             start_page = page_num - 4
+            print("4")
         else:
             start_page = page_num - (page_num % 5) + 1
+            print("5")
 
-        if page_length - page_num < 3:
+        if page_length - page_num < 5 and page_length - start_page < 5:
             end_page = page_length + 1
+            next_page = 0
+            print(end_page)
+            print("6")
         else:
             end_page = start_page + 5
+            next_page = end_page
+            print("7")
         pages_count = [i for i in range(start_page, end_page)]
+        prev = start_page - 1
         state = 1
 
-        result = {"pages_count": pages_count, "db_data": db_data, "state": state}
+        result = {
+            "pages_count": pages_count,
+            "db_data": db_data,
+            "state": state,
+            "prev": prev,
+            "next_page": next_page,
+        }
+
     return result
 
 

@@ -102,8 +102,10 @@
 	  </div><br>
   <h1 class="mb-4">장바구니</h1>
   -->
-  {% for page_info in page_infos %}
-
+  	<h2>장바구니</h2>
+    <h5><br>총 {{page_infos|length}}개 물품을 담았습니다<br></h5>
+    
+  	{% for page_info in page_infos %}
     <div id="{{ page_info.sell__sell_id }}" class="cart-item">
       <img class="wine-image"
       	   src="{{ page_info.sell__wine__wine_image }}" 
