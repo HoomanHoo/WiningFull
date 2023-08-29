@@ -24,7 +24,7 @@ services:
       #timeout: 4m
       #retries: 0 # healthcheck 옵션이 DB의 read/write 오류를 발생시킨다 이유는 찾아보아야함
     volumes:
-     - ./bit_save.sql:/docker-entrypoint-initdb.d/initdb.sql
+     - ./save.sql:/docker-entrypoint-initdb.d/initdb.sql
      - /etc/timezone:/etc/timezone
      - mysql-database:/var/lib/mysql:rw
      # mysql-database:/var/lib/mysql The designated data directory /var/lib/mysql/ is unusable. You can remove all files that the server added to it. 
