@@ -43,7 +43,6 @@ const addPoint = Vue.createApp({
             }
 
             else if (userAccountId.value == -1) {
-                console.log(userAccountId.value);
                 show.value = true;
             }
         }
@@ -103,11 +102,6 @@ const addPoint = Vue.createApp({
             })
         })
 
-
-
-
-
-
         return {
             decidedValues,
             pointAdd,
@@ -125,7 +119,6 @@ const addPoint = Vue.createApp({
             addPaymentMethod
         }
     },
-
 
 })
 addPoint.mount("#rootDiv");

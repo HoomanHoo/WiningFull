@@ -1,13 +1,14 @@
 #!/usr/bin/bash
 
-while ! wget mysql:3307 ; do
+while ! wget 192.168.0.3:3306 ; do
+
     echo "mysql is still set up"
     sleep 15
 done
 #sleep 360
 echo "mysql is ready"
 
-result=$(mysql -hmysql -P3307 -uroot -pbit bit -e "select count(*) from auth_user")
+result=$(mysql -h 192.168.0.3 -P3306 -ubit -pbit bit -e "select count(*) from auth_user")
 echo ${result}
 str=${result:9}
 echo ${result}

@@ -1,37 +1,37 @@
 version: '3.7'
 services:
-  db:
-    image: mysql:8.0.33
-    container_name: mysql
-    ports:
-     - '3307:3307'
-    #init: true
-    environment:
-     MYSQL_HOST: localhost
-     MYSQL_DATABASE: bit
-     MYSQL_USER: bit
-     MYSQL_PASSWORD: bit
-     MYSQL_ROOT_PASSWORD: bit
-     MYSQL_TCP_PORT: 3307
-     MYSQL_PORT: 3307
-     TZ: Asia/Seoul
-    command: 
-     - --character-set-server=utf8mb4
-     - --collation-server=utf8mb4_unicode_ci
-    #healthcheck: 
-      #test: ["CMD-SHELL", "mysql -uroot -pbit bit < /bit_save.sql"]
-      #interval: 1s
-      #timeout: 4m
-      #retries: 0 # healthcheck 옵션이 DB의 read/write 오류를 발생시킨다 이유는 찾아보아야함
-    volumes:
-     - ./save.sql:/docker-entrypoint-initdb.d/initdb.sql
-     - /etc/timezone:/etc/timezone
-     - mysql-database:/var/lib/mysql:rw
-     # mysql-database:/var/lib/mysql The designated data directory /var/lib/mysql/ is unusable. You can remove all files that the server added to it. 
-     #- 디렉토리 충돌이 나서 발생하는 오류. host pc의 volume을 지우거나 디렉토리를 변경해주면 된다.
-     #- type: volume
-       #source: db_vol
-       #target: /var/lib/mysql
+  # db:   #use AWS RDS
+  #   image: mysql:8.0.33
+  #   container_name: mysql
+  #   ports:
+  #    - '3306:3306'
+  #   #init: true
+  #   environment:
+  #    MYSQL_HOST: 127.0.0.1
+  #    MYSQL_DATABASE: bit
+  #    MYSQL_USER: bit
+  #    MYSQL_PASSWORD: bit
+  #    MYSQL_ROOT_PASSWORD: bit
+  #    MYSQL_TCP_PORT: 3306
+  #    MYSQL_PORT: 3306
+  #    TZ: Asia/Seoul
+  #   command: 
+  #    - --character-set-server=utf8mb4
+  #    - --collation-server=utf8mb4_unicode_ci
+  #   #healthcheck: 
+  #     #test: ["CMD-SHELL", "mysql -uroot -pbit bit < /bit_save.sql"]
+  #     #interval: 1s
+  #     #timeout: 4m
+  #     #retries: 0 # healthcheck 옵션이 DB의 read/write 오류를 발생시킨다 이유는 찾아보아야함
+  #   volumes:
+  #   #  - ./save.sql:/docker-entrypoint-initdb.d/initdb.sql
+  #    - /etc/timezone:/etc/timezone
+  #    - mysql-database:/var/lib/mysql:rw
+  #    # mysql-database:/var/lib/mysql The designated data directory /var/lib/mysql/ is unusable. You can remove all files that the server added to it. 
+  #    #- 디렉토리 충돌이 나서 발생하는 오류. host pc의 volume을 지우거나 디렉토리를 변경해주면 된다.
+  #    #- type: volume
+  #      #source: db_vol
+  #      #target: /var/lib/mysql
   web:
     build:
       context: .
@@ -41,12 +41,15 @@ services:
     volumes:
      - ./staticfiles:/project/staticfiles
      - ./media:/project/media
-    expose:
-     - "8001"
-     - "3307"
+    ports:
+     - "8001:8001"
+    #  - "3306:3306"
     entrypoint: /bin/bash /entrypoint.sh 
-    depends_on:
-     - db
+    # network_mode: "host"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # depends_on:
+    #  - db
   nginx:
     image: nginx:latest
     container_name: nginx
@@ -58,8 +61,8 @@ services:
      - ./media:/project/media
     depends_on:
      - web
-volumes: 
-  mysql-database:  
+# volumes: 
+#   mysql-database:  
 
   
      

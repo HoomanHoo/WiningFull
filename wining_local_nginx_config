@@ -22,3 +22,4 @@ server {
         access_log /var/log/nginx/8000_access.log;
         error_log /var/log/nginx/8000_error.log;
 }
+"장바구니에 해당 상품을 추가하시려면 로그인 하셔야 합니다 \n 로그인 하시겠습니까?"

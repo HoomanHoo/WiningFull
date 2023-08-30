@@ -20,7 +20,6 @@ function deleteElement() {
 		document.getElementById("allPrice").value = allPrice - parseInt(row.querySelector("input[name=purchasePrice]").value);
 
 		if (document.getElementById("cartId")) {
-			console.log("cartId")
 			const cartId = document.getElementById("cartId").value
 			const url = "/purchasing/cart/" + cartId;
 			const myInit = {

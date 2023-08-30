@@ -171,8 +171,10 @@ DATABASES = {
         "NAME": "bit",
         "USER": "bit",
         "PASSWORD": "bit",
-        "HOST": "mysql",    # mysql docker container 이름 
-        "PORT": "3307", #defiened port in docker-compose.yml
+        # "HOST": "mysql",    # mysql docker container 이름 
+        # "PORT": "3307", #defiened port in docker-compose.yml
+        "HOST": "192.168.0.3",
+        "PORT": "3306",
         "OPTIONS": {
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
             "charset": "utf8",

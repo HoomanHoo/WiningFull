@@ -3,7 +3,7 @@ const wineNames = document.querySelectorAll(".wineName");
 const productAdd = document.getElementById("productAdd");
 const srhByName = document.getElementById("srhByName");
 const wineList = document.getElementById("wineList");
-const btnDeletes = document.querySelectorAll("input[name=btnDelete]")
+const btnDeletes = document.querySelectorAll("input[name=btnDelete]");
 let pages = document.querySelectorAll("a[name=pages]");
 
 for (var i = 0; i < pages.length; i++) {
@@ -16,7 +16,7 @@ function paging() {
 
 	if (document.getElementById("srhByName").value) {
 		const srhKeyWord = document.getElementById("srhByName").value;
-		url = "../../product/pages/" + this.id + "?srhkeyword=" + srhKeyWord
+		url = "../../product/pages/" + this.id + "?srhkeyword=" + srhKeyWord;
 	}
 
 	fetch(url).then((response) => response.json()).then((data) => {
@@ -26,10 +26,8 @@ function paging() {
 		let wines = resultData["datas"];
 		let nextPage = resultData["next_page"];
 		let prevPage = resultData["prev"];
-		console.log(prevPage);
-		console.log(nextPage);
-		console.log(pages);
 		wineList.replaceChildren();
+
 		for (var i = 0; i < wines.length; i++) {
 			let wineId = wines[i].wine_id;
 			let wineName = wines[i].wine_name;
@@ -110,16 +108,16 @@ function deleteRow() {
 
 function deleteDefaultRow() {
 	const row = this.parentNode;
-	wineId = row.querySelector("input[name=wineId]").value
-	url = "/store/discontinue-product?wineid=" + wineId
-	fetch(url).then((response) => response.json()).then((data) => alert(data["result"]))
+	wineId = row.querySelector("input[name=wineId]").value;
+	url = "/store/discontinue-product?wineid=" + wineId;
+	fetch(url).then((response) => response.json()).then((data) => alert(data["result"]));
 
 	row.replaceChildren();
 }
 
 function searchByName() {
 	const srhKeyWord = this.value;
-	const url = "../product/pages/1?srhkeyword=" + srhKeyWord
+	const url = "../product/pages/1?srhkeyword=" + srhKeyWord;
 	const xhttp = new XMLHttpRequest();
 
 	xhttp.onreadystatechange = () => {
@@ -130,8 +128,8 @@ function searchByName() {
 
 				let pages = resultData["pages"];
 				let wines = resultData["wines"];
-				console.log(pages);
 				wineList.replaceChildren();
+
 				for (var i = 0; i < wines.length; i++) {
 					let wineId = wines[i].wine_id;
 					let wineName = wines[i].wine_name;
@@ -321,7 +319,7 @@ function addElement() {
 }
 
 for (var i = 0; i < btnDeletes.length; i++) {
-	btnDeletes[i].addEventListener("click", deleteDefaultRow)
+	btnDeletes[i].addEventListener("click", deleteDefaultRow);
 }
 
 for (var i = 0; i < wineNames.length; i++) {
@@ -329,5 +327,5 @@ for (var i = 0; i < wineNames.length; i++) {
 }
 
 
-srhByName.addEventListener("keyup", searchByName)
+srhByName.addEventListener("keyup", searchByName);
 

@@ -11,7 +11,7 @@ function deleteElement() {
 		const row = this.parentNode.parentNode;
 		const cartDetailId = this.id;
 		const cartId = document.getElementById("cartId").value;
-		console.log(cartId);
+
 		let purchasePrice = parseInt(document.getElementById("2id" + cartDetailId).innerText.slice(0, -2));
 		let allPriceValue = document.getElementById("allPrice").innerText;
 		let allPrice = parseInt(allPriceValue.slice(0, -2));

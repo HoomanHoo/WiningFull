@@ -15,7 +15,6 @@ const background = Vue.createApp({
         const addShow = Vue.ref(false);
 
         const registPaymentMethod = () => {
-            console.log("werwer")
             listShow.value = false;
             addShow.value = true;
         }
@@ -72,7 +71,7 @@ const background = Vue.createApp({
                     return response.json();
                 }
                 else {
-                    alert("문제가 발생하였습니다\n 나중에 다시 시도해주세요")
+                    alert("문제가 발생하였습니다\n 나중에 다시 시도해주세요");
                     return false;
                 }
             }).then((data) => {
@@ -116,7 +115,7 @@ const background = Vue.createApp({
                         userAccount3.value = responseData["user_account3"];
                         userAccountId.value = responseData["user_account_id"];
                         alert("삭제가 완료 되었습니다");
-                        console.log(userAccountId.value);
+              
                     })
                     return false;
                 }
@@ -147,7 +146,6 @@ const background = Vue.createApp({
                 userAccount3.value = responseData["user_account3"];
                 userAccountId.value = responseData["user_account_id"];
 
-                console.log(userAccountId.value);
             })
         })
 

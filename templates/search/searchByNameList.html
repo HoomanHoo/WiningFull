@@ -126,21 +126,27 @@
 			<input type="hidden" id="searchstart" value="{{search_word}}">
 			
 			
-<div class="photo-board">
+		<div class="photo-board">
 			{% for start_result in start_results %}								<!-- 검색 결과가 있다면 반복문으로 나타낸다 -->
-
-				
 				<div class="photo-item">	    	
 				 	<a href="/detail/winedetail?wine_id={{ start_result.wine_id }}">
 						<img class="photo-image" src="../{{ start_result.wine_image.url }}"> 
 						<div class="photo-name">{{ start_result.wine_name }}</div>
 						<div class="photo-name-eng">{{ start_result.wine_name_eng }} </div>
 					</a>
-				</div>
-					
-				<br><br>
+				</div><br><br>
+			{% endfor %}<br>
+						{% for include_result in include_results %}								<!-- 검색 결과가 있다면 반복문으로 나타낸다 -->
+				<div class="photo-item">	    	
+				 	<a href="/detail/winedetail?wine_id={{ include_result.wine_id }}">
+				 		<img class="photo-image" src="../{{ include_result.wine_image.url }}">
+						<div class="photo-name" id="{include_result.wine_id}}">{{ include_result.wine_name }}</div>
+						<div class="photo-name-eng">{{ include_result.wine_name_eng }} </div>
+					</a>	
+				</div><br><br>
 			{% endfor %}
-</div>
+		</div>		
+			
 <style>
 
 
@@ -173,7 +179,7 @@
 .photo-image {
     width: 100%;
     height: auto;
-    max-height: 400px;
+    max-height: 300px;
     object-fit: cover;
     border-radius: 5px;
 }
@@ -186,40 +192,7 @@
 .photo-name-eng {
     color: #666;
 }
-</style>	
-
-	
-			{% for post in page_obj %}
-				<li> {{ post.title }}</li>
-			{% endfor %}
-			
-			
-		
-			
-		
-			
-			
-			{% for include_result in include_results %}								<!-- 검색 결과가 있다면 반복문으로 나타낸다 -->
-
-				<div class="list_outline_include" style=" width:60%; height: 240px; border: 5px solid rgb(255, 136, 139); 
-					border-radius: 1em; padding: 3px 3px 3px 3px; margin: 0 auto;">	    	
-				 	<a href="/detail/winedetail?wine_id={{ include_result.wine_id }}">
-				 		<div class="list_image" style="float: left;">
-				 			<img src="../{{ include_result.wine_image.url }}" width="150" height="200"> 
-				 		</div>
-							<div class="list_name" id="{include_result.wine_id}}" style="font-size: x-large; font-color:black;"> 
-								{{ include_result.wine_name }}
-							</div>
-							<div class="list_name_eng" style="font-size: large; padding: 5px 5px 5px 5px; font-color:black;"> 
-								{{ include_result.wine_name_eng }} 
-							</div>
-						</a>	
-					</div>
-					
-				<br><br>
-			{% endfor %}
-			
-			
+</style>			
 			
 			
 		{% endif %}

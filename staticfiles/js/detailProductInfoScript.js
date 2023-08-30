@@ -16,7 +16,7 @@ function priceCalc(){
 function buyListLocation(event){
 	console.log("buylist");
 	if (document.getElementById("userId").value == "None"){
-		const doLogin = confirm("Àå¹Ù±¸´Ï¿¡ ÇØ´ç »óÇ°À» Ãß°¡ÇÏ½Ã·Á¸é ·Î±×ÀÎ ÇÏ¼Å¾ß ÇÕ´Ï´Ù \n ·Î±×ÀÎ ÇÏ½Ã°Ú½À´Ï±î?")
+		const doLogin = confirm("ì¥ë°”êµ¬ë‹ˆì— í•´ë‹¹ ìƒí’ˆì„ ì¶”ê°€í•˜ì‹œë ¤ë©´ ë¡œê·¸ì¸ í•˜ì…”ì•¼ í•©ë‹ˆë‹¤ \n ë¡œê·¸ì¸ í•˜ì‹œê² ìŠµë‹ˆê¹Œ?");
 		console.log(doLogin);
 		if (doLogin == false){
 			event.preventDefault();
@@ -37,9 +37,8 @@ function buyListLocation(event){
 }
 
 function checkLogin(event){
-	console.log("checkLogin");
 	if (document.getElementById("userId").value == "None"){
-		const doLogin = confirm("Àå¹Ù±¸´Ï¿¡ ÇØ´ç »óÇ°À» Ãß°¡ÇÏ½Ã·Á¸é ·Î±×ÀÎ ÇÏ¼Å¾ß ÇÕ´Ï´Ù \n ·Î±×ÀÎ ÇÏ½Ã°Ú½À´Ï±î?")
+		const doLogin = confirm("??????? ??? ????? ?????ï¿½ï¿½??? ?ï¿½ï¿½??? ???? ???? \n ?ï¿½ï¿½??? ??ï¿½ï¿½??????")
 		console.log(doLogin);
 		if (doLogin == false){
 			event.preventDefault();
