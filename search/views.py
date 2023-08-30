@@ -67,7 +67,7 @@ class SearchByNameView(View):
 
             include_results = WinWine.objects.filter(
                 ~Q(wine_name__startswith=search_word), wine_name__contains=search_word
-            )  # SEARCH_QUERY_03 (와인 이름에 검색어가 포함된 것 select)
+            )[0:100]  # SEARCH_QUERY_03 (와인 이름에 검색어가 포함된 것 select)
             include_results_count = (
                 include_results.count()
             )  # SEARCH_QUERY_04 (select한 queryset의 row 개수)
@@ -83,7 +83,7 @@ class SearchByNameView(View):
             include_results = WinWine.objects.filter(
                 ~Q(wine_name_eng__istartswith=search_word),
                 wine_name_eng__icontains=search_word,
-            )  # SEARCH_QUERY_07 (와인 이름에 검색어가 포함된 것 select (대소문자 구분하지 않는다))
+            )[0:100]  # SEARCH_QUERY_07 (와인 이름에 검색어가 포함된 것 select (대소문자 구분하지 않는다))
             include_results_count = (
                 include_results.count()
             )  # SEARCH_QUERY_08 (select한 queryset의 row 개수)
@@ -272,7 +272,7 @@ class SearchByCategoryView(View):
                 wine_food__in=list_food,
                 wine_region__in=list_region,
                 wine_capacity=750,
-            ).select_related("wine_region")
+            ).select_related("wine_region")[0:100]
             print("750")
 
         # SEARCH_QUERY_12
@@ -289,7 +289,7 @@ class SearchByCategoryView(View):
                 wine_food__in=list_food,
                 wine_region__in=list_region,
                 wine_capacity__gt=0,
-            ).select_related("wine_region")
+            ).select_related("wine_region")[0:100]
             print("0")
 
         # SEARCH_QUERY_13
@@ -304,7 +304,7 @@ class SearchByCategoryView(View):
                 wine_tannin__in=list_tannin,
                 wine_food__in=list_food,
                 wine_region__in=list_region,
-            ).select_related("wine_region")
+            ).select_related("wine_region")[0:100]
             print("그 외")
 
         print(category_results)
@@ -463,7 +463,7 @@ class SearchByUserView(View):
             "wine_sando",
             "wine_tannin",
             "wine_food",
-        ).order_by("wine_id")
+        ).order_by("wine_id")[0:100]
         results_count = wine_dtos.count()
         print(results_count)
 
