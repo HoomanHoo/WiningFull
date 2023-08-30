@@ -9,12 +9,11 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import mimetypes
+import os
 from pathlib import Path
 from django.conf.global_settings import STATICFILES_DIRS
 from django.test.signals import static_finders_changed
-import mimetypes
-import os
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,10 +24,6 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_SAVE_EVERY_REQUEST = True
 
 CSRF_TRUSTED_ORIGINS = [
-    #"http://*.192.168.0.2:8001", 
-    #"http://192.168.0.2:8001", 
-    #"http://localhost:8001", 
-    #"http://172.27.0.3:8001", 
     "http://nginx:8001", 
     "http://*:8001"
     ]
@@ -173,8 +168,9 @@ DATABASES = {
         "PASSWORD": "bit",
         # "HOST": "mysql",    # mysql docker container 이름 
         # "PORT": "3307", #defiened port in docker-compose.yml
-        "HOST": "192.168.0.3",
-        "PORT": "3306",
+        "HOST": "192.168.0.3",    #use virtual machine's host pc mysql server
+        # "HOST": "sample-db.cuy0rgqhle4s.ap-northeast-2.rds.amazonaws.com", #AWS RDS Endpoint
+        "PORT": "3306", #virtual machine's host pc mysql server and AWS RDS port
         "OPTIONS": {
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
             "charset": "utf8",
@@ -183,6 +179,7 @@ DATABASES = {
     }
 }
 
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

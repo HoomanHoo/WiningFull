@@ -36,7 +36,7 @@
       border: 1px solid #ccc;
       margin-bottom: 15px;
       margin-right:20px;
-      margin-left:220px;
+      margin-left:20px;
       padding: 10px;
       display: flex;
       align-items: center;
@@ -95,13 +95,10 @@
     
 
 <!-- 결제하기 -->
-<div class="container py-4">
-<!--  
-   	  <div>
-	    <input type="button" value="뒤로가기" onclick="history.back()" class="btn btn-secondary checkout-btn">
-	  </div><br>        
-      <h1 class="mb-4">결제하기</h1>
--->
+<div class="container mt-4" id="layoutSidenav_content">
+  	&nbsp;<h2>결제하기</h2><br>
+    <table class="table">
+
     <form method="post" id="buyList" action="order" class="needs-validation" novalidate>
         {% csrf_token %}
 		{% if cart_id != None %}

@@ -8,8 +8,7 @@ ADD . /project/
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
 
-COPY migrate.sh /migrate.sh
-COPY save.sql /save.sql
+## COPY save.sql /save.sql chmod +x /save.sql 
+
 COPY entrypoint.sh /entrypoint.sh
-COPY pymysqlex.py /pymysqlex.py
-RUN chmod +x /migrate.sh && chmod +x /save.sql && chmod +x /entrypoint.sh && chmod +x /pymysqlex.py
+RUN  chmod +x /entrypoint.sh

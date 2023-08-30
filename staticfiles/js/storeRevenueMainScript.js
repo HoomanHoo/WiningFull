@@ -10,7 +10,6 @@ term.addEventListener("change", paging)
 function paging(e) {
     check = e.type
     let termValue = term.value;
-    console.log(check)
     if (check == "click") {
         let page_num = this.id;
         url = "/store/revenue/pages/" + page_num + "/term/" + termValue

@@ -419,40 +419,44 @@ class ModifyUserView(View):
         dto.user_tel = request.POST["user_tel"]
 
         dto.save()
-
-        try:
-            fdto = WinUserFavorite.objects.get(user_id=user_id)
-
-            fdto.fav_wine_color = request.POST["color"]
-            fdto.fav_alc = request.POST["alc"]
-            fdto.fav_numbwith = request.POST["comp_num"]
-            fdto.fav_sweet = request.POST["sweet"]
-            fdto.fav_bitter = request.POST["bitter"]
-            fdto.fav_sour = request.POST["sour"]
-            fdto.fav_season = request.POST["season"]
-            fdto.fav_food = request.POST["food"]
-            fdto.fav_first_priority = request.POST["fav_first"]
-            fdto.fav_second_priority = request.POST["fav_second"]
-            fdto.fav_third_priority = request.POST["fav_third"]
-
-            fdto.save()
-
-        except WinUserFavorite.DoesNotExist:
-            fdto = WinUserFavorite.objects.create(user_id=user_id)
-
-            fdto.fav_wine_color = request.POST["color"]
-            fdto.fav_alc = request.POST["alc"]
-            fdto.fav_numbwith = request.POST["comp_num"]
-            fdto.fav_sweet = request.POST["sweet"]
-            fdto.fav_bitter = request.POST["bitter"]
-            fdto.fav_sour = request.POST["sour"]
-            fdto.fav_season = request.POST["season"]
-            fdto.fav_food = request.POST["food"]
-            fdto.fav_first_priority = request.POST["fav_first"]
-            fdto.fav_second_priority = request.POST["fav_second"]
-            fdto.fav_third_priority = request.POST["fav_third"]
-
-            fdto.save()
+        
+        if dto.user_grade_id == 1:
+            try:
+                fdto = WinUserFavorite.objects.get(user_id=user_id)
+    
+                fdto.fav_wine_color = request.POST["color"]
+                fdto.fav_alc = request.POST["alc"]
+                fdto.fav_numbwith = request.POST["comp_num"]
+                fdto.fav_sweet = request.POST["sweet"]
+                fdto.fav_bitter = request.POST["bitter"]
+                fdto.fav_sour = request.POST["sour"]
+                fdto.fav_season = request.POST["season"]
+                fdto.fav_food = request.POST["food"]
+                fdto.fav_first_priority = request.POST["fav_first"]
+                fdto.fav_second_priority = request.POST["fav_second"]
+                fdto.fav_third_priority = request.POST["fav_third"]
+    
+                fdto.save()
+    
+            except WinUserFavorite.DoesNotExist:
+                fdto = WinUserFavorite.objects.create(user_id=user_id)
+    
+                fdto.fav_wine_color = request.POST["color"]
+                fdto.fav_alc = request.POST["alc"]
+                fdto.fav_numbwith = request.POST["comp_num"]
+                fdto.fav_sweet = request.POST["sweet"]
+                fdto.fav_bitter = request.POST["bitter"]
+                fdto.fav_sour = request.POST["sour"]
+                fdto.fav_season = request.POST["season"]
+                fdto.fav_food = request.POST["food"]
+                fdto.fav_first_priority = request.POST["fav_first"]
+                fdto.fav_second_priority = request.POST["fav_second"]
+                fdto.fav_third_priority = request.POST["fav_third"]
+    
+                fdto.save()
+        else : 
+            pass
+        
 
         return redirect("myPage")
 
@@ -560,7 +564,7 @@ class ReviewListView(View):
         rdto = WinUser.objects.get(user_id=user_id)
         review_c = WinReview.objects.filter(user_id=user_id).count()
 
-        context = {"dtos": dtos, "rdto": rdto, "review_c": review_c}
+        context = {"dtos": dtos, "rdto": rdto, "review_c" : review_c}
 
         return HttpResponse(template.render(context, request))
 
@@ -610,7 +614,7 @@ class PurchaseDetailView(View):
 
         for purchase in purchases:
             purchase_details = WinPurchaseDetail.objects.filter(purchase_id=purchase)
-
+            
             for purchase_detail in purchase_details:
                 wine_name = purchase_detail.sell.wine.wine_name
                 wine_id = purchase_detail.sell.wine.wine_id
@@ -627,7 +631,7 @@ class PurchaseDetailView(View):
                 dtos.append(
                     {
                         "wine_name": wine_name,
-                        "wine_id": wine_id,
+                        "wine_id" : wine_id,
                         "wine_name_eng": wine_name_eng,
                         "wine_image": wine_image,
                         "purchase_price": purchase_price,
@@ -637,13 +641,8 @@ class PurchaseDetailView(View):
                         "purchase_det_state": purchase_det_state,
                     }
                 )
-
-        context = {
-            "dtos": dtos,
-            "reviews": reviews,
-            "pdto": pdto,
-            "purchase_c": purchase_c,
-        }
+            
+        context = {"dtos": dtos, "reviews": reviews, "pdto": pdto, "purchase_c" : purchase_c,}
 
         return HttpResponse(template.render(context, request))
 
@@ -683,7 +682,7 @@ class MyBoardView(View):
             "dtos_and_images": dtos_and_images,
             "user_id": user_id,
             "bdto": bdto,
-            "board_c": board_c,
+            "board_c" : board_c
         }
 
         return HttpResponse(template.render(context, request))
@@ -704,7 +703,7 @@ class MyCommentView(View):
         for dto in dtos:
             print(dto.board.board_title)
 
-        context = {"dtos": dtos, "cdto": cdto, "comment_c": comment_c}
+        context = {"dtos": dtos, "cdto": cdto, "comment_c" : comment_c}
 
         return HttpResponse(template.render(context, request))
 

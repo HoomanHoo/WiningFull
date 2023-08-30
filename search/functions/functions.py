@@ -1,5 +1,6 @@
 import random
 import numpy as np
+# import re
 
 
 def win_corr_code(value):
@@ -86,8 +87,8 @@ def win_reco_alc(user_select, wine_alc):
         [0, 5, 5, 3, 2, 1],
         [0, 1, 1, 2, 4, 5],
         [0, 1, 1, 1, 1, 3],
-        [0, 3, 3, 3, 3, 3],
-        [0, 1, 1, 1, 1, 1],
+        [0, 4, 4, 4, 4, 4],
+        [0, 2, 2, 2, 2, 2],
     ]
     return alc_table[user_select][wine_alc]
 
@@ -130,3 +131,9 @@ def sort(a, b):
 
 def random_generate(list, cnt):
     return random.sample(list, cnt)
+
+
+# def list_string_to_real(str_list): 
+#    result = re.findall(r'\d+', str_list)
+#    result = list(map(int, result))
+#    return result

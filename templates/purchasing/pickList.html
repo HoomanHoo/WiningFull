@@ -33,7 +33,7 @@
       border: 1px solid #ccc;
       margin-bottom: 15px;
       margin-right:20px;
-      margin-left:220px;
+      margin-left:20px;
       padding: 10px;
       display: flex;
       align-items: center;
@@ -95,39 +95,35 @@
 
 
 <!-- 장바구니 -->
-<div class="container py-4">
-  <!--  
-   	  <div>
-	    <input type="button" value="뒤로가기" onclick="history.back()" class="btn btn-secondary checkout-btn">
-	  </div><br>
-  <h1 class="mb-4">장바구니</h1>
-  -->
+<div class="container mt-4" id="layoutSidenav_content">
   	<h2>장바구니</h2>
-    <h5><br>총 {{page_infos|length}}개 물품을 담았습니다<br></h5>
+    <h5><br>총 {{page_infos|length}}개 물품을 담았습니다<br><br></h5>
+    <table class="table">
     
-  	{% for page_info in page_infos %}
-    <div id="{{ page_info.sell__sell_id }}" class="cart-item">
-      <img class="wine-image"
-      	   src="{{ page_info.sell__wine__wine_image }}" 
-      	   alt="{{ page_info.sell__wine__wine_name }}">
-      <div class="cart-item-details">
-        <div class="cart-item-name">
-        	{{ page_info.sell__wine__wine_name }}
-        </div>
-        <div id="1id{{page_info.cart_det_id}}">
-        	{{ page_info.cart_det_qnty }} 개
-        </div>
-        <div class="cart-item-price" id="2id{{page_info.cart_det_id}}">
-        	{{ page_info.purchase_price }} 원
-        </div>
-      </div>
-      <div>
-        <input type="button" id="{{ page_info.cart_det_id }}" name="btnDelete" value="삭제" class="btn btn-outline-danger">
-
-      </div>
-    </div>
-  {% endfor %}
-
+	  	{% for page_info in page_infos %}
+	    <div id="{{ page_info.sell__sell_id }}" class="cart-item">
+	      <img class="wine-image"
+	      	   src="{{ page_info.sell__wine__wine_image }}" 
+	      	   alt="{{ page_info.sell__wine__wine_name }}">
+	      <div class="cart-item-details">
+	        <div class="cart-item-name">
+	        	{{ page_info.sell__wine__wine_name }}
+	        </div>
+	        <div id="1id{{page_info.cart_det_id}}">
+	        	{{ page_info.cart_det_qnty }} 개
+	        </div>
+	        <div class="cart-item-price" id="2id{{page_info.cart_det_id}}">
+	        	{{ page_info.purchase_price }} 원
+	        </div>
+	      </div>
+	      <div>
+	        <input type="button" id="{{ page_info.cart_det_id }}" name="btnDelete" value="삭제" class="btn btn-outline-danger">
+	
+	      </div>
+	    </div>
+	  {% endfor %}
+	</table>
+	
   <div class="checkout-section">
     <div class="d-flex">
       <div></div>

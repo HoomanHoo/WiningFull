@@ -22,7 +22,6 @@ btnCheck.addEventListener("click", () => {
 
             if (responseData["code"] == -1) {
                 alert(responseData["result"]);
-                console.log("비밀번호가 달라");
                 return false;
             }
             else if (responseData["code"] == 1) {

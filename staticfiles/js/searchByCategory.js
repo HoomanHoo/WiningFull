@@ -13,11 +13,16 @@ if(k0.checked == true) {
     k3.checked = false;
     k4.checked = false;
     k5.checked = false;
-    k6.checked = false;
+    
     
 } else {
 	k0.checked = false;
-	}
+	k1.checked = true;
+	k2.checked = true;
+    k3.checked = true;
+    k4.checked = true;
+    k5.checked = true;
+    k6.checked = true;}
 }
  
 function select_k_check() {	
@@ -41,6 +46,8 @@ if(c0.checked == true) {
     
 } else {
 	c0.checked = false;
+	c1.checked = true;
+	c2.checked = true;
 	}
 }
  
@@ -68,6 +75,11 @@ if(a0.checked == true) {
     
 } else {
 	a0.checked = false;
+	a1.checked = true;
+	a2.checked = true;
+    a3.checked = true;
+    a4.checked = true;
+    a5.checked = true;
 	}
 }
  
@@ -97,6 +109,12 @@ if(d0.checked == true) {
     
 } else {
 	d0.checked = false;
+	d1.checked = true;
+	d2.checked = true;
+    d3.checked = true;
+    d4.checked = true;
+    d5.checked = true;
+    d6.checked = true;
 	}
 }
  
@@ -126,6 +144,12 @@ if(s0.checked == true) {
     
 } else {
 	s0.checked = false;
+	s1.checked = true;
+	s2.checked = true;
+    s3.checked = true;
+    s4.checked = true;
+    s5.checked = true;
+    s6.checked = true;
 	}
 }
  
@@ -155,6 +179,12 @@ if(t0.checked == true) {
     
 } else {
 	t0.checked = false;
+	t1.checked = true;
+	t2.checked = true;
+    t3.checked = true;
+    t4.checked = true;
+    t5.checked = true;
+    t6.checked = true;
 	}
 }
  
@@ -184,6 +214,12 @@ if(f0.checked == true) {
     
 } else {
 	f0.checked = false;
+	f1.checked = true;
+	f2.checked = true;
+    f3.checked = true;
+    f4.checked = true;
+    f5.checked = true;
+    f6.checked = true;
 	}
 }
  
@@ -213,6 +249,12 @@ if(r0.checked == true) {
     
 } else {
 	r0.checked = false;
+	r1.checked = true;
+	r2.checked = true;
+    r3.checked = true;
+    r4.checked = true;
+    r5.checked = true;
+    r6.checked = true;
 	}
 }
  

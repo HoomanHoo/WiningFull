@@ -4,7 +4,7 @@ services:
   #   image: mysql:8.0.33
   #   container_name: mysql
   #   ports:
-  #    - '3306:3306'
+  #    - '3307:3307'
   #   #init: true
   #   environment:
   #    MYSQL_HOST: 127.0.0.1
@@ -12,8 +12,8 @@ services:
   #    MYSQL_USER: bit
   #    MYSQL_PASSWORD: bit
   #    MYSQL_ROOT_PASSWORD: bit
-  #    MYSQL_TCP_PORT: 3306
-  #    MYSQL_PORT: 3306
+  #    MYSQL_TCP_PORT: 3307
+  #    MYSQL_PORT: 3307
   #    TZ: Asia/Seoul
   #   command: 
   #    - --character-set-server=utf8mb4
@@ -24,11 +24,11 @@ services:
   #     #timeout: 4m
   #     #retries: 0 # healthcheck 옵션이 DB의 read/write 오류를 발생시킨다 이유는 찾아보아야함
   #   volumes:
-  #   #  - ./save.sql:/docker-entrypoint-initdb.d/initdb.sql
+  #   #  - ./save.sql:/docker-entrypoint-initdb.d/initdb.sql  # initial setting and data for docker mysql image
   #    - /etc/timezone:/etc/timezone
   #    - mysql-database:/var/lib/mysql:rw
   #    # mysql-database:/var/lib/mysql The designated data directory /var/lib/mysql/ is unusable. You can remove all files that the server added to it. 
-  #    #- 디렉토리 충돌이 나서 발생하는 오류. host pc의 volume을 지우거나 디렉토리를 변경해주면 된다.
+  #    #- 디렉토리 충돌이 나서 발생하는 오류. host pc의 volume을 지우거나(docker volume prune [-a]) 디렉토리를 변경해주면 된다.
   #    #- type: volume
   #      #source: db_vol
   #      #target: /var/lib/mysql
@@ -37,7 +37,7 @@ services:
       context: .
       dockerfile: dockerfile
     container_name: wining
-    command: sh /migrate.sh
+    # command: sh /migrate.sh
     volumes:
      - ./staticfiles:/project/staticfiles
      - ./media:/project/media
@@ -46,8 +46,8 @@ services:
     #  - "3306:3306"
     entrypoint: /bin/bash /entrypoint.sh 
     # network_mode: "host"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    # extra_hosts:
+      #   - "host.docker.internal:host-gateway"
     # depends_on:
     #  - db
   nginx:
