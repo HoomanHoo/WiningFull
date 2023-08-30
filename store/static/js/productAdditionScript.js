@@ -328,6 +328,5 @@ for (var i = 0; i < wineNames.length; i++) {
 	wineNames[i].addEventListener("click", addElement);
 }
 
-
 srhByName.addEventListener("keyup", searchByName)
 

@@ -26,6 +26,7 @@ function paging() {
 		let wines = resultData["datas"];
 		let nextPage = resultData["next_page"];
 		let prevPage = resultData["prev"];
+
 		wineList.replaceChildren();
 
 		for (var i = 0; i < wines.length; i++) {
@@ -128,6 +129,7 @@ function searchByName() {
 
 				let pages = resultData["pages"];
 				let wines = resultData["wines"];
+
 				wineList.replaceChildren();
 
 				for (var i = 0; i < wines.length; i++) {
@@ -169,6 +171,7 @@ function searchByName() {
 				}
 				let prev = document.getElementById("prev");
 				let next = document.getElementById("next");
+
 				if (pages[0] < 6) {
 					prev.className = "page-item disabled";
 				}
@@ -184,6 +187,7 @@ function searchByName() {
 					document.querySelector(".next").setAttribute("id", pages[4] + 1);
 				}
 				let pageNumList = document.querySelectorAll(".page-num-list");
+
 				for (var i = 0; i < pageNumList.length; i++) {
 					pageNumList[i].remove();
 				}

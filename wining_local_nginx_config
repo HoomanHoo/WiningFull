@@ -4,16 +4,16 @@ server {
         
         location = /favicon.ico {access_log off; log_not_found off; }
         location /static/ {
-                alias /home/hoomanhoo/wining/Wining/staticfiles/;       
+                alias /home/hoomanhoo/wining/Wining/staticfiles/;    ## 프로젝트 경로의 staticfiles에서 static 파일을 서빙한다 
         }
         
         location /media/ {
-                alias /home/hoomanhoo/wining/Wining/media/;
+                alias /home/hoomanhoo/wining/Wining/media/;  ## 프로젝트 경로의 media에서 media 파일을 서빙한다
         }       
 
         location / {
                 include proxy_params;
-                proxy_pass http://unix:/run/gunicorn.sock;
+                proxy_pass http://unix:/run/gunicorn.sock;      ## 리눅스 환경 상에서 gunicorn 데몬의 소켓에 바인딩 한다
                 proxy_buffer_size       128k;
                 proxy_buffers           4 256k;
                 proxy_busy_buffers_size 256k;
@@ -22,4 +22,4 @@ server {
         access_log /var/log/nginx/8000_access.log;
         error_log /var/log/nginx/8000_error.log;
 }
-"장바구니에 해당 상품을 추가하시려면 로그인 하셔야 합니다 \n 로그인 하시겠습니까?"
+

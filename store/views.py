@@ -185,7 +185,6 @@ class ProductAdditionView(View):
         store_id = get_store_info(user_id=user_id)["store_id"]
 
         template = loader.get_template("store/productAddition.html")
-        print(pages_count[-1] + 1)
         context = {
             "wines": db_data,
             "store_id": store_id,
@@ -644,6 +643,7 @@ class StoreRevenueTermView(APIView):  # 기간별 매출 보기
         state = paging_result["pages_count"]
         pages["prev"] = paging_result.get("prev", 0)
         pages["next_page"] = paging_result.get("next_page", 0)
+
         serialized = RevenueSerializer(db_data, many=True)
         page_serialized = PageSerializer(pages, context={"datas": serialized.data})
         json_result = JSONRenderer().render(page_serialized.data)

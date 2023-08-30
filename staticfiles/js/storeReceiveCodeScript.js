@@ -2,15 +2,13 @@ const search = document.getElementById("btnSearch");
 
 search.addEventListener("click", () => {
     let code = document.getElementById("searchReceiveCode").value;
-    if (code == ""){
-        alert("please input receive code");
+    if (code == "") {
+        alert("수령코드를 입력해주세요");
     }
-    else{
+    else {
         let url = "../receive-code/codes/" + code;
         fetch(url).then((response) => response.json()).then((data) => {
-            console.log(data);
             let result = JSON.parse(data);
-            console.log(result);
             let receiveCheck = document.getElementById("btnReceive");
             let id = result.purchase_detail_id;
             let qnty = result.purchase_det_number;
@@ -18,7 +16,6 @@ search.addEventListener("click", () => {
             let storeName = result.store_name;
             let userName = result.user_name;
             let wineName = result.wine_name;
-            console.log(wineName);
 
             if (id == -1) {
                 alert("유효하지 않은 수령 코드입니다\n 다시 확인해주세요");
@@ -78,7 +75,7 @@ search.addEventListener("click", () => {
 
                 receiveCheck.disabled = false;
             }
-        
+
 
         })
     }

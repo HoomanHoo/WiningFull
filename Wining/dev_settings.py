@@ -24,14 +24,14 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 SESSION_SAVE_EVERY_REQUEST = True
 
-CSRF_TRUSTED_ORIGINS = [
-    # "http://*.192.168.0.2:8001",
-    # "http://192.168.0.2:8001",
-    # "http://localhost:8001",
-    # "http://172.27.0.3:8001",
-    "http://nginx:8001",
-    "http://*:8001",
-]
+# CSRF_TRUSTED_ORIGINS = [
+#     # "http://*.192.168.0.2:8001",
+#     # "http://192.168.0.2:8001",
+#     # "http://localhost:8001",
+#     # "http://172.27.0.3:8001",
+#     "http://nginx:8001",
+#     "http://*:8001",
+# ]
 
 
 MEDIA_URL = "/media/"
@@ -171,8 +171,8 @@ DATABASES = {
         "NAME": "bit",
         "USER": "bit",
         "PASSWORD": "bit",
-        "HOST": "localhost",  # mysql docker container 이름
-        "PORT": "3306",  # defiened port in docker-compose.yml
+        "HOST": "localhost",
+        "PORT": "3306",
         "OPTIONS": {
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
             "charset": "utf8",
@@ -232,7 +232,7 @@ STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 )
 
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+# STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

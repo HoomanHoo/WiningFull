@@ -1,6 +1,6 @@
 version: '3.7'
 services:
-  # db:   #use AWS RDS
+  # db:   # AWS RDS 사용 시 Mysql Image는 필요 없음
   #   image: mysql:8.0.33
   #   container_name: mysql
   #   ports:
@@ -24,7 +24,7 @@ services:
   #     #timeout: 4m
   #     #retries: 0 # healthcheck 옵션이 DB의 read/write 오류를 발생시킨다 이유는 찾아보아야함
   #   volumes:
-  #   #  - ./save.sql:/docker-entrypoint-initdb.d/initdb.sql  # initial setting and data for docker mysql image
+  #   #  - ./save.sql:/docker-entrypoint-initdb.d/initdb.sql  # docker mysql image 빌드 시 넣을 초기 데이터
   #    - /etc/timezone:/etc/timezone
   #    - mysql-database:/var/lib/mysql:rw
   #    # mysql-database:/var/lib/mysql The designated data directory /var/lib/mysql/ is unusable. You can remove all files that the server added to it. 
@@ -37,34 +37,29 @@ services:
       context: .
       dockerfile: dockerfile
     container_name: wining
-    # command: sh /migrate.sh
     volumes:
-     - ./staticfiles:/project/staticfiles
-     - ./media:/project/media
+      - ./staticfiles:/project/staticfiles
+      - ./media:/project/media
     ports:
-     - "8001:8001"
+      - "8001:8001"
     #  - "3306:3306"
-    entrypoint: /bin/bash /entrypoint.sh 
+    entrypoint: /bin/bash /entrypoint.sh
     # network_mode: "host"
     # extra_hosts:
-      #   - "host.docker.internal:host-gateway"
+    #   - "host.docker.internal:host-gateway" #가상머신의 local mysql server를 사용하려 했으나 동작하지 않음
     # depends_on:
     #  - db
   nginx:
     image: nginx:latest
     container_name: nginx
     ports:
-     - "80:80/tcp"
+      - "80:80/tcp"
     volumes:
-     - ./nginx.conf:/etc/nginx/nginx.conf #마운트할 디렉토리: docker image 내부 디렉토리
-     - ./staticfiles:/project/staticfiles
-     - ./media:/project/media
+      - ./nginx.conf:/etc/nginx/nginx.conf #마운트할 디렉토리: docker image 내부 디렉토리
+      - ./staticfiles:/project/staticfiles
+      - ./media:/project/media
     depends_on:
-     - web
+      - web
+
 # volumes: 
 #   mysql-database:  
-
-  
-     
- 
-

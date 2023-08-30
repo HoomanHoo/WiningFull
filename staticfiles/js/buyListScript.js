@@ -32,6 +32,7 @@ function deleteElement() {
 					cartDetailId: cartDetailId,
 				}),
 			};
+
 			fetch(url, myInit).then((response) => response.json()).then((data) => alert(data["result"]))
 		}
 		row.remove();

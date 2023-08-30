@@ -23,10 +23,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 SESSION_SAVE_EVERY_REQUEST = True
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://nginx:8001", 
-    "http://*:8001"
-    ]
+CSRF_TRUSTED_ORIGINS = ["http://nginx:8001", "http://*:8001"]
 
 
 MEDIA_URL = "/media/"
@@ -166,11 +163,11 @@ DATABASES = {
         "NAME": "bit",
         "USER": "bit",
         "PASSWORD": "bit",
-        # "HOST": "mysql",    # mysql docker container 이름 
-        # "PORT": "3307", #defiened port in docker-compose.yml
-        "HOST": "192.168.0.3",    #use virtual machine's host pc mysql server
+        # "HOST": "mysql",    # mysql docker container 이름
+        # "PORT": "3307", # docker-compose.yml에 정의된 port 번호
+        "HOST": "192.168.0.3",  # 가상머신 사용 시, 가상머신의 호스트 PC IP - 호스트 PC의 mysql을 사용하기 위함
         # "HOST": "sample-db.cuy0rgqhle4s.ap-northeast-2.rds.amazonaws.com", #AWS RDS Endpoint
-        "PORT": "3306", #virtual machine's host pc mysql server and AWS RDS port
+        "PORT": "3306",  # 가상머신의 호스트 PC와 AWS RDS의 Mysql 포트 번호
         "OPTIONS": {
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
             "charset": "utf8",
@@ -231,7 +228,7 @@ STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 )
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -253,7 +250,7 @@ with open(KAKAO_PATH, "r", encoding="utf-8") as kakao:
 
 mimetypes.add_type(
     "application/javascript", ".js", True
-)  #자바스크립트 파일을 text/plain으로 읽는 것을 방지하기 위함
+)  # 자바스크립트 파일을 text/plain으로 읽는 것을 방지하기 위함
 
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -270,5 +267,3 @@ with open(ACCOUNT_PATH, "r", encoding="utf-8") as mail:
         DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
         if not mail.readline():
             break
-
-

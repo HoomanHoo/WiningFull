@@ -35,6 +35,7 @@ const addPoint = Vue.createApp({
 
             if (userAccountId.value != -1) {
                 const url = "account/" + userAccountId.value;
+
                 fetch(url).then((response) => response.json()).then((data) => {
                     const responseData = JSON.parse(data);
                     accountList.value = responseData;
@@ -65,6 +66,7 @@ const addPoint = Vue.createApp({
                     "selectedAccount": thisValue
                 })
             }
+
             fetch(url, init).then((response) => {
                 if (response.ok) {
                     return response.json();

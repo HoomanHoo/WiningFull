@@ -54,12 +54,10 @@ def insert_store_info(
 
     try:
         store_url = WinStoreUrl.objects.get(store_id=store.store_id)
-        print("try")
+
         if store_map_url == "":
-            print("No URL!")
             store_url.delete()
         else:
-            print("try-else")
             store_url.store_map_url = store_map_url
             store_url.save()
     except ObjectDoesNotExist as ex:
@@ -121,9 +119,7 @@ def delete_product(wine_id: str, user_id: str):
 
 def delete_user_info(user_id):
     user_info = WinUser.objects.filter(user_id=user_id)
-    print(user_info)
     result = user_info.delete()
-    print(result)
 
 
 @transaction.atomic
@@ -195,7 +191,6 @@ def get_store_info(user_id: str) -> QuerySet:
             "storeUrl__store_map_url",
         )
     )[0]
-    print(type(store_info))
     return store_info
 
 
@@ -274,19 +269,19 @@ def get_store_revenue(user_id: str, term: int = 0):
     sell_filter = WinSell.objects.filter(store__user_id=user_id).all()
 
     if term == 0:
-        truncDate = Cast(TruncDate("purchase_time"), CharField())
+        trunc_date = Cast(TruncDate("purchase_time"), CharField())
 
     elif term == 1:
-        truncDate = Cast(TruncMonth("purchase_time"), CharField())
+        trunc_date = Cast(TruncMonth("purchase_time"), CharField())
 
     elif term == 2:
-        truncDate = Cast(TruncQuarter("purchase_time"), CharField())
+        trunc_date = Cast(TruncQuarter("purchase_time"), CharField())
 
     elif term == 3:
-        truncDate = Cast(TruncYear("purchase_time"), CharField())
+        trunc_date = Cast(TruncYear("purchase_time"), CharField())
 
     queryset = (
-        WinPurchase.objects.annotate(date=truncDate)
+        WinPurchase.objects.annotate(date=trunc_date)
         .select_related("purchasePurchaseDetail")
         .values("date")
         .filter(purchasePurchaseDetail__sell_id__in=sell_filter)

@@ -10,7 +10,6 @@ term.addEventListener("change", paging)
 function paging(e) {
     check = e.type
     let termValue = term.value;
-    console.log(check)
     if (check == "click") {
         let page_num = this.id;
         url = "/store/revenue/pages/" + page_num + "/term/" + termValue
@@ -32,7 +31,6 @@ function paging(e) {
             let prevPage = resultData["prev"];
 
             let date = "";
-            console.log(resultData);
             revenueList.replaceChildren();
             for (let i = 0; i < revenues.length; i++) {
                 let values = revenues[i].date;
@@ -43,12 +41,11 @@ function paging(e) {
 
                 else if (termValue == 1) {
                     date = values.substr(0, 7) + "월";
-                    console.log(date);
                 }
 
                 else if (termValue == 2) {
                     const quarter = values.substr(5, 2);
-                    console.log(quarter);
+
                     if (quarter == "01") {
                         date = "1분기";
                     }

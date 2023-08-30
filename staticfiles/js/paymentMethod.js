@@ -8,7 +8,24 @@ const background = Vue.createApp({
         const userAccount3 = Vue.ref("");
         const userAccountId = Vue.ref("");
         const newPaymentMethod = Vue.ref("");
-        const bankList = Vue.ref([{ "name": "KEB하나", "key": 1 }, { "name": "SC제일", "key": 2 }, { "name": "KB국민", "key": 3 }, { "name": "신한", "key": 4 }, { "name": "외환", "key": 5 }, { "name": "우리", "key": 6 }, { "name": "한국시티", "key": 7 }, { "name": "경남", "key": 8 }, { "name": "광주", "key": 9 }, { "name": "대구", "key": 10 }, { "name": "부산", "key": 11 }, { "name": "전북", "key": 12 }, { "name": "제주", "key": 13 }, { "name": "기업", "key": 14 }, { "name": "농협", "key": 15 }, { "name": "수협", "key": 16 }, { "name": "한국산업", "key": 17 }, { "name": "한국수출입", "key": 18 }]);
+        const bankList = Vue.ref([{ "name": "KEB하나", "key": 1 },
+        { "name": "SC제일", "key": 2 },
+        { "name": "KB국민", "key": 3 },
+        { "name": "신한", "key": 4 },
+        { "name": "외환", "key": 5 },
+        { "name": "우리", "key": 6 },
+        { "name": "한국시티", "key": 7 },
+        { "name": "경남", "key": 8 },
+        { "name": "광주", "key": 9 },
+        { "name": "대구", "key": 10 },
+        { "name": "부산", "key": 11 },
+        { "name": "전북", "key": 12 },
+        { "name": "제주", "key": 13 },
+        { "name": "기업", "key": 14 },
+        { "name": "농협", "key": 15 },
+        { "name": "수협", "key": 16 },
+        { "name": "한국산업", "key": 17 },
+        { "name": "한국수출입", "key": 18 }]);
         const hover = Vue.ref({ "z-index": 3, "position": "absolute", "left": "0vw", "right": "0vw", "top": "0vh", "bottom": "0vh" });
         const unHover = Vue.ref({ "z-index": 1, "position": "relative" });
         const listShow = Vue.ref(true);
@@ -115,7 +132,7 @@ const background = Vue.createApp({
                         userAccount3.value = responseData["user_account3"];
                         userAccountId.value = responseData["user_account_id"];
                         alert("삭제가 완료 되었습니다");
-              
+
                     })
                     return false;
                 }

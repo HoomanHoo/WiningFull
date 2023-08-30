@@ -58,7 +58,6 @@ Vue.createApp({
       };
 
       let observer = new IntersectionObserver(callback, options);
-
       let target = document.querySelector("#scrollArea");
       observer.observe(target);
     }
@@ -69,7 +68,6 @@ Vue.createApp({
     }
 
     const move = function (event) {
-
       location.href = "../../sell/" + event[0]
     }
 

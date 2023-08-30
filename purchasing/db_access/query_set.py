@@ -97,7 +97,7 @@ def insert_purchase(result: dict) -> list:
 @transaction.atomic
 def add_cart_info(user_id: str, sell_id: str, quantity: int, current_time: str) -> int:
     cart_id = get_cart_id(user_id)
-    print(cart_id)
+
     if cart_id is None or cart_id == 0:
         cart_info = WinCart(
             user_id=user_id,
@@ -376,7 +376,7 @@ def get_product_reviews(sell_id: int, select_code: int) -> QuerySet:
         order = "-review_score"
     elif select_code == 3:
         order = "review_score"
-    #
+
     review_list = (
         WinReview.objects.filter(sell_id=sell_id)
         .annotate(
@@ -404,11 +404,9 @@ def get_product_reviews(sell_id: int, select_code: int) -> QuerySet:
 
     list_length = review_list.count()
     if list_length > 5:
-        print("list is longer then 6")
         return review_list[:6]
 
     elif list_length <= 5 and list_length >= 1:
-        print("list is short")
         return review_list
 
 

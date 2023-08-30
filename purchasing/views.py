@@ -443,13 +443,13 @@ class OrderPageView(View):
             current_time=current_time,
             cart_info=cart_id,
         )
-        # result = sequence.calc()
+
         if result is None:
             logger.error("No buy list")
             return redirect("purchasing:buyList")
 
         else:
-            try:  # with transaction 걸어줘야함
+            try:
                 with transaction.atomic():
                     receive_codes = []
                     enc_receive_codes = []
