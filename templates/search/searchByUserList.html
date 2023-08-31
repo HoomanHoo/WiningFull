@@ -35,12 +35,15 @@
 		{% if results_count == 0 %}										<!-- 검색 결과 유무에 따라 나눈다 -->
 				검색 결과가 없습니다
 		{% else %}
+			{% if recommend_by_user == 1 %}	
+				<h4> {{user_id}} 님과 유사한 회원이 선호하는 결과 </h4>
+			{% elif recommend_by_user == 0 %}
 				<h4> {{user_id}} 님의 취향 입력 정보에 기반한 결과 </h4>
+			{% endif %}	
+		
 		</div>
 		<div>
-			
-			
-			{% endif %}
+		{% endif %}
 		</div>
 		</div>										<!-- 전체 결과 수 출력 -->
 	<br><br>

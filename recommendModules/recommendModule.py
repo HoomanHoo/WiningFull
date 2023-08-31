@@ -26,7 +26,7 @@
 
 """
 import pandas as pd
-
+import numpy as np
 from recommendModules.assistanceFunction.dataConverter import df_to_csv,\
     csv_to_df, df_to_db
 
@@ -39,6 +39,7 @@ from recommendModules.getResult.simFromDB import get_cart_matrix,\
 from recommendModules.getResult.simFromFav import get_user_similarity
 import operator
 from _datetime import datetime
+from sqlalchemy import sql
 from sqlalchemy.engine.create import create_engine
 import pymysql
 from pymysql.constants import CLIENT
@@ -130,7 +131,7 @@ review_matrix = get_review_matrix(dF_review, dF_sell, dF_wine_id, dF_user_id)
 dF_detail_view_matrix = get_detail_matrix(dF_detail_view, dF_wine_id, dF_user_id)
 dF_detail_view_n_matrix = get_detail_n_matrix(dF_detail_view_n, dF_wine_id, dF_user_id)
 
-dF_user_and_wine = pd.merge(dF_purchase, dF_purchase_detail, on = 'purchase_id', how = 'outer')
+# dF_user_and_wine = pd.merge(dF_purchase, dF_purchase_detail, on = 'purchase_id', how = 'outer')
 
 print(cart_matrix.shape)
 print(purchase_matrix.shape)
@@ -138,19 +139,19 @@ print(review_matrix.shape)
 print(dF_detail_view_matrix.shape)
 print(dF_detail_view_n_matrix.shape)
 
-dF_db_result = result_function(cart_matrix, purchase_matrix, review_matrix, dF_detail_view_matrix, dF_detail_view_n_matrix, [10, 30, 100, 5, 0.1])
+dF_db_result = result_function(cart_matrix, purchase_matrix, review_matrix, dF_detail_view_matrix, dF_detail_view_n_matrix, [10, 30, 100, 1, 0])
 dF_db_result = dF_db_result.T.fillna(0)
 print(dF_db_result)
 print(dF_db_result.columns)
 print(dF_db_result.shape)
-df_to_csv(dF_db_result, "data_from_db")
+df_to_csv(dF_db_result, "data_from_db")         
 
 
 
 
 
-dF_result = dF_fav_result + dF_db_result
-print(dF_result)
+dF_result = 0.2 * dF_fav_result + 0.8 * dF_db_result
+print(dF_result)                            
 print(dF_result.columns)
 print(dF_result.shape)
 df_to_csv(dF_db_result, "dF_db_result")
@@ -173,82 +174,77 @@ user_matrix = dF_result.T
 
 
 def similar_users_func(user_id, matrix, k):
-    # 현재 유저에 대한 데이터프레임 만들기
-    # matrix의 index = user_id -> 현재 1명 유저에 대한 평가 정보 찾기
+
     user = matrix[matrix.index == user_id]
     print(user.shape)
-    # matrix index 값이 user_id와 다른가?
-    # 일치하지 않는 값들은 other_users
+
     other_users = matrix[matrix.index != user_id]
     print(other_users.shape)
-    # 대상 user, 다른 유저와의 cosine 유사도 계산 
-    # list 변환
+
     similarities = cosine_similarity(user,other_users)[0].tolist()
     print(similarities)
-    # 다른 사용자의 인덱스 목록 생성
+
     other_users_list = other_users.index.tolist()
     print(other_users_list)
-    
-    # 인덱스/유사도로 이뤄진 딕셔너리 생성
-    # dict(zip()) -> {'other_users_list1': similarities, 'other_users_list2': similarities}
+  
     user_similarity = dict(zip(other_users_list, similarities))
-    
-    # 딕셔너리 정렬
-    # key=operator.itemgetter(1) -> 오름차순 정렬 -> reverse -> 내림차순
+
     user_similarity_sorted = sorted(user_similarity.items(), key=operator.itemgetter(1))
     user_similarity_sorted.reverse()
-    
-    # 가장 높은 유사도 k개 정렬하기
+
     top_users_similarities = user_similarity_sorted[:k]
     users = [i[0] for i in top_users_similarities]
     
     return users
-    # 현재 유저에 대한 정보 찾기
+   
 
 
 
 
 
 def recommend_item_func(user_index, similar_user_indices, matrix, purchase_filter, items=10):
-    # 유저와 비슷한 유저 가져오기
+ 
     similar_users = matrix[matrix.index.isin(similar_user_indices)]
     print(similar_users)
-    # 비슷한 유저 평균 계산 # row 계산
+   
     similar_users = similar_users.mean(axis=0)
-    # dataframe 변환 : 정렬/필터링 용이
+
     similar_users_df = pd.DataFrame(similar_users, columns=['user_similarity'])
     print(similar_users_df)
-    # 현재 사용자의 벡터 가져오기 : matrix = rating_matrix(pivot table)
+   
     user_df = matrix[matrix.index == user_index]
     print(user_df)
-    # 현재 사용자의 평가 데이터 정렬
+   
     user_df_transposed = user_df.transpose()
     print(user_df_transposed)
-    # 컬럼명 변경 48432 -> rating
+   
     user_df_transposed.columns = ['rating']
     print(user_df_transposed)
-    # 미시청 콘텐츠는 rating 0로 바꾸어 준다. remove any rows without a 0 value. Anime not watched yet
-    #user_df_transposed = user_df_transposed[user_df_transposed['rating']==0]
     
-    # 미시청 콘텐츠 목록리스트 만들기
     wines_not_purchased = user_df_transposed.index.tolist()
     print(wines_not_purchased)
-    # 안본 콘텐츠 필터링
-    similar_users_df_filtered = similar_users_df[similar_users_df.index.isin(wines_not_purchased)]
-    print(similar_users_df_filtered)
-    # 평균값을 기준으로 내림차순 정렬
-    similar_users_df_ordered = similar_users_df_filtered.sort_values(by=['user_similarity'], ascending=False)
-    print(similar_users_df_ordered)
-    # 상위 10개 값 가져오기
-    # items = 10
-    similar_users_df_ordered = similar_users_df_ordered[similar_users_df_ordered.index.isin(purchase_filter)]
-    top_n_wines = similar_users_df_ordered.head(items)
+  
+    similar_wines_df_filtered = similar_users_df[similar_users_df.index.isin(wines_not_purchased)]
+    print(similar_wines_df_filtered)
+   
+    similar_wines_df_ordered = similar_wines_df_filtered.sort_values(by=['user_similarity'], ascending=False)
+    print(similar_wines_df_ordered)
+ 
+    similar_wines_df_ordered = similar_wines_df_ordered[similar_wines_df_ordered.index.isin(purchase_filter)]
+    print("similar_wines_df_ordered")
+    print(similar_wines_df_ordered)
+    top_n_wines = similar_wines_df_ordered.head(items)
+    print("top_n_wines")
+    print(top_n_wines)
     top_n_wines_indices = top_n_wines.index.tolist()
+    print("top_n_wines_indices")
+    print(top_n_wines_indices)
 
-    # anime dataframe에서 top10값 찾기
-    wines_information = dF_wine_id[dF_wine_id["wine_id"].isin(top_n_wines_indices)]
+    #wines_information = dF_wine_id[dF_wine_id["wine_id"].isin(top_n_wines_indices)]
+    wines_information = np.array(top_n_wines_indices)-1
+    print(wines_information)
     
-    return wines_information #items
+    return wines_information 
 
 print(dF_user_id)
 dF_gen_id = dF_user_id["user_id"].tolist()
@@ -287,29 +283,12 @@ for idx in range(len(dF_gen_id)):
     
     print(dF_gen_id[idx])
     print(recommend_content)
-    recommend_table.append(recommend_content.index.tolist())
+    recommend_table.append(recommend_content.tolist())
 
 recommend_table = pd.DataFrame(recommend_table)
 print(recommend_table)
 print(recommend_table.shape)
 # 모든 추천
-
-
-
-
-user_db = pymysql.connect(
-    user = 'bit',
-        password = 'bit',
-        host = '127.0.0.1', 
-        db = 'bit',
-        charset = 'utf8',
-        client_flag= CLIENT.MULTI_STATEMENTS
-      )
-# cursor 설정
-cursor = user_db.cursor(pymysql.cursors.DictCursor)
-cursor.execute("SELECT MAX(recommend_id) FROM win_recommend")
-max_id = cursor.fetchall()
-
 
 
 
@@ -335,7 +314,11 @@ print(recommend_table)
 
 df_to_csv(recommend_table, "recommend_table")
 
-
+conn = pymysql.connect(host='127.0.0.1', user='bit', password='bit', db='bit')
+curs = conn.cursor(pymysql.cursors.DictCursor)
+sql_truncate_1 = 'TRUNCATE TABLE win_recommend'
+curs.execute(sql_truncate_1)
+conn.commit()
 
 df_to_db(recommend_table, "win_recommend")
 

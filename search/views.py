@@ -40,6 +40,7 @@ from numpy.f2py.crackfortran import get_sorted_names
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
+
 class SearchByNameView(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -332,8 +333,15 @@ class SearchByUserView(View):
         return View.dispatch(self, request, *args, **kwargs)
 
     def get(self, request):
+        user_id = request.session.get("memid")
+        user = WinUser.objects.get(user_id=user_id)
+        print(user)
+        user_grade = user.user_grade.user_grade
+        print(user_grade)
         template = loader.get_template("search/searchByUser.html")
-        context = {}
+        context = {
+            "user_grade" : user_grade
+            }
         return HttpResponse(template.render(context, request))
 
     def post(self, request):
@@ -342,8 +350,18 @@ class SearchByUserView(View):
         user = WinUser.objects.get(user_id=user_id)
         print(user_id)
         print(user)
-
-        if (False):
+        
+        user_exist = True
+        
+        try:
+            recommend_dto = WinRecommend.objects.get(user_id=user_id)
+        except WinRecommend.DoesNotExist : 
+            user_exist = False
+            
+        print(user_exist)
+        
+        
+        if (user_exist):
             # recommend_table 에서 불러오기 
             recommend_dto = WinRecommend.objects.get(user_id=user_id)
             print(recommend_dto)
@@ -393,6 +411,8 @@ class SearchByUserView(View):
             print(len(sorted_name_eng))
             print(len(sorted_image))
             print(results_count)
+            
+            recommend_by_user = 1
     
         else : 
             
@@ -501,6 +521,11 @@ class SearchByUserView(View):
                 sorted_name_eng.append(wine_dtos[int(idx)].wine_name_eng)
                 sorted_image.append(wine_dtos[int(idx)].wine_image)
             
+            sorted_id = sorted_id[:10]
+            sorted_name = sorted_name[:10]
+            sorted_name_eng = sorted_name_eng[:10]
+            sorted_image = sorted_image[:10]
+            
             # Template 에서 반복문을 쓰기 위해 zip으로 묶는다
             list_for_user = zip(sorted_id, sorted_name, sorted_name_eng, sorted_image)
             
@@ -513,7 +538,7 @@ class SearchByUserView(View):
             print(len(sorted_image))
             print(results_count)
        
-        
+            recommend_by_user = 0
 
         template = loader.get_template("search/searchByUserList.html")
         context = {
@@ -521,6 +546,7 @@ class SearchByUserView(View):
             "sorted_id": sorted_id,
             "list_for_user": list_for_user,
             "user_id": user_id,
+            "recommend_by_user" : recommend_by_user,
         }
         return HttpResponse(template.render(context, request))
 

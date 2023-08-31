@@ -35,7 +35,7 @@ sql[23] = "SELECT * FROM bit.win_user_favorite"
 
 
 def result_function(cart, purchase, review, detail, detail_n, weight_list):
-    result = (cart * weight_list[0] + purchase * weight_list[1] + review * weight_list[2] + \
+    result = (cart * weight_list[0] + purchase * weight_list[1] + pow(2.0, (review-3)) * weight_list[2] + \
             detail * weight_list[3] + detail_n * weight_list[4]) / 100 
     return result
 
@@ -156,6 +156,8 @@ def get_puchase_matrix(dF_purchase, dF_purchase_detail, dF_sell, dF_wine_id, dF_
     
     purchase_m = pd.merge(purchase_m3, dF_user_id, on = 'user_id', how = 'outer')
     purchase_m['user_id'] = purchase_m['user_id'].fillna("가상")
+    purchase_m['wine_id'] = purchase_m['wine_id'].fillna(1)
+    purchase_m['purchase_det_number'] = purchase_m['purchase_det_number'].fillna(0)
     df_to_csv(purchase_m, "purchase_merged")
     
     purchase_matrix = pd.pivot_table(purchase_m, values='purchase_det_number', index=['user_id'],

@@ -32,17 +32,19 @@
 <input type="checkbox" name="name1" id="c5" value="value5" onClick="example_1();">
 <input type="checkbox" name="name1" id="c6" value="value6" onClick="example_1();">
 -->
-
-
-			
-			<form method="post" action="searchbyuserlist" name="searchbyuser">
+			{% if user_grade == 2 %}
+				<h4> 일반회원만 사용할 수 있습니다. </h4>
+			{% else %}
 				
-
-				<div style="text-align: center;">
-				<input class="inputbutton" type="submit" value="검색" style="display :inline-block; padding: 10px 30px;">
-			</div>
-				
-			</form>
+				<form method="post" action="searchbyuserlist" name="searchbyuser">
+					
+	
+					<div style="text-align: center;">
+					<input class="inputbutton" type="submit" value="검색" style="display :inline-block; padding: 10px 30px;">
+				</div>
+					
+				</form>
+			{% endif %}	
 		{% endblock %}
 
 

@@ -13,7 +13,12 @@ def get_user_similarity(df_user_fav, df_wine):
     
     df_result = pd.DataFrame()
     
+    plane=[]
+    
     for idx_wine in range(len(df_wine)):
+        
+        row = []
+        
         for idx_user_fav in range(len(df_user_fav)):
             
             user_favorite = [
@@ -51,10 +56,14 @@ def get_user_similarity(df_user_fav, df_wine):
                 + food_score * user_prior[5]
             )
             
-            df_result.loc[idx_wine, idx_user_fav] = user_similarity
+            #df_result.loc[idx_wine, idx_user_fav] = user_similarity
             
-            
+            row.append(user_similarity)
+        
+        plane.append(row)
     
+    df_result = pd.DataFrame(plane)
+        
     return df_result 
 
 
