@@ -67,14 +67,14 @@ buyList.addEventListener("submit", function (event) {
 
 	const userPoint = parseInt(document.getElementById("userPoint").value);
 	const allPrice = parseInt(document.getElementById("allPrice").value);
-
+	const sellIds = document.querySelectorAll("input[name=sellId]").length;
 	if (allPrice > userPoint) {
 		alert("포인트가 부족합니다");
 		event.preventDefault();
 		return false;
 	}
 	else {
-		if (this.querySelectorAll("input[name=sellId]").length == 0) {
+		if (sellIds == 0) {
 			alert("선택된 상품이 없습니다");
 			event.preventDefault();
 			return false;

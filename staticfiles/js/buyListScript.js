@@ -67,7 +67,7 @@ buyList.addEventListener("submit", function (event) {
 
 	const userPoint = parseInt(document.getElementById("userPoint").value);
 	const allPrice = parseInt(document.getElementById("allPrice").value);
-	const sellIds = this.querySelectorAll("input[name=sellId]").length;
+	const sellIds = document.querySelectorAll("input[name=sellId]").length;
 	if (allPrice > userPoint) {
 		alert("포인트가 부족합니다");
 		event.preventDefault();
