@@ -13,11 +13,9 @@ function paging(e) {
     if (check == "click") {
         let page_num = this.id;
         url = "/store/revenue/pages/" + page_num + "/term/" + termValue
-        console.log("click")
     }
     else {
         url = "/store/revenue/pages/" + 1 + "/term/" + termValue
-        console.log("change")
     }
 
     fetch(url)
@@ -29,12 +27,13 @@ function paging(e) {
             let revenues = resultData["datas"];
             let nextPage = resultData["next_page"];
             let prevPage = resultData["prev"];
-
             let date = "";
+
             revenueList.replaceChildren();
+
             for (let i = 0; i < revenues.length; i++) {
                 let values = revenues[i].date;
-                console.log(values);
+
                 if (termValue == 0) {
                     date = values.substr(0, 10);
                 }
@@ -81,16 +80,15 @@ function paging(e) {
                 newQntySum.setAttribute("class", "col");
                 newQntySum.innerText = qntySum + "개";
 
-
                 revenueList.appendChild(newRow);
                 newRow.appendChild(newDate);
                 newRow.appendChild(newValueSum);
                 newRow.appendChild(newQntySum);
 
-
             }
             let prev = document.getElementById("prev");
             let next = document.getElementById("next");
+
             if (prevPage < 1) {
                 prev.className = "page-item disabled";
             }

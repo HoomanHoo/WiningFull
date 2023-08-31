@@ -23,7 +23,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 SESSION_SAVE_EVERY_REQUEST = True
 
-CSRF_TRUSTED_ORIGINS = ["http://nginx:8001", "http://*:8001"]
+# CSRF_TRUSTED_ORIGINS = ["http://nginx:8001", "http://*:8001"]
 
 
 MEDIA_URL = "/media/"
@@ -165,8 +165,8 @@ DATABASES = {
         "PASSWORD": "bit",
         # "HOST": "mysql",    # mysql docker container 이름
         # "PORT": "3307", # docker-compose.yml에 정의된 port 번호
-        "HOST": "192.168.0.3",  # 가상머신 사용 시, 가상머신의 호스트 PC IP - 호스트 PC의 mysql을 사용하기 위함
-        # "HOST": "sample-db.cuy0rgqhle4s.ap-northeast-2.rds.amazonaws.com", #AWS RDS Endpoint
+        # "HOST": "192.168.0.3",  # 가상머신 사용 시, 가상머신의 호스트 PC IP - 호스트 PC의 mysql을 사용하기 위함
+        "HOST": "sample-db.cuy0rgqhle4s.ap-northeast-2.rds.amazonaws.com",  # AWS RDS Endpoint
         "PORT": "3306",  # 가상머신의 호스트 PC와 AWS RDS의 Mysql 포트 번호
         "OPTIONS": {
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
@@ -219,9 +219,9 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
-# STATICFILES_DIRS = [
-#     BASE_DIR / 'static',
-# ]
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",

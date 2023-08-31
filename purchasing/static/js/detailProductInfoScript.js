@@ -5,52 +5,51 @@ const sellForm = document.getElementById("sellForm");
 
 qnty.addEventListener("change", priceCalc);
 btnBuy.addEventListener("click", buyListLocation);
-sellForm.addEventListener("submit", checkLogin);				
-					
-function priceCalc(){
-	document.getElementById("purchasePrice").value 
+sellForm.addEventListener("submit", checkLogin);
+
+function priceCalc() {
+	document.getElementById("purchasePrice").value
 		= document.getElementById("qnty").value * document.getElementById("sellPrice").value;
 }
 
 
-function buyListLocation(event){
+function buyListLocation(event) {
 	console.log("buylist");
-	if (document.getElementById("userId").value == "None"){
-		const doLogin = confirm("Àå¹Ù±¸´Ï¿¡ ÇØ´ç »óÇ°À» Ãß°¡ÇÏ½Ã·Á¸é ·Î±×ÀÎ ÇÏ¼Å¾ß ÇÕ´Ï´Ù \n ·Î±×ÀÎ ÇÏ½Ã°Ú½À´Ï±î?")
-		console.log(doLogin);
-		if (doLogin == false){
+	if (document.getElementById("userId").value == "None") {
+		const doLogin = confirm("ìƒí’ˆì„ êµ¬ë§¤í•˜ì‹œë ¤ë©´ ë¡œê·¸ì¸ í•˜ì…”ì•¼ í•©ë‹ˆë‹¤ \n ë¡œê·¸ì¸ í•˜ì‹œê² ìŠµë‹ˆê¹Œ?");
+
+		if (doLogin == false) {
 			event.preventDefault();
 			return false;
 		}
 
-		else if(doLogin==true){
+		else if (doLogin == true) {
 			event.preventDefault();
 			window.open("../templogin", "_black", "width=500, height=700");
 			return false;
 		}
-		
+
 	}
-	else{
+	else {
 		link = "../payment?sellid=" + sellId.value + "&qnty=" + document.getElementById("qnty").value;
 		location.href = link;
 	}
 }
 
-function checkLogin(event){
-	console.log("checkLogin");
-	if (document.getElementById("userId").value == "None"){
-		const doLogin = confirm("Àå¹Ù±¸´Ï¿¡ ÇØ´ç »óÇ°À» Ãß°¡ÇÏ½Ã·Á¸é ·Î±×ÀÎ ÇÏ¼Å¾ß ÇÕ´Ï´Ù \n ·Î±×ÀÎ ÇÏ½Ã°Ú½À´Ï±î?")
-		console.log(doLogin);
-		if (doLogin == false){
+function checkLogin(event) {
+	if (document.getElementById("userId").value == "None") {
+		const doLogin = confirm("ì¥ë°”êµ¬ë‹ˆì— í•´ë‹¹ ìƒí’ˆì„ ì¶”ê°€í•˜ì‹œë ¤ë©´ ë¡œê·¸ì¸ í•˜ì…”ì•¼ í•©ë‹ˆë‹¤ \n ë¡œê·¸ì¸ í•˜ì‹œê² ìŠµë‹ˆê¹Œ?")
+
+		if (doLogin == false) {
 			event.preventDefault();
 			return false;
 		}
 
-		else if(doLogin==true){
+		else if (doLogin == true) {
 			event.preventDefault();
 			window.open("../templogin", "_black", "width=500, height=700");
 			return false;
 		}
-		
+
 	}
 }

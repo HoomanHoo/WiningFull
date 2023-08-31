@@ -48,6 +48,7 @@ function paging() {
 
 		let prev = document.getElementById("prev");
 		let next = document.getElementById("next");
+
 		if (prevPage < 1) {
 			prev.className = "page-item disabled";
 		}

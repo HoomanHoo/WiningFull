@@ -18,10 +18,10 @@
 # 가상머신 호스트 PC의 Mysql을 사용할 시 해당 서버와의 연결 상태를 확인한다
 
 echo "Verify that there are existing superuser"
-result=$(mysql -h 192.168.0.3 -P3306 -ubit -pbit bit -e "select count(*) from auth_user") 
+# result=$(mysql -h 192.168.0.3 -P3306 -ubit -pbit bit -e "select count(*) from auth_user") 
 # 호스트 PC의 Mysql에 해당하는 테이블이 있는지, 슈퍼유저가 존재하는지 질의
 
-# result=$(mysql -h sample-db.cuy0rgqhle4s.ap-northeast-2.rds.amazonaws.com -P3306 -ubit -pbit bit -e "select count(*) from auth_user")
+result=$(mysql -h sample-db.cuy0rgqhle4s.ap-northeast-2.rds.amazonaws.com -P3306 -ubit -pbit bit -e "select count(*) from auth_user")
 # AWS RDS에 해당하는 테이블이 있는지, 슈퍼유저가 존재하는지 질의
 
 # result=$(mysql -hmysql -P3307 -uroot -pbit bit -e "select count(*) from auth_user")

@@ -4,8 +4,6 @@ btnCheck.addEventListener("click", () => {
     const url = "/store/drop-store";
     const passwd = document.getElementById("passwd").value;
 
-    console.log(passwd);
-
     const init = {
         method: "POST",
         header: {
@@ -20,21 +18,19 @@ btnCheck.addEventListener("click", () => {
     fetch(url, init)
         .then((response) => response.json())
         .then((data) => {
-            let responseData = data
+            let responseData = data;
 
             if (responseData["code"] == -1) {
-                alert(responseData["result"])
-                console.log("비밀번호가 달라")
-                return false
+                alert(responseData["result"]);
+                return false;
             }
             else if (responseData["code"] == 1) {
                 alert(responseData["result"])
-                console.log("비밀번호가 맞아")
-                //유저 마이페이지로 리다이렉트
+                location.href = "../../search/main";
             }
-        })
+        });
 
-})
+});
 function getCookie(name) {
     let matches = document.cookie.match(new RegExp(
         "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"

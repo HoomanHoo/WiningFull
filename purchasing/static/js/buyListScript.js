@@ -20,7 +20,6 @@ function deleteElement() {
 		document.getElementById("allPrice").value = allPrice - parseInt(row.querySelector("input[name=purchasePrice]").value);
 
 		if (document.getElementById("cartId")) {
-			console.log("cartId")
 			const cartId = document.getElementById("cartId").value
 			const url = "/purchasing/cart/" + cartId;
 			const myInit = {
@@ -33,6 +32,7 @@ function deleteElement() {
 					cartDetailId: cartDetailId,
 				}),
 			};
+
 			fetch(url, myInit).then((response) => response.json()).then((data) => alert(data["result"]))
 		}
 		row.remove();
@@ -75,6 +75,7 @@ buyList.addEventListener("submit", function (event) {
 	}
 	else {
 		if (sellIds == 0) {
+			console.log(sellIds)
 			alert("선택된 상품이 없습니다");
 			event.preventDefault();
 			return false;
