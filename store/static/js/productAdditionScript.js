@@ -124,7 +124,7 @@ function searchByName() {
 	xhttp.onreadystatechange = () => {
 		if (xhttp.readyState === XMLHttpRequest.DONE) {
 			if (xhttp.status === 200) {
-				const result = xhttp.response;
+				const data = xhttp.response;
 				const resultData = JSON.parse(data);
 
 				let pages = resultData["pages"];
