@@ -1,4 +1,3 @@
-
 const wineNames = document.querySelectorAll(".wineName");
 const productAdd = document.getElementById("productAdd");
 const srhByName = document.getElementById("srhByName");
@@ -11,13 +10,33 @@ for (var i = 0; i < pages.length; i++) {
 }
 
 function paging() {
-	let modify = document.getElementById("modify");
-	let url = "../../product/pages/" + this.id;
-
-	if (document.getElementById("srhByName").value) {
-		const srhKeyWord = document.getElementById("srhByName").value;
-		url = "../../product/pages/" + this.id + "?srhkeyword=" + srhKeyWord;
+	let modify = document.getElementById("modify").value;
+	console.log(modify)
+	let url = "../product/pages/" + this.id;
+	const srhKeyWord = document.getElementById("srhByName").value;
+	if (srhKeyWord !== "") {
+		console.log(srhKeyWord);
+		if (document.getElementById("srhByName").value && modify !== "0") {
+			console.log(11);
+			url = "../../product/pages/" + this.id + "?srhkeyword=" + srhKeyWord;
+		}
+		else if (document.getElementById("srhByName").value && modify === "0") {
+			console.log(22);
+			url = "../product/pages/" + this.id + "?srhkeyword=" + srhKeyWord;
+		}
 	}
+	else {
+		console.log(srhKeyWord);
+		if (modify !== "0") {
+			console.log(33);
+			url = "../../product/pages/" + this.id;
+		}
+		else if (modify === "0") {
+			console.log(44);
+			url = "../product/pages/" + this.id;
+		}
+	}
+
 
 	fetch(url).then((response) => response.json()).then((data) => {
 		const resultData = JSON.parse(data);
@@ -118,7 +137,16 @@ function deleteDefaultRow() {
 
 function searchByName() {
 	const srhKeyWord = this.value;
-	const url = "../../product/pages/1?srhkeyword=" + srhKeyWord;
+	let modify = document.getElementById("modify").value;
+	console.log(modify)
+	if (modify !== "0") {
+		console.log(1);
+		url = "../../product/pages/1?srhkeyword=" + srhKeyWord;
+	}
+	else if (modify === "0") {
+		console.log(2);
+		url = "../product/pages/1?srhkeyword=" + srhKeyWord;
+	}
 	const xhttp = new XMLHttpRequest();
 
 	xhttp.onreadystatechange = () => {
@@ -203,8 +231,8 @@ function searchByName() {
 					newPages.appendChild(newPageNum);
 					next.before(newPages);
 					newPageNum.addEventListener("click", paging);
-				}
 
+				}
 			}
 			else if (xhttp.status === 500) {
 				console.log("서버에 문제가 발생했습니다. 잠시 뒤 다시 시도해주세요");
