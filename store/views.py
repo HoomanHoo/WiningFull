@@ -198,10 +198,10 @@ class ProductAdditionView(View):
         return HttpResponse(template.render(context, request))
 
     def post(self, request):
-        user_id = request.session.get("temp_id")
+        user_id = request.session.get("temp_id", None)
 
         if user_id is None:
-            user_id = request.session.get("memid")
+            user_id = request.session.get("memid", None)
 
         store_id = request.POST.get("storeId", None)
         sell_ids = request.POST.getlist("sellId", None)

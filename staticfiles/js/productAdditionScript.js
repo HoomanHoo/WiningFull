@@ -118,7 +118,7 @@ function deleteDefaultRow() {
 
 function searchByName() {
 	const srhKeyWord = this.value;
-	const url = "../product/pages/1?srhkeyword=" + srhKeyWord;
+	const url = "../../product/pages/1?srhkeyword=" + srhKeyWord;
 	const xhttp = new XMLHttpRequest();
 
 	xhttp.onreadystatechange = () => {
