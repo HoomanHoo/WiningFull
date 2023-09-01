@@ -125,10 +125,12 @@ function searchByName() {
 		if (xhttp.readyState === XMLHttpRequest.DONE) {
 			if (xhttp.status === 200) {
 				const result = xhttp.response;
-				let resultData = JSON.parse(result);
+				const resultData = JSON.parse(data);
 
 				let pages = resultData["pages"];
-				let wines = resultData["wines"];
+				let wines = resultData["datas"];
+				let nextPage = resultData["next_page"];
+				let prevPage = resultData["prev"];
 
 				wineList.replaceChildren();
 
@@ -163,7 +165,6 @@ function searchByName() {
 					newWineInfo.appendChild(newWineCapacity);
 					newWineInfo.appendChild(newWineAlc);
 
-
 					const wineNames = document.querySelectorAll(".wineName");
 					for (let i = 0; i < wineNames.length; i++) {
 						wineNames[i].addEventListener("click", addElement);
@@ -171,15 +172,14 @@ function searchByName() {
 				}
 				let prev = document.getElementById("prev");
 				let next = document.getElementById("next");
-
-				if (pages[0] < 6) {
+				if (prevPage < 1) {
 					prev.className = "page-item disabled";
 				}
 				else {
 					prev.className = "page-item";
 					document.querySelector(".prev").setAttribute("id", pages[0] - 1);
 				}
-				if (pages.length < 5) {
+				if (pages.length < 5 || nextPage == 0) {
 					next.className = "page-item disabled";
 				}
 				else {
@@ -187,7 +187,6 @@ function searchByName() {
 					document.querySelector(".next").setAttribute("id", pages[4] + 1);
 				}
 				let pageNumList = document.querySelectorAll(".page-num-list");
-
 				for (var i = 0; i < pageNumList.length; i++) {
 					pageNumList[i].remove();
 				}
@@ -204,7 +203,6 @@ function searchByName() {
 					newPages.appendChild(newPageNum);
 					next.before(newPages);
 					newPageNum.addEventListener("click", paging);
-
 				}
 
 			}

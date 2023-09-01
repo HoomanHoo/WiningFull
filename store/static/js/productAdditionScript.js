@@ -125,7 +125,7 @@ function searchByName() {
 		if (xhttp.readyState === XMLHttpRequest.DONE) {
 			if (xhttp.status === 200) {
 				const result = xhttp.response;
-				let resultData = JSON.parse(result);
+				const resultData = JSON.parse(data);
 
 				let pages = resultData["pages"];
 				let wines = resultData["datas"];
@@ -203,8 +203,8 @@ function searchByName() {
 					newPages.appendChild(newPageNum);
 					next.before(newPages);
 					newPageNum.addEventListener("click", paging);
-				}
 
+				}
 			}
 			else if (xhttp.status === 500) {
 				console.log("서버에 문제가 발생했습니다. 잠시 뒤 다시 시도해주세요");
