@@ -308,7 +308,7 @@ class DiscontinueProductView(View):
 
 
 class StoreMyPageView(View):  # 점주 페이지
-    def get(self, request, **kwargs):
+    def get(self, request):
         user_id = request.session.get("memid")
 
         info = get_store_info(user_id=user_id)
@@ -323,43 +323,18 @@ class StoreMyPageView(View):  # 점주 페이지
         else:
             image_url = ""
 
-        page_num = kwargs.get("pageNum", 1)
         template = loader.get_template("store/storeMyPage.html")
-        show_length = 30
-        end = int(show_length) * int(page_num)
-        start = end - 30
-        detail_sell_list = get_detail_sell_list(user_id=user_id)
-        list_info = db_preprocessing(
-            db_data=detail_sell_list, end_page=end, start_page=start
-        )
-        paging_result = pagenation(
-            show_length=show_length,
-            page_num=page_num,
-            end_page=end,
-            start_page=start,
-            datas=list_info,
-        )
-
-        pages_count = paging_result["pages_count"]
-        db_data = paging_result["db_data"]
-        state = paging_result["pages_count"]
-        prev = paging_result.get("prev", 0)
-        next_page = paging_result.get("next_page", 0)
 
         context = {
             "user_id": user_id,
             "info": info,
             "main_address": main_address,
             "detail_address": detail_address,
-            "list": db_data,
-            "pages_count": pages_count,
             "image_url": image_url,
             "dto": user_info,
-            "prev": prev,
-            "next_page": next_page,
         }
 
-        logger.info(f"{user_id}: page_num: {page_num} StoreMyPageView")
+        logger.info(f"{user_id} StoreMyPageView")
         return HttpResponse(template.render(context, request))
 
 

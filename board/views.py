@@ -41,13 +41,13 @@ class ListView(View):
                 dtos = (
                     WinBoard.objects.annotate(comment_count=Count("wincomment"))
                     .filter(board_title__icontains=search_query)
-                    .order_by("-board_reg_time")[start:end]
+                    .order_by("-board_id")[start:end]
                 )
                 count = dtos.count()
             else:
                 dtos = WinBoard.objects.annotate(
                     comment_count=Count("wincomment")
-                ).order_by("-board_reg_time")[start:end]
+                ).order_by("-board_id")[start:end]
 
             number = count - (pagenum - 1) * int(PAGE_SIZE)
             number = number - count - 1
