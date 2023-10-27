@@ -15,7 +15,7 @@ class WinSearch(models.Model):
     search_time = models.DateTimeField()
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_search"
 
 
@@ -25,13 +25,13 @@ class WinSearchN(models.Model):
     search_n_time = models.DateTimeField()
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_search_n"
 
 
 class WinRecommend(models.Model):
     recommend_id = models.AutoField(primary_key=True)
-    user_id = models.CharField(max_length=30)  
+    user_id = models.CharField(max_length=30)
     recommend_rank_1 = models.IntegerField()
     recommend_rank_2 = models.IntegerField()
     recommend_rank_3 = models.IntegerField()
@@ -45,6 +45,5 @@ class WinRecommend(models.Model):
     update_time = models.DateTimeField()
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_recommend"
-

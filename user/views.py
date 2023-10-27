@@ -19,9 +19,9 @@ from user.models import (
     WinUserAccount,
     WinUserGrade,
     WinUserFavorite,
-    WinReview,
     WinPointHis,
 )
+from store.models import WinReview
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.dateformat import DateFormat
 from datetime import datetime

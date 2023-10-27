@@ -1,5 +1,12 @@
 from django.contrib import admin
-from store.models import WinStore, WinStoreExcel, WinStoreUrl, WinRevenue, WinSell
+from store.models import (
+    WinReview,
+    WinStore,
+    WinStoreExcel,
+    WinStoreUrl,
+    WinRevenue,
+    WinSell,
+)
 
 
 # Register your models here.
@@ -39,6 +46,18 @@ class WinSellAdmin(admin.ModelAdmin):
     )
 
 
+class WinReviewAdmin(admin.ModelAdmin):
+    list_display = (
+        "review_id",
+        "user_id",
+        "sell_id",
+        "review_content",
+        "review_score",
+        "review_reg_time",
+    )
+
+
+admin.site.register(WinReview, WinReviewAdmin)
 admin.site.register(WinStore, WinStoreAdmin)
 admin.site.register(WinStoreExcel, WinStoreExcelAdmin)
 admin.site.register(WinStoreUrl, WinStoreUrlAdmin)

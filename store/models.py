@@ -11,7 +11,7 @@ class WinStore(models.Model):
     store_state = models.IntegerField(default=0)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_store"
 
 
@@ -21,7 +21,7 @@ class WinStoreExcel(models.Model):
     store_excel = models.CharField(max_length=300)  #
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_store_excel"
 
 
@@ -31,7 +31,7 @@ class WinStoreUrl(models.Model):
     store_map_url = models.CharField(max_length=300)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_store_url"
 
 
@@ -42,7 +42,7 @@ class WinRevenue(models.Model):
     revenue_date = models.DateTimeField()
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_revenue"
 
 
@@ -56,5 +56,18 @@ class WinSell(models.Model):
     sell_state = models.IntegerField()
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_sell"
+
+
+class WinReview(models.Model):
+    review_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey("user.WinUser", models.CASCADE)  #
+    sell = models.ForeignKey("WinSell", models.CASCADE, default="")  #
+    review_content = models.CharField(max_length=500)
+    review_score = models.DecimalField(max_digits=2, decimal_places=1)
+    review_reg_time = models.DateTimeField()
+
+    class Meta:
+        # managed = False
+        db_table = "win_review"

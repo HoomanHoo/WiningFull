@@ -13,7 +13,7 @@ class WinBoard(models.Model):
     board_ip = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_board"
 
 
@@ -23,7 +23,7 @@ class WinBoardImg(models.Model):
     board_image = models.ImageField(max_length=150)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_board_img"
 
 
@@ -36,7 +36,7 @@ class WinComment(models.Model):
     content_ip = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_comment"
 
 
@@ -47,5 +47,5 @@ class WinBoardLike(models.Model):
     board_like_time = models.DateTimeField()
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "win_board_like"

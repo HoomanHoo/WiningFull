@@ -5,7 +5,6 @@ from user.models import (
     WinUserFavorite,
     WinUserGrade,
     WinPointHis,
-    WinReview,
 )
 
 
@@ -70,17 +69,3 @@ class WinPointHisAdmin(admin.ModelAdmin):
 
 
 admin.site.register(WinPointHis, WinPointHisAdmin)
-
-
-class WinReviewAdmin(admin.ModelAdmin):
-    list_display = (
-        "review_id",
-        "user_id",
-        "sell_id",
-        "review_content",
-        "review_score",
-        "review_reg_time",
-    )
-
-
-admin.site.register(WinReview, WinReviewAdmin)

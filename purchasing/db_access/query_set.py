@@ -13,8 +13,8 @@ from django.db.models.functions import (
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 
-from store.models import WinSell, WinRevenue
-from user.models import WinReview, WinUser
+from store.models import WinSell, WinReview, WinRevenue
+from user.models import WinUser
 from purchasing.models import (
     WinPurchase,
     WinPurchaseDetail,
