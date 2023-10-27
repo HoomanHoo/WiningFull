@@ -1,7 +1,74 @@
 # 프로젝트 개요
 
 AWS EC2, RDS와 머신러닝 기반 추천 기능을 활용한 와인 검색, 판매 및 구매 서비스 Wining입니다.
+
 국내 와인 소비량은 해마다 증가중에 있으나 와인을 잘 선택해서 즐기기에는 입문 장벽이 너무 높다는 점을 어려움으로 꼽을 수 있습니다. 이에 사용자의 취향을 기반으로 와인을 선택할 수 있게 해주는 서비스를 구상하게 되었습니다.
+
+# 실행환경 및 실행 방법
+
+- AWS ~~<http://sample-elb-1600299374.ap-northeast-2.elb.amazonaws.com/search/main>~~ 현재 접속 불가
+- Window (Window 10 권장)
+- 
+  python 3.8, MySQL 8.0.33 필요
+  
+  <https://github.com/HTH016/Wining/releases/tag/publish> 에서 소스코드 다운
+
+  임의의 경로에 압축 해제
+
+  명령프롬포트 실행 후 압축 해제한 경로로 이동
+
+  mysql 접속
+
+  ```
+  create database bit;
+  ```
+  mysql 로그아웃
+  ```
+  mysql -u계정이름 -p bit < 소스코드 루트 경로\bit_save.sql
+  ```
+
+  ```
+  pip install -r requirements.txt
+  ```
+
+  ```
+  python dev_manage.py runserver
+  ```
+
+  
+- Linux(가상머신)
+
+  - Ubuntu 20.04 LTS 권장, Git, Docker Compose 2.20.2 설치 필요
+```
+mkdir wining
+```
+
+```
+cd wining
+```
+
+```
+git clone https://github.com/HTH016/Wining.git
+```
+
+```
+cd Wining
+```
+
+```
+git checkout product
+```
+
+```
+sudo docker compose up --build
+```
+
+- 서비스 접속
+
+  - 기본 페이지 접속 <http://가상머신의ip/search/main> / <http://127.0.0.1:8000/search/main>
+  - 일반 유저의 경우 기본 페이지 접속 후 Login - Regist with Kakao 클릭 - 회원가입 진행 후 myPage
+  - 점주 유저의 경우 기본 페이지 접속 후 Login - Regist with Kakao 클릭 - store 클릭 - 회원가입 진행 후 myPage - 점주페이지
+  - 관리자 접속 <http://가상머신의ip/admin> / <http://127.0.0.1:8000/admin> ID: admin / PW: admin1234
 
 # 역할 분담
 - HTH016
