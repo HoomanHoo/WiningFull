@@ -163,11 +163,11 @@ DATABASES = {
         "NAME": "bit",
         "USER": "bit",
         "PASSWORD": "bit",
-        # "HOST": "mysql",    # mysql docker container 이름
-        # "PORT": "3307", # docker-compose.yml에 정의된 port 번호
+        "HOST": "mysql",    # mysql docker container 이름
+        "PORT": "3307", # docker-compose.yml에 정의된 port 번호
         # "HOST": "192.168.0.3",  # 가상머신 사용 시, 가상머신의 호스트 PC IP - 호스트 PC의 mysql을 사용하기 위함
-        "HOST": "sample-db.cuy0rgqhle4s.ap-northeast-2.rds.amazonaws.com",  # AWS RDS Endpoint
-        "PORT": "3306",  # 가상머신의 호스트 PC와 AWS RDS의 Mysql 포트 번호
+        # "HOST": "sample-db.cuy0rgqhle4s.ap-northeast-2.rds.amazonaws.com",  # AWS RDS Endpoint
+        #"PORT": "3306",  # 가상머신의 호스트 PC와 AWS RDS의 Mysql 포트 번호
         "OPTIONS": {
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
             "charset": "utf8",
