@@ -11,7 +11,7 @@ AWS EC2, RDS와 머신러닝 기반 추천 기능을 활용한 와인 검색, �
 - 
   python 3.8, MySQL 8.0.33 필요
   
-  <https://github.com/HTH016/Wining/releases/tag/publish> 에서 소스코드 다운
+  <https://github.com/HTH016/Wining/releases/tag/published> 에서 소스코드 다운
 
   임의의 경로에 압축 해제
 
