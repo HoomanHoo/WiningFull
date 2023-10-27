@@ -1,0 +1,5 @@
+3928e19c741cff6d9be9122659cfc5ce
+http://localhost:8000/user/inputUser
+http://localhost:8000/user/inputUserInfo
+http://localhost:8000/user/inputStore
+http://localhost:8000/user/locallogout

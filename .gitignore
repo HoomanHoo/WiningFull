@@ -5,12 +5,12 @@
 /errorhandling/migrations
 /detail/migrations
 /board/migrations
-/log
+#/log
 __pycache__
 *.pyc
 *.project
 *.pydevproject
 *.prefs
-/private_files
+#/private_files
 /media/profile
 /.vscode
