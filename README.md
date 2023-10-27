@@ -28,7 +28,7 @@ AWS EC2, RDS와 머신러닝 기반 추천 기능을 활용한 와인 검색, �
   ```
 
   ```
-  pip install -r requirements.txt
+  pip install -r window_requirements.txt
   ```
 
   ```
