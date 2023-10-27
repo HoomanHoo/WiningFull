@@ -1,32 +1,36 @@
 version: '3.7'
 services:
-  # db:   # AWS RDS 사용 시 Mysql Image는 필요 없음
-  #   image: mysql:8.0.33
-  #   container_name: mysql
-  #   ports:
-  #    - '3307:3307'
-  #   #init: true
-  #   environment:
-  #    MYSQL_HOST: 127.0.0.1
-  #    MYSQL_DATABASE: bit
-  #    MYSQL_USER: bit
-  #    MYSQL_PASSWORD: bit
-  #    MYSQL_ROOT_PASSWORD: bit
-  #    MYSQL_TCP_PORT: 3307
-  #    MYSQL_PORT: 3307
-  #    TZ: Asia/Seoul
-  #   command: 
-  #    - --character-set-server=utf8mb4
-  #    - --collation-server=utf8mb4_unicode_ci
+  db:   # AWS RDS 사용 시 Mysql Image는 필요 없음
+    image: mysql:8.0.33
+    container_name: mysql
+    #ports:
+      #- '3307:3307'
+    expose:
+      - "3307"
+    #init: true
+    environment:
+      MYSQL_HOST: 127.0.0.1
+      MYSQL_DATABASE: bit
+      MYSQL_USER: bit
+      MYSQL_PASSWORD: bit
+      MYSQL_ROOT_PASSWORD: bit
+      MYSQL_TCP_PORT: 3307
+      MYSQL_PORT: 3307
+      TZ: Asia/Seoul
+    command: 
+     - --character-set-server=utf8mb4
+     - --collation-server=utf8mb4_unicode_ci
+  # services.db.environment.command must be a string, number, boolean or null -> command is under the enviroment. command is always same depth with enviroment
+   
   #   #healthcheck: 
   #     #test: ["CMD-SHELL", "mysql -uroot -pbit bit < /bit_save.sql"]
   #     #interval: 1s
   #     #timeout: 4m
   #     #retries: 0 # healthcheck 옵션이 DB의 read/write 오류를 발생시킨다 이유는 찾아보아야함
-  #   volumes:
-  #   #  - ./save.sql:/docker-entrypoint-initdb.d/initdb.sql  # docker mysql image 빌드 시 넣을 초기 데이터
-  #    - /etc/timezone:/etc/timezone
-  #    - mysql-database:/var/lib/mysql:rw
+    volumes:
+     - ./bit_save.sql:/docker-entrypoint-initdb.d/initdb.sql  # docker mysql image 빌드 시 넣을 초기 데이터
+     - /etc/timezone:/etc/timezone
+     - mysql-database:/var/lib/mysql:rw
   #    # mysql-database:/var/lib/mysql The designated data directory /var/lib/mysql/ is unusable. You can remove all files that the server added to it. 
   #    #- 디렉토리 충돌이 나서 발생하는 오류. host pc의 volume을 지우거나(docker volume prune [-a]) 디렉토리를 변경해주면 된다.
   #    #- type: volume
@@ -40,15 +44,17 @@ services:
     volumes:
       - ./staticfiles:/project/staticfiles
       - ./media:/project/media
-    ports:
-      - "8001:8001"
-    #  - "3306:3306"
+    expose:
+      - "8001"
+    #ports:
+      #- "8001:8001"
+      #- "3307:3307"
     entrypoint: /bin/bash /entrypoint.sh
     # network_mode: "host"
     # extra_hosts:
     #   - "host.docker.internal:host-gateway" #가상머신의 local mysql server를 사용하려 했으나 동작하지 않음
-    # depends_on:
-    #  - db
+    depends_on:
+      - db
   nginx:
     image: nginx:latest
     container_name: nginx
@@ -61,5 +67,5 @@ services:
     depends_on:
       - web
 
-# volumes: 
-#   mysql-database:  
+volumes: 
+  mysql-database:  

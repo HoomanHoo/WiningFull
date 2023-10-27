@@ -8,7 +8,7 @@ ADD . /project/
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
 
-## COPY save.sql /save.sql chmod +x /save.sql 
+## COPY bit_save.sql /bit_save.sql chmod +x /bit_save.sql 
 
 COPY entrypoint.sh /entrypoint.sh
 RUN  chmod +x /entrypoint.sh
