@@ -17,7 +17,7 @@ AWS EC2, RDS와 머신러닝 기반 추천 기능을 활용한 와인 검색, �
   - Django 4.2.2
   - Django Rest Framework 3.14.0
   - MySQL 8.0.33
-- DevOps
+- 기타
   - Git v2.40
   - gunicorn 20.1.0
   - Nginx
