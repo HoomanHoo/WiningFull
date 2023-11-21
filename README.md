@@ -9,7 +9,7 @@ AWS EC2, RDS와 머신러닝 기반 추천 기능을 활용한 와인 검색, �
 
 # 사용 기술
 - Front-end
-  - Vue.js 3
+  - Vue.js 3.3.4
   - JQuery 3.6.4
   - Bootstrap 5.3.0 / 5.0.0
 - Back-end
@@ -18,10 +18,11 @@ AWS EC2, RDS와 머신러닝 기반 추천 기능을 활용한 와인 검색, �
   - Django Rest Framework 3.14.0
   - MySQL 8.0.33
 - 기타
-  - Git v2.40
+  - Git
   - gunicorn 20.1.0
-  - Nginx
-  - Docker Compose 2.21
+  - Nginx 1.24
+  - Docker 24.0.5
+  - Docker Compose 2.20
   - AWS(Amazon Web Service) EC2, RDS
 - BigData
   - Pandas 2.0.2
@@ -30,61 +31,61 @@ AWS EC2, RDS와 머신러닝 기반 추천 기능을 활용한 와인 검색, �
 # 실행환경 및 실행 방법
 
 - AWS ~~<http://sample-elb-1600299374.ap-northeast-2.elb.amazonaws.com/search/main>~~ 현재 접속 불가
-- Window (Window 10 권장)
-- 
-  python 3.8, MySQL 8.0.33 필요
+- python 3.8, MySQL 8.0.33 필요
+  - Window (Window 10 권장)
   
-  <https://github.com/HTH016/Wining/releases/tag/published> 에서 소스코드 다운
-
-  임의의 경로에 압축 해제
-
-  명령프롬포트 실행 후 압축 해제한 경로로 이동
-
-  mysql 접속
-
-  ```
-  create database bit;
-  ```
-  mysql 로그아웃
-  ```
-  mysql -u계정이름 -p bit < 소스코드 루트 경로\bit_save.sql
-  ```
-
-  ```
-  pip install -r window_requirements.txt
-  ```
-
-  ```
-  python dev_manage.py runserver
-  ```
-
+    
+    <https://github.com/HTH016/Wining/releases/tag/published> 에서 소스코드 다운
   
-- Linux(가상머신)
-
-  - Ubuntu 20.04 LTS 권장, Git, Docker Compose 2.20.2 설치 필요
-```
-mkdir wining
-```
-
-```
-cd wining
-```
-
-```
-git clone https://github.com/HTH016/Wining.git
-```
-
-```
-cd Wining
-```
-
-```
-git checkout product
-```
-
-```
-sudo docker compose up --build
-```
+    임의의 경로에 압축 해제
+  
+    명령프롬포트 실행 후 압축 해제한 경로로 이동
+  
+    mysql 접속
+  
+    ```
+    create database bit;
+    ```
+    mysql 로그아웃
+    ```
+    mysql -u계정이름 -p bit < 소스코드 루트 경로\bit_save.sql
+    ```
+  
+    ```
+    pip install -r window_requirements.txt
+    ```
+  
+    ```
+    python dev_manage.py runserver
+    ```
+  
+    
+  - Linux(가상머신)
+  
+    - Ubuntu 20.04 LTS 권장, Git, Docker 24.0.5, Docker Compose 2.20.2 설치 필요
+    ```
+    mkdir wining
+    ```
+    
+    ```
+    cd wining
+    ```
+    
+    ```
+    git clone https://github.com/HTH016/Wining.git
+    ```
+    
+    ```
+    cd Wining
+    ```
+    
+    ```
+    git checkout product
+    ```
+    
+    ```
+    sudo docker compose up --build
+    ```
 
 - 서비스 접속
 
@@ -102,7 +103,7 @@ sudo docker compose up --build
   - 와인 추천 모듈(recommendModules) 설계 및 구현
 
 - HoomanHoo
-  - 담당 업무 -  Front-End, Back-End, DevOps
+  - 담당 업무 -  Front-End, Back-End, 배포
   - Front-End
     - Intersection Observer API와 Vue.js를 이용한 무한 스크롤 기능으로 매장 리스트 살펴보기 기능 구현
     - Fetch API와 Vue.js를 활용하여 상품 댓글 정렬, 포인트 충전 및 결제 수단 등록, 연관 검색어 표시 기능 구현
@@ -122,7 +123,7 @@ sudo docker compose up --build
     - 포인트 결제 및 상품 구매 기능 구현
     
 
-  - DevOps
+  - 기타 사항
     - 개발 환경과 실행 환경 설정 분리(manage.py와 settings.py, wsgi.py를 개발용(Windows용)과 실행용(Linux용) 으로 나눔)
     - Git (Tortoise Git, Github Desktop, Git CLI)을 통한 코드 버전 관리
     - Nginx 연동으로 static file serving에 대한 WAS의 부담 경감
