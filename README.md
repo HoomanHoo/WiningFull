@@ -7,6 +7,23 @@ AWS EC2, RDS와 머신러닝 기반 추천 기능을 활용한 와인 검색, �
 # 프로젝트 진행 기간
 - 2023.06.05~2023.09.04(풀 스택 4명)
 
+
+# 프로젝트 실행 화면
+- 일반 회원 정보 페이지
+![mypage](https://github.com/HTH016/Wining/assets/129934364/07ab4afa-8857-438d-ab71-68eede0e7bd5)
+
+- 자유 게시판
+![board](https://github.com/HTH016/Wining/assets/129934364/25b61e0a-28a5-4840-890d-c5bbb2ceb2c9)
+![boaard2](https://github.com/HTH016/Wining/assets/129934364/030ec7bf-a525-4c34-8613-a232c8d367fa)
+
+- 점포 정보 페이지
+![storeinfo](https://github.com/HTH016/Wining/assets/129934364/4aa33173-3f6b-4c12-ac5a-400ddf28f2ec)
+
+- 결제 페이지
+![paying](https://github.com/HTH016/Wining/assets/129934364/d3fce7fe-a49f-49c7-912a-18882e574a1e)
+
+
+
 # 사용 기술
 - Front-end
   - Vue.js 3.3.4
@@ -137,21 +154,6 @@ AWS EC2, RDS와 머신러닝 기반 추천 기능을 활용한 와인 검색, �
 - Minseo-0619
   - 게시판(board) front-end 및 back-end 구현
   -  웹UI/UX 설계 및 적용
-
-# 프로젝트 실행 화면
-- 일반 회원 정보 페이지
-![mypage](https://github.com/HTH016/Wining/assets/129934364/07ab4afa-8857-438d-ab71-68eede0e7bd5)
-
-- 자유 게시판
-![board](https://github.com/HTH016/Wining/assets/129934364/25b61e0a-28a5-4840-890d-c5bbb2ceb2c9)
-![boaard2](https://github.com/HTH016/Wining/assets/129934364/030ec7bf-a525-4c34-8613-a232c8d367fa)
-
-- 점포 정보 페이지
-![storeinfo](https://github.com/HTH016/Wining/assets/129934364/4aa33173-3f6b-4c12-ac5a-400ddf28f2ec)
-
-- 결제 페이지
-![paying](https://github.com/HTH016/Wining/assets/129934364/d3fce7fe-a49f-49c7-912a-18882e574a1e)
-
 
 
 
